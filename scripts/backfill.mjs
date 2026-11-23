@@ -9,10 +9,10 @@ function flag(name,fallback){const i=args.indexOf('--'+name);return i===-1?fallb
 function positiveInt(name,fallback,cap=366){const n=Number(flag(name,String(fallback)));if(!Number.isSafeInteger(n)||n<1||n>cap)throw Error('--'+name+' must be 1..'+cap);return n}
 function usage(){console.log(`Bets private archive collector (read-only public data endpoints)
   npm run backfill -- --game cs2 --from 2026-11-01 --to 2026-11-07 --max-requests 7
-  npm run backfill -- --game dota --pages 5 [--continue] [--since 2026-06-01]\n  npm run backfill -- --game cs2 --older --max-requests 14
+  npm run backfill -- --game dota --pages 5 [--continue] [--since 2026-06-01]\n  npm run backfill -- --game cs2 --older --max-requests 30
   --file <path>        Archive target (default .data/matches.json; git-ignored)
   --delay <ms>        Minimum source pacing, 1100–10000 (default 1200)
-  --continue          Dota only: continue from prior archived cursor\n  --older             CS2 only: fetch previous 14 calendar days (stops at 365 days)
+  --continue          Dota only: continue from prior archived cursor\n  --older             CS2 only: fetch previous 30 calendar days (stops at 365 days)
 No paid APIs, bookmaker logins, or bets. Upstream may block or rate-limit.`)}
 async function main(){
  if(args.includes('--help')){usage();return}
@@ -36,10 +36,10 @@ async function main(){
   const yearAgo=new Date(Date.now()-365*86400000).toISOString().slice(0,10);
   const olderTo=new Date(oldestDate-86400000).toISOString().slice(0,10);
   if(older&&olderTo<yearAgo){console.log('CS2 one-year historical scan complete');return}
-  const olderFrom=new Date(Math.max(Date.parse(yearAgo+'T00:00:00Z'),oldestDate-14*86400000)).toISOString().slice(0,10);
+  const olderFrom=new Date(Math.max(Date.parse(yearAgo+'T00:00:00Z'),oldestDate-30*86400000)).toISOString().slice(0,10);
   const from=older?olderFrom:flag('from',new Date(Date.now()-6*86400000).toISOString().slice(0,10));
   const to=older?olderTo:flag('to',today);
-  const series=[...days(from,to,{maxDays:366})],max=positiveInt('max-requests',older?14:7);
+  const series=[...days(from,to,{maxDays:366})],max=positiveInt('max-requests',older?30:7);
   if(series.length>max)throw Error('Range is '+series.length+' days; set --max-requests '+series.length+' to authorize it');
   for(const date of series){
    if(total.requests)await sleep(delay);
