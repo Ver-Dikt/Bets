@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: bets-esports
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node src/server.mjs
+    healthCheckPath: /api/health
+    autoDeployTrigger: commit
