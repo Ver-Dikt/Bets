@@ -44,9 +44,10 @@ async function main(){
   for(const date of series){
    if(total.requests)await sleep(delay);
    const matches=await fetchCsDay(date);total.requests++;
-   const report=await mergeAndSave(matches,older?{cs2OlderThrough:date}:{});
+   const report=await mergeAndSave(matches);
    console.log('[CS2]',date,'received',matches.length,'added',report.added,'duplicates',report.duplicates,'conflicts',report.conflicts);
   }
+  if(older){archive.scan={...(archive.scan||{}),cs2OlderThrough:from};await writeArchive(file,archive)}
  }else{
   const pages=positiveInt('pages',5),since=isoDay(flag('since',new Date(Date.now()-365*86400000).toISOString().slice(0,10)));
   const currentDota=archive.matches.filter(x=>x.discipline==='dota').map(x=>Number(x.id.slice(5))).filter(Number.isSafeInteger);
