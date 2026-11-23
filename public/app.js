@@ -10,3 +10,4 @@ $('save').onclick=()=>{if(!draft||Date.parse(draft.kickoff)<=Date.now())return;d
 $('backup').onclick=()=>{const blob=new Blob([JSON.stringify({...data,exportedAt:new Date().toISOString()},null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='bets-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000)};
 $('restore').onclick=()=>$('file').click();$('file').onchange=async e=>{try{const x=JSON.parse(await e.target.files[0].text());if(!Array.isArray(x.matches)||!Array.isArray(x.records))throw Error('Некорректный файл');if(!confirm('Заменить историю в браузере файлом?'))return;data={matches:x.matches,records:x.records};persist()}catch(e){alert(e.message)}};
 render();
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));}
