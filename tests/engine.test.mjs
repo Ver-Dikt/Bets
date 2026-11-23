@@ -1,0 +1,6 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {fit,predict,market,score} from '../src/engine.mjs';
+test('chronological split excludes future results',()=>{let m=[{discipline:'cs2',date:'2026-01-01',a:'A',b:'B',winner:'A'},{discipline:'cs2',date:'2026-03-01',a:'A',b:'B',winner:'B'}];assert.equal(fit(m,'cs2','2026-02-01').count,1)});
+test('no probability without enough history',()=>assert.equal(predict([],'dota','A','B','2026-12-01').status,'insufficient'));
+test('EV & margin',()=>{let r=market(.6,2,2);assert.ok(Math.abs(r.evA-.2)<1e-10);assert.equal(r.overround,0)});
+test('games use separate histories',()=>{let m=Array.from({length:12},(_,i)=>({discipline:'cs2',date:'2026-01-'+String(i+1).padStart(2,'0'),a:'A',b:'B',winner:'A'}));assert.equal(predict(m,'dota','A','B','2026-02-01').status,'insufficient');assert.equal(predict(m,'cs2','A','B','2026-02-01').status,'ok')});
+test('Brier score',()=>assert.ok(Math.abs(score([{probability:.8,actual:1},{probability:.6,actual:0}]).brier-.2)<1e-10));
