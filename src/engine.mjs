@@ -76,3 +76,17 @@ export function walkForward(matches,game,{warmup=100}={}){
  }
  return {game,total:ordered.length,tested:forecasts.length,skipped:Math.max(0,ordered.length-warmup-forecasts.length),...score(forecasts)};
 }
+
+export function compareModels(matches,game,{warmup=100}={}){
+ const ordered=history(matches,game,'9999-12-31T00:00:00Z');
+ const buckets={ensemble:[],elo:[],form:[],h2h:[]};
+ for(let i=warmup;i<ordered.length;i++){
+  const m=ordered[i],p=modelComparison(ordered.slice(0,i),game,m.a,m.b,m.date);
+  if(p.status!=='ok')continue;
+  const actual=m.winner===m.a?1:0;
+  buckets.ensemble.push({probability:p.pa,actual});
+  for(const k of ['elo','form','h2h'])buckets[k].push({probability:p.components[k],actual});
+ }
+ return {game,total:ordered.length,results:Object.fromEntries(Object.entries(buckets).map(([model,records])=>[model,score(records)])),
+  note:'All metrics are on the same chronologically eligible matches; no tuning on the test rows.'};
+}
