@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-11-23T23:00:39.548Z",
+  "archiveUpdatedAt": "2026-11-23T23:00:39.436Z",
+  "totalMatches": 3050,
+  "games": {
+    "cs2": {
+      "rows": 2355,
+      "earliest": "2026-10-08T01:05:00.000Z",
+      "latest": "2026-11-23T19:00:00.000Z",
+      "format": "series",
+      "model": "ensemble-v1-uncalibrated",
+      "tested": 519,
+      "coverage": 0.22038216560509555,
+      "quality": {
+        "ensemble": {
+          "count": 519,
+          "resolved": 519,
+          "wins": 278,
+          "brier": 0.24349606705277935,
+          "logloss": 0.6798891859462796,
+          "roi": null,
+          "priced": 0
+        },
+        "elo": {
+          "count": 519,
+          "resolved": 519,
+          "wins": 278,
+          "brier": 0.24296146239764174,
+          "logloss": 0.6787505815605052,
+          "roi": null,
+          "priced": 0
+        },
+        "form": {
+          "count": 519,
+          "resolved": 519,
+          "wins": 278,
+          "brier": 0.24674812339145394,
+          "logloss": 0.6866496551325608,
+          "roi": null,
+          "priced": 0
+        },
+        "h2h": {
+          "count": 519,
+          "resolved": 519,
+          "wins": 278,
+          "brier": 0.24908946218574293,
+          "logloss": 0.691333967061689,
+          "roi": null,
+          "priced": 0
+        }
+      },
+      "sampleAdequacy": "RESEARCH_SAMPLE_500_PLUS",
+      "caveat": "Forward-only historical replay. No independently logged pre-match forecasts or profitable-edge claim."
+    },
+    "dota": {
+      "rows": 695,
+      "earliest": "2026-10-15T13:53:21.000Z",
+      "latest": "2026-11-23T18:07:01.000Z",
+      "format": "map",
+      "model": "ensemble-v1-uncalibrated",
+      "tested": 211,
+      "coverage": 0.3035971223021583,
+      "quality": {
+        "ensemble": {
+          "count": 211,
+          "resolved": 211,
+          "wins": 102,
+          "brier": 0.24288740980787663,
+          "logloss": 0.678702053729977,
+          "roi": null,
+          "priced": 0
+        },
+        "elo": {
+          "count": 211,
+          "resolved": 211,
+          "wins": 102,
+          "brier": 0.24307478441745062,
+          "logloss": 0.6791129634472072,
+          "roi": null,
+          "priced": 0
+        },
+        "form": {
+          "count": 211,
+          "resolved": 211,
+          "wins": 102,
+          "brier": 0.24490109490320336,
+          "logloss": 0.6824555034764285,
+          "roi": null,
+          "priced": 0
+        },
+        "h2h": {
+          "count": 211,
+          "resolved": 211,
+          "wins": 102,
+          "brier": 0.24750445391425258,
+          "logloss": 0.6880288944931423,
+          "roi": null,
+          "priced": 0
+        }
+      },
+      "sampleAdequacy": "INSUFFICIENT_OUT_OF_SAMPLE",
+      "caveat": "Forward-only historical replay. No independently logged pre-match forecasts or profitable-edge claim."
+    }
+  },
+  "sourcePolicy": "real finished matches only; provider terms and availability still need monitoring",
+  "warnings": [
+    "Comparisons use a fixed heuristic and are not calibrated.",
+    "Pre-match odds unavailable: ROI not calculated.",
+    "Provider data are not independently audited."
+  ]
+}
