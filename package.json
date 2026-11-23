@@ -1,1 +1,17 @@
-{"name":"bets","version":"0.1.0","private":true,"type":"module","scripts":{"dev":"wrangler dev","deploy":"wrangler deploy","test":"node --test tests/*.test.mjs"},"devDependencies":{"wrangler":"^4.0.0"}}
+{
+  "name": "bets",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "node --test tests/*.test.mjs",
+    "serve": "node src/server.mjs",
+    "backfill": "node scripts/backfill.mjs",
+    "check": "npm test"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}
