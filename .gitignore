@@ -6,3 +6,7 @@ node_modules/
 .wrangler/
 .DS_Store
 *.log
+
+# Real match archive and private local working data
+.data/
+private-data/
