@@ -1,0 +1,101 @@
+name: Bets Private Match Archive
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Data collection"
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - cs2_recent
+          - cs2_older
+          - cs2_range
+          - dota_recent
+          - dota_older
+      from_date:
+        description: "CS2 range start YYYY-MM-DD (for cs2_range)"
+        required: false
+        type: string
+      to_date:
+        description: "CS2 range end YYYY-MM-DD (for cs2_range)"
+        required: false
+        type: string
+  schedule:
+    - cron: "17 6 * * *"
+  push:
+    paths:
+      - ".github/workflows/collect.yml"
+permissions:
+  contents: write
+concurrency:
+  group: bets-data-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  collect:
+    if: github.event.repository.private == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm test
+      - name: Ingest public finished match history into PRIVATE repo only
+        shell: bash
+        env:
+          MODE: ${{ inputs.mode || 'all' }}
+          FROM_DATE: ${{ inputs.from_date || '' }}
+          TO_DATE: ${{ inputs.to_date || '' }}
+        run: |
+          set -uo pipefail
+          fail=0
+          run_collector() {
+            echo "::group::Bets collect $*"
+            if node scripts/backfill.mjs --file data/private/matches.json "$@"; then
+              echo "Source fetch completed."
+            else
+              echo "::warning::Source unavailable or schema changed; no synthetic data inserted."
+              fail=1
+            fi
+            echo "::endgroup::"
+          }
+          if [[ "$MODE" == "all" || "$MODE" == "cs2_recent" ]]; then
+            FROM=$(date -u -d '2 days ago' +%F)
+            TO=$(date -u +%F)
+            run_collector --game cs2 --from "$FROM" --to "$TO" --max-requests 3
+          fi
+          if [[ "$MODE" == "all" || "$MODE" == "cs2_older" ]]; then
+            run_collector --game cs2 --older --max-requests 14
+          fi
+          if [[ "$MODE" == "cs2_range" ]]; then
+            if [[ -z "$FROM_DATE" || -z "$TO_DATE" ]]; then echo "Both dates required"; fail=1
+            else run_collector --game cs2 --from "$FROM_DATE" --to "$TO_DATE" --max-requests 31
+            fi
+          fi
+          if [[ "$MODE" == "all" || "$MODE" == "dota_recent" ]]; then
+            run_collector --game dota --pages 2
+          fi
+          if [[ "$MODE" == "all" || "$MODE" == "dota_older" ]]; then
+            run_collector --game dota --pages 3 --continue
+          fi
+          if [[ "$fail" != 0 ]]; then echo "::warning::At least one provider failed, prior successful archive updates retained."; fi
+      - name: Save private data only if something changed
+        if: always()
+        shell: bash
+        run: |
+          if [[ ! -f data/private/matches.json ]]; then
+            echo "No archive created by collectors"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/private/matches.json
+          if ! git diff --cached --quiet; then
+            git commit -m "data: update private verified finished match archive"
+            git push origin HEAD:main
+          else
+            echo "Nothing new to commit"
+          fi
