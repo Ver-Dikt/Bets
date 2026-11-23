@@ -1,4 +1,4 @@
-import {predict,market,score,walkForward} from '/engine.mjs';
+import {predict,market,score,walkForward,compareModels} from '/engine.mjs';
 const $=x=>document.getElementById(x),key='bets-paper-v1',safe=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));let data={matches:[],records:[]},draft=null;
 try{const x=JSON.parse(localStorage.getItem(key)||'null');if(Array.isArray(x?.matches)&&Array.isArray(x?.records))data=x}catch{}
 function persist(){localStorage.setItem(key,JSON.stringify(data));render()}
