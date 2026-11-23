@@ -22,3 +22,13 @@ test('archive persists and loads; no data is invented when missing',async()=>{
   assert.ok((await readFile(file,'utf8')).includes('cs-1'));
  }finally{await rm(dir,{recursive:true,force:true})}
 });
+
+test('re-fetch enriches stable team IDs but never changes identity or winner',()=>{
+ const first=mergeArchive(emptyArchive(),[m]).archive;
+ const updated=mergeArchive(first,[{...m,providerTeamIds:['77','88']}]);
+ assert.equal(updated.report.duplicates,1);
+ assert.deepEqual(updated.archive.matches[0].providerTeamIds,['77','88']);
+ const bad=mergeArchive(updated.archive,[{...m,providerTeamIds:['999','88']}]);
+ assert.equal(bad.report.conflicts,1);
+ assert.deepEqual(bad.archive.matches[0].providerTeamIds,['77','88']);
+});
