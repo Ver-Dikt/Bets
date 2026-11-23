@@ -25,6 +25,13 @@ export function mergeArchive(archive,incoming){
   const previous=byId.get(item.id);
   if(!previous){byId.set(item.id,item);added++;continue}
   if(previous.discipline!==item.discipline||previous.a!==item.a||previous.b!==item.b||previous.winner!==item.winner||previous.date!==item.date){conflicts++;continue}
+  // Enrich older records with provider IDs when a later re-fetch supplies them.
+  // Never silently change a team ID once an authoritative ID was recorded.
+  const oldIds=Array.isArray(previous.providerTeamIds)?previous.providerTeamIds:[],
+        newIds=Array.isArray(item.providerTeamIds)?item.providerTeamIds:[];
+  if([0,1].some(i=>oldIds[i]!=null&&newIds[i]!=null&&String(oldIds[i])!==String(newIds[i]))){conflicts++;continue}
+  const mergedIds=[0,1].map(i=>oldIds[i]??newIds[i]??null);
+  if(mergedIds.some((id,i)=>id!=null&&oldIds[i]==null))byId.set(item.id,{...previous,providerTeamIds:mergedIds});
   duplicates++;
  }
  const matches=[...byId.values()].sort((x,y)=>Date.parse(x.date)-Date.parse(y.date)||x.id.localeCompare(y.id));
