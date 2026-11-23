@@ -1,9 +1,10 @@
+import {canonicalizeMatches} from './identity.mjs';
 // One chronological pass over verified finished games, instead of refitting every event.
 // Calculates each prediction BEFORE applying any results with the same timestamp.
 import {history,sigmoid,score} from './engine.mjs';
 export function backtestFast(matches,game,{warmup=100}={}){
  if(!Number.isSafeInteger(warmup)||warmup<0)throw Error('Некорректный период обучения');
- const ordered=history(matches,game,'9999-12-31T00:00:00Z');
+ const ordered=history(canonicalizeMatches(matches),game,'9999-12-31T00:00:00Z');
  const teams=new Map(),pairs=new Map();
  const buckets={ensemble:[],elo:[],form:[],h2h:[]};
  const team=name=>teams.get(name)??{rating:1500,seen:0,form:[]};
