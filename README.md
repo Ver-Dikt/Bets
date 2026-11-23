@@ -5,9 +5,11 @@ Free-first esports analysis, without real wagering or paid AI APIs.
 ## Implemented
 - Responsive mobile page and browser-side paper journal.
 - Server-side OpenDota finished pro-match feed and best-effort unofficial bo3.gg CS2 finished match feed.
-- Elo probability model trained only on events **before** target match; separate game ratings.
+- Elo + recent form + head-to-head heuristic ensemble trained only on events **before** target match; separate game ratings. Compare components with a forward-only Brier/log-loss backtest. Model is currently **uncalibrated**.
 - Minimum historical coverage before any probability is shown, and honest source errors.
 - Fair odds, bookmaker overround, EV, Brier score and JSON journal export.
+
+Integration references and license cautions: [docs/OPEN_SOURCE_INTEGRATIONS.md](docs/OPEN_SOURCE_INTEGRATIONS.md).
 
 ## Not yet implemented
 - Real-time verified live feed, reliable future fixtures, year-long historical backfill, cloud-synced immutable forecast log, full bookmaker odds history, calibrated ML and independent profitable track record.
