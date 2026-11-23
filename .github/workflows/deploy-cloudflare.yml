@@ -1,8 +1,6 @@
 name: Deploy Bets to Cloudflare
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
 jobs:
   deploy:
     if: ${{ vars.BETS_CLOUDFLARE_ENABLED == 'true' }}
