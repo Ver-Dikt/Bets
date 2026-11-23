@@ -13,3 +13,35 @@ render();
 const runBacktest=()=>{const game=$('game').value;const result=walkForward(data.matches,game,{warmup:40});const root=$('backtest-output');if(!root)return;const cm=compareModels(data.matches,game,{warmup:40});root.textContent=result.tested?('Хронологически проверено '+result.tested+' матчей. Brier (меньше лучше): ансамбль '+cm.results.ensemble.brier.toFixed(3)+' · Elo '+cm.results.elo.brier.toFixed(3)+' · форма '+cm.results.form.brier.toFixed(3)+' · H2H '+cm.results.h2h.brier.toFixed(3)+'. Все оценки некалиброванные.'):'Недостаточно последовательной истории для бэктеста: '+result.total+' матчей в архиве.'};
 $('backtest')?.addEventListener('click',runBacktest);
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));}
+
+async function loadArchive(){
+ const button=$('archiveLoad');if(button)button.disabled=true;
+ const root=$('archiveStatus');if(root)root.textContent='Читаю архив локального сервера…';
+ try{
+  const game=$('source').value==='cs'?'cs2':'dota';
+  const response=await fetch('/api/archive?game='+game+'&limit=1500',{cache:'no-store'});
+  const result=await response.json();
+  if(!response.ok||!Array.isArray(result.matches))throw Error(result.error||'Архив недоступен');
+  const byId=new Map(data.matches.filter(m=>m?.id).map(m=>[m.id,m]));
+  for(const m of result.matches)if(m&&m.id&&m.a&&m.b&&m.winner&&Number.isFinite(Date.parse(m.date)))byId.set(m.id,m);
+  data.matches=[...byId.values()].sort((a,b)=>Date.parse(a.date)-Date.parse(b.date));
+  persist();
+  if(root)root.textContent='Загружено '+result.matches.length+' матчей '+game+' из '+result.total+' в серверном архиве. Обновление: '+(result.updatedAt||'ещё нет');
+ }catch(e){if(root)root.textContent='Ошибка архива: '+e.message}
+ finally{if(button)button.disabled=false}
+}
+$('archiveLoad')?.addEventListener('click',loadArchive);
+$('serverBacktest')?.addEventListener('click',async()=>{
+ const root=$('serverBacktest-output'),button=$('serverBacktest'),game=$('game').value;
+ button.disabled=true;root.textContent='Быстрый хронологический расчёт по архиву…';
+ try{
+  const response=await fetch('/api/evaluate?game='+encodeURIComponent(game)+'&warmup=100',{cache:'no-store'});
+  const result=await response.json();if(!response.ok)throw Error(result.error||'Отчёт недоступен');
+  if(!result.tested){root.textContent='В серверном архиве '+result.total+' матчей '+game+', но недостаточно истории для честной проверки.';return}
+  const entries=Object.entries(result.results);
+  root.textContent='Проверено '+result.tested+' из '+result.total+' матчей ('+(100*result.coverage).toFixed(1)+'% охват). Brier: '+entries.map(([name,value])=>name+' '+(value.brier?.toFixed(4)??'—')).join(' · ')+'. Модели некалиброванные; это не заявленная точность будущих прогнозов.';
+ }catch(e){root.textContent='Ошибка проверки: '+e.message}finally{button.disabled=false}
+});
+fetch('/api/archive/status',{cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject(new Error('not ready'))).then(j=>{
+ const root=$('archiveStatus');if(root&&j.total>0)root.textContent='На локальном сервере '+j.total+' завершённых матчей (CS2: '+j.cs2+', Dota 2: '+j.dota+').';
+}).catch(()=>{});
