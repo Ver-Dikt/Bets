@@ -8,7 +8,7 @@ export function normalizeOpenDota(payload){
   const date=new Date(m.start_time*1000);if(!Number.isFinite(date.valueOf()))continue;
   const a=String(m.radiant_name).trim(),b=String(m.dire_name).trim();
   if(!a||!b||a===b)continue;
-  result.push({id:'dota-'+m.match_id,discipline:'dota',date:date.toISOString(),a,b,winner:m.radiant_win?a:b,source:'OpenDota',kind:'map'});
+  result.push({id:'dota-'+m.match_id,discipline:'dota',date:date.toISOString(),a,b,winner:m.radiant_win?a:b,source:'OpenDota',kind:'map',providerTeamIds:[m.radiant_team_id,m.dire_team_id].map(id=>Number.isSafeInteger(id)&&id>0?String(id):null)});
  }
  return result;
 }
