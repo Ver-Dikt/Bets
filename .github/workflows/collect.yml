@@ -44,6 +44,7 @@ jobs:
           node-version: "22"
       - run: npm test
       - name: Ingest public finished match history into PRIVATE repo only
+        id: collect
         shell: bash
         env:
           MODE: ${{ inputs.mode || 'all' }}
@@ -68,7 +69,7 @@ jobs:
             run_collector --game cs2 --from "$FROM" --to "$TO" --max-requests 3
           fi
           if [[ "$MODE" == "all" || "$MODE" == "cs2_older" ]]; then
-            run_collector --game cs2 --older --max-requests 14
+            run_collector --game cs2 --older --max-requests 30
           fi
           if [[ "$MODE" == "cs2_range" ]]; then
             if [[ -z "$FROM_DATE" || -z "$TO_DATE" ]]; then echo "Both dates required"; fail=1
@@ -81,7 +82,16 @@ jobs:
           if [[ "$MODE" == "all" || "$MODE" == "dota_older" ]]; then
             run_collector --game dota --pages 3 --continue
           fi
-          if [[ "$fail" != 0 ]]; then echo "::warning::At least one provider failed, prior successful archive updates retained."; fi
+          if [[ "$fail" != 0 ]]; then echo "::warning::At least one provider failed, prior successful archive updates retained."; exit 1; fi
+      - name: Recompute honest model evidence from actual finished games
+        if: always() && steps.collect.outcome != 'skipped'
+        shell: bash
+        run: |
+          if [[ -f data/private/matches.json ]]; then
+            node scripts/report.mjs data/private/matches.json data/private/report.json
+          else
+            echo "No archive to report yet"
+          fi
       - name: Save private data only if something changed
         if: always()
         shell: bash
@@ -92,7 +102,7 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/private/matches.json
+          git add -A data/private/
           if ! git diff --cached --quiet; then
             git commit -m "data: update private verified finished match archive"
             git push origin HEAD:main
