@@ -28,7 +28,7 @@ export function mergeArchive(archive,incoming){
   duplicates++;
  }
  const matches=[...byId.values()].sort((x,y)=>Date.parse(x.date)-Date.parse(y.date)||x.id.localeCompare(y.id));
- return {archive:{schemaVersion:1,updatedAt:archive.updatedAt,matches},report:{added,duplicates,conflicts,rejected,total:matches.length}};
+ return {archive:{...archive,matches},report:{added,duplicates,conflicts,rejected,total:matches.length}};
 }
 
 export async function readArchive(file=DEFAULT_ARCHIVE){
