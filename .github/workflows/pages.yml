@@ -1,0 +1,42 @@
+name: Bets GitHub Pages
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "site/**"
+      - "public/engine.mjs"
+      - "public/identity.mjs"
+      - "public/icon.svg"
+      - "data/private/matches.json"
+      - "data/private/report.json"
+      - "scripts/build-pages.mjs"
+      - ".github/workflows/pages.yml"
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: bets-pages
+  cancel-in-progress: false
+jobs:
+  deploy:
+    # Do not attempt publication while repository is Private.
+    if: github.event.repository.private == false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm run build:pages
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
