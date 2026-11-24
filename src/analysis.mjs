@@ -1,17 +1,20 @@
 import {fit,history,modelComparison,market} from './engine.mjs';
-import {canonicalizeMatches} from './identity.mjs';
+import {canonicalizeMatches,resolveTeamName} from './identity.mjs';
 const sum=(items)=>items.reduce((a,x)=>a+x,0);
 const pct=(n,d)=>d?100*n/d:null;
 export function analyzeFixture(fixture,archive,oddsA='',oddsB=''){
  const game=fixture.game,cutoff=fixture.date;
- const matches=history(canonicalizeMatches(archive),game,cutoff);
+ const normalized=canonicalizeMatches(archive);
+ const matches=history(normalized,game,cutoff);
  const ids=fixture.providerIds??[];
  const provider=game==='cs2'?'bo3':'opendota';
  const key=(id,label)=>id!=null&&/^[1-9]\d{0,17}$/.test(String(id))?provider+':'+id:label;
- const a=key(ids[0],fixture.a),b=key(ids[1],fixture.b);
+ const a=ids[0]!=null?key(ids[0],fixture.a):resolveTeamName(matches,game,fixture.a);
+ const b=ids[1]!=null?key(ids[1],fixture.b):resolveTeamName(matches,game,fixture.b);
+ const model=fit(matches,game,cutoff);
  const team=(id)=>{const all=matches.filter(m=>m.a===id||m.b===id);
  const last=all.slice(-10),wins=last.filter(m=>m.winner===id).length;
- const rating=fit(matches,game,cutoff).elo.get(id)??1500;
+ const rating=model.elo.get(id)??1500;
  return {id,count:all.length,last:last.length,wins,losses:last.length-wins,winrate:pct(wins,last.length),
  lastPlayed:all.length?all.at(-1).date:null,rating};
  };
