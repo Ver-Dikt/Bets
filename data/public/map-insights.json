@@ -1,47 +1,47 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-24T05:25:01.698724+00:00",
+  "generatedAt": "2026-11-24T05:26:56.767335+00:00",
   "source": "verified bo3.gg map scores via MIT Aokua/csgopred map model",
-  "historicalMaps": 2503,
+  "historicalMaps": 4014,
   "insights": {
     "bo3-133422": {
       "status": "map-analysis",
-      "teamAMaps": 28,
-      "teamBMaps": 12,
+      "teamAMaps": 37,
+      "teamBMaps": 31,
       "maps": [
         {
           "map": "Ancient",
-          "probA": 0.5456073831077984,
-          "mapsA": 11,
-          "mapsB": 3
+          "probA": 0.5383435365079329,
+          "mapsA": 13,
+          "mapsB": 5
         },
         {
           "map": "Anubis",
-          "probA": 0.47818179391854354,
-          "mapsA": 3,
-          "mapsB": 2
-        },
-        {
-          "map": "Dust2",
-          "probA": 0.4847251221998292,
-          "mapsA": 4,
-          "mapsB": 2
-        },
-        {
-          "map": "Inferno",
-          "probA": 0.49554920362861304,
+          "probA": 0.45003789844564757,
           "mapsA": 5,
           "mapsB": 4
         },
         {
-          "map": "Mirage",
-          "probA": 0.4862010712965694,
+          "map": "Dust2",
+          "probA": 0.4167525403435141,
+          "mapsA": 7,
+          "mapsB": 8
+        },
+        {
+          "map": "Inferno",
+          "probA": 0.4217421495101781,
           "mapsA": 5,
+          "mapsB": 13
+        },
+        {
+          "map": "Mirage",
+          "probA": 0.4751666682133797,
+          "mapsA": 7,
           "mapsB": 0
         },
         {
           "map": "Nuke",
-          "probA": 0.49652232028005194,
+          "probA": 0.49644886857108833,
           "mapsA": 0,
           "mapsB": 1
         },
