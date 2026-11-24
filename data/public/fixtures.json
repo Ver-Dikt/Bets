@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-24T15:46:08.524Z",
+  "generatedAt": "2026-11-24T16:21:33.751Z",
   "fixtures": [
     {
       "id": "bo3-134895",
@@ -16,7 +16,7 @@
         "thechampiongg"
       ],
       "score": [
-        0,
+        1,
         1
       ],
       "providerIds": [
@@ -24,7 +24,7 @@
         "25374"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "bo3-134639",
@@ -41,14 +41,14 @@
       ],
       "score": [
         0,
-        0
+        1
       ],
       "providerIds": [
         "20952",
         "25747"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "bo3-134979",
@@ -72,7 +72,7 @@
         "5440"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "fetchedAt": "2026-11-24T16:21:27.955Z",
       "rosters": [
         null,
         {
@@ -109,122 +109,6 @@
       ]
     },
     {
-      "id": "opendota-live-9103896435",
-      "game": "dota",
-      "a": "PARIVISION",
-      "b": "GamerLegion",
-      "date": "2026-11-24T15:15:01.000Z",
-      "status": "live",
-      "tournament": null,
-      "format": null,
-      "providerIds": [
-        "9824702",
-        "9964962"
-      ],
-      "source": "OpenDota Live",
-      "fetchedAt": "2026-11-24T15:45:00.000Z",
-      "liveState": {
-        "seriesId": "1172272",
-        "second": 1410,
-        "goldLead": 3983,
-        "kills": [
-          21,
-          16
-        ],
-        "delay": 900,
-        "heroes": [
-          [
-            44,
-            49,
-            86,
-            29,
-            68
-          ],
-          [
-            16,
-            79,
-            78,
-            119,
-            145
-          ]
-        ]
-      },
-      "rosters": [
-        {
-          "observedAt": "2026-11-24T06:05:20.005Z",
-          "players": [
-            {
-              "id": 106573901,
-              "name": "No[o]ne-",
-              "played": 134,
-              "metric": 0.664179104477612
-            },
-            {
-              "id": 73401082,
-              "name": "Dukalis",
-              "played": 134,
-              "metric": 0.664179104477612
-            },
-            {
-              "id": 164199202,
-              "name": "9Class",
-              "played": 134,
-              "metric": 0.664179104477612
-            },
-            {
-              "id": 1044002267,
-              "name": "Satanic",
-              "played": 133,
-              "metric": 0.6691729323308271
-            },
-            {
-              "id": 195108598,
-              "name": "Noticed",
-              "played": 89,
-              "metric": 0.7303370786516854
-            }
-          ],
-          "source": "OpenDota team profile"
-        },
-        {
-          "observedAt": "2026-11-24T06:05:20.010Z",
-          "players": [
-            {
-              "id": 154974246,
-              "name": "RCY",
-              "played": 283,
-              "metric": 0.5053003533568905
-            },
-            {
-              "id": 160119017,
-              "name": "Fayde",
-              "played": 283,
-              "metric": 0.5053003533568905
-            },
-            {
-              "id": 90423751,
-              "name": "Bignum",
-              "played": 283,
-              "metric": 0.5053003533568905
-            },
-            {
-              "id": 191362875,
-              "name": "Speeed",
-              "played": 283,
-              "metric": 0.5053003533568905
-            },
-            {
-              "id": 177203952,
-              "name": "Yuma",
-              "played": 58,
-              "metric": 0.5689655172413793
-            }
-          ],
-          "source": "OpenDota team profile"
-        }
-      ]
-    },
-    {
       "id": "bo3-134584",
       "game": "cs2",
       "a": "Drama",
@@ -238,7 +122,7 @@
         "phantom-academy"
       ],
       "score": [
-        0,
+        1,
         0
       ],
       "providerIds": [
@@ -246,7 +130,7 @@
         "22009"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "fetchedAt": "2026-11-24T16:21:27.955Z",
       "rosters": [
         {
           "observedAt": "2026-11-24T12:59:14.756Z",
@@ -283,48 +167,6 @@
       ]
     },
     {
-      "id": "opendota-live-9103887230",
-      "game": "dota",
-      "a": "Team Yandex",
-      "b": "1win",
-      "date": "2026-11-24T15:21:31.000Z",
-      "status": "live",
-      "tournament": null,
-      "format": null,
-      "providerIds": [
-        "9823272",
-        "10182357"
-      ],
-      "source": "OpenDota Live",
-      "fetchedAt": "2026-11-24T15:45:00.000Z",
-      "liveState": {
-        "seriesId": "1172273",
-        "second": 1306,
-        "goldLead": -1135,
-        "kills": [
-          13,
-          18
-        ],
-        "delay": 900,
-        "heroes": [
-          [
-            145,
-            7,
-            16,
-            37,
-            21
-          ],
-          [
-            121,
-            53,
-            126,
-            131,
-            38
-          ]
-        ]
-      }
-    },
-    {
       "id": "bo3-132989",
       "game": "cs2",
       "a": "boyband",
@@ -339,14 +181,14 @@
       ],
       "score": [
         0,
-        0
+        1
       ],
       "providerIds": [
         "22899",
         "22898"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "bo3-134966",
@@ -354,23 +196,23 @@
       "a": "Vitality Academy",
       "b": "SINQU",
       "date": "2026-11-24T16:00:00.000Z",
-      "status": "upcoming",
+      "status": "live",
       "tournament": "ESEA Season 59: Advanced Division - Europe",
       "format": "Bo3",
       "teamSlugs": [
         "vitality-academy",
         "sinqu"
       ],
-      "score": null,
+      "score": [
+        0,
+        0
+      ],
       "providerIds": [
         "23335",
         "22190"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z",
-      "confirmation": [
-        "Esport Agenda"
-      ],
+      "fetchedAt": "2026-11-24T16:21:27.955Z",
       "rosters": [
         {
           "observedAt": "2026-11-24T12:59:15.455Z",
@@ -437,21 +279,6 @@
       ]
     },
     {
-      "id": "agenda-dota-1807994",
-      "game": "dota",
-      "a": "PuckChamp",
-      "b": "Zero Tenacity",
-      "date": "2026-11-24T16:15:00.000Z",
-      "status": "upcoming",
-      "tournament": "European Pro League",
-      "format": "Bo3",
-      "score": null,
-      "providerIds": null,
-      "source": "Esport Agenda",
-      "sourceUrl": "https://www.esportagenda.com/match/1807994",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
-    },
-    {
       "id": "agenda-cs2-1832008",
       "game": "cs2",
       "a": "99firepower 1utility",
@@ -464,7 +291,7 @@
       "providerIds": null,
       "source": "Esport Agenda",
       "sourceUrl": "https://www.esportagenda.com/match/1832008",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "agenda-dota-1816479",
@@ -482,64 +309,7 @@
       ],
       "source": "Esport Agenda",
       "sourceUrl": "https://www.esportagenda.com/match/1816479",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
-    },
-    {
-      "id": "agenda-dota-1816480",
-      "game": "dota",
-      "a": "Xtreme Gaming",
-      "b": "Team Liquid",
-      "date": "2026-11-24T17:00:00.000Z",
-      "status": "upcoming",
-      "tournament": "BLAST Slam",
-      "format": "Bo3",
-      "score": null,
-      "providerIds": [
-        "8261500",
-        "2163"
-      ],
-      "source": "Esport Agenda",
-      "sourceUrl": "https://www.esportagenda.com/match/1816480",
-      "fetchedAt": "2026-11-24T15:46:05.033Z",
-      "rosters": [
-        null,
-        {
-          "observedAt": "2026-11-24T15:46:06.958Z",
-          "players": [
-            {
-              "id": 152962063,
-              "name": "m1CKe",
-              "played": 1765,
-              "metric": 0.5762039660056657
-            },
-            {
-              "id": 77490514,
-              "name": "Boxi",
-              "played": 1736,
-              "metric": 0.5731566820276498
-            },
-            {
-              "id": 16497807,
-              "name": "tOfu",
-              "played": 364,
-              "metric": 0.5741758241758241
-            },
-            {
-              "id": 898455820,
-              "name": "Malr1ne",
-              "played": 33,
-              "metric": 0.5151515151515151
-            },
-            {
-              "id": 60943014,
-              "name": "Jabbz",
-              "played": 7,
-              "metric": null
-            }
-          ],
-          "source": "OpenDota team profile"
-        }
-      ]
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "bo3-134967",
@@ -560,7 +330,7 @@
         "21439"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "fetchedAt": "2026-11-24T16:21:27.955Z",
       "confirmation": [
         "Esport Agenda"
       ]
@@ -584,7 +354,7 @@
         "20702"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "fetchedAt": "2026-11-24T16:21:27.955Z",
       "rosters": [
         null,
         {
@@ -633,7 +403,7 @@
       "providerIds": null,
       "source": "Esport Agenda",
       "sourceUrl": "https://www.esportagenda.com/match/1832013",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "bo3-134968",
@@ -654,7 +424,7 @@
         "22418"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "fetchedAt": "2026-11-24T16:21:27.955Z",
       "rosters": [
         {
           "observedAt": "2026-11-24T15:46:07.227Z",
@@ -739,7 +509,7 @@
         "2868"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "fetchedAt": "2026-11-24T16:21:27.955Z",
       "confirmation": [
         "Esport Agenda"
       ],
@@ -827,7 +597,7 @@
         "24506"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "fetchedAt": "2026-11-24T16:21:27.955Z",
       "confirmation": [
         "Esport Agenda"
       ],
@@ -915,7 +685,7 @@
         "20697"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "fetchedAt": "2026-11-24T16:21:27.955Z",
       "confirmation": [
         "Esport Agenda"
       ],
@@ -973,7 +743,7 @@
         "24535"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "fetchedAt": "2026-11-24T16:21:27.955Z",
       "confirmation": [
         "Esport Agenda"
       ]
@@ -991,7 +761,7 @@
       "providerIds": null,
       "source": "Esport Agenda",
       "sourceUrl": "https://www.esportagenda.com/match/1832004",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "agenda-cs2-1832010",
@@ -1006,7 +776,7 @@
       "providerIds": null,
       "source": "Esport Agenda",
       "sourceUrl": "https://www.esportagenda.com/match/1832010",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "agenda-cs2-1832011",
@@ -1021,7 +791,7 @@
       "providerIds": null,
       "source": "Esport Agenda",
       "sourceUrl": "https://www.esportagenda.com/match/1832011",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "agenda-dota-1807995",
@@ -1036,7 +806,7 @@
       "providerIds": null,
       "source": "Esport Agenda",
       "sourceUrl": "https://www.esportagenda.com/match/1807995",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "bo3-134784",
@@ -1057,7 +827,7 @@
         "25839"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "fetchedAt": "2026-11-24T16:21:27.955Z",
       "confirmation": [
         "Esport Agenda"
       ]
@@ -1081,7 +851,7 @@
         "9930"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "fetchedAt": "2026-11-24T16:21:27.955Z",
       "confirmation": [
         "Esport Agenda"
       ],
@@ -1139,7 +909,7 @@
         "25342"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "fetchedAt": "2026-11-24T16:21:27.955Z",
       "confirmation": [
         "Esport Agenda"
       ]
@@ -1163,9 +933,43 @@
         "9728"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "fetchedAt": "2026-11-24T16:21:27.955Z",
       "confirmation": [
         "Esport Agenda"
+      ],
+      "rosters": [
+        null,
+        {
+          "observedAt": "2026-11-24T16:21:33.206Z",
+          "players": [
+            {
+              "id": 31197,
+              "name": "licaNy",
+              "metric": 5.813062258163963
+            },
+            {
+              "id": 32193,
+              "name": "duggy",
+              "metric": 5.946549728382342
+            },
+            {
+              "id": 33170,
+              "name": "Viresse",
+              "metric": 6.050091544328408
+            },
+            {
+              "id": 50672,
+              "name": "hatex",
+              "metric": 6.247150572713818
+            },
+            {
+              "id": 75198,
+              "name": "Rip",
+              "metric": null
+            }
+          ],
+          "source": "bo3.gg team profile"
+        }
       ]
     },
     {
@@ -1187,7 +991,7 @@
         "22009"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "fetchedAt": "2026-11-24T16:21:27.955Z",
       "confirmation": [
         "Esport Agenda"
       ]
@@ -1211,9 +1015,43 @@
         "24666"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "fetchedAt": "2026-11-24T16:21:27.955Z",
       "confirmation": [
         "Esport Agenda"
+      ],
+      "rosters": [
+        null,
+        {
+          "observedAt": "2026-11-24T16:21:33.419Z",
+          "players": [
+            {
+              "id": 24498,
+              "name": "Remind",
+              "metric": 5.221236926577138
+            },
+            {
+              "id": 34138,
+              "name": "Lambdacore",
+              "metric": 5.983386816457557
+            },
+            {
+              "id": 39783,
+              "name": "awks",
+              "metric": 5.727015562766282
+            },
+            {
+              "id": 49691,
+              "name": "njuki",
+              "metric": 5.517643334659581
+            },
+            {
+              "id": 52381,
+              "name": "zakarinh0",
+              "metric": 5.5010715702376505
+            }
+          ],
+          "source": "bo3.gg team profile"
+        }
       ]
     },
     {
@@ -1235,7 +1073,41 @@
         "1199"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z",
+      "rosters": [
+        null,
+        {
+          "observedAt": "2026-11-24T16:21:33.715Z",
+          "players": [
+            {
+              "id": 25106,
+              "name": "Crazyy",
+              "metric": 6.339857820970562
+            },
+            {
+              "id": 50319,
+              "name": "v4NO",
+              "metric": 6.256925059749622
+            },
+            {
+              "id": 84020,
+              "name": "Rentlax",
+              "metric": 5.553136194886735
+            },
+            {
+              "id": 84021,
+              "name": "shark",
+              "metric": 6.574953805202715
+            },
+            {
+              "id": 84465,
+              "name": "Ananasino",
+              "metric": 6.6554940455689255
+            }
+          ],
+          "source": "bo3.gg team profile"
+        }
+      ]
     },
     {
       "id": "bo3-134974",
@@ -1256,7 +1128,7 @@
         "21440"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "bo3-134975",
@@ -1277,7 +1149,7 @@
         "9438"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "fetchedAt": "2026-11-24T16:21:27.955Z",
       "confirmation": [
         "Esport Agenda"
       ]
@@ -1301,7 +1173,7 @@
         "23072"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "fetchedAt": "2026-11-24T16:21:27.955Z",
       "confirmation": [
         "Esport Agenda"
       ]
@@ -1325,7 +1197,7 @@
         "21698"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "bo3-134980",
@@ -1346,7 +1218,7 @@
         "25424"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "fetchedAt": "2026-11-24T16:21:27.955Z",
       "confirmation": [
         "Esport Agenda"
       ]
@@ -1370,7 +1242,7 @@
         "16743"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "fetchedAt": "2026-11-24T16:21:27.955Z",
       "confirmation": [
         "Esport Agenda"
       ]
@@ -1394,7 +1266,7 @@
         "6277"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "fetchedAt": "2026-11-24T16:21:27.955Z",
       "confirmation": [
         "Esport Agenda"
       ]
@@ -1418,7 +1290,7 @@
         "25842"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "fetchedAt": "2026-11-24T16:21:27.955Z",
       "confirmation": [
         "Esport Agenda"
       ]
@@ -1442,7 +1314,7 @@
         "25112"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "bo3-134741",
@@ -1463,7 +1335,7 @@
         "24914"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "bo3-134743",
@@ -1484,7 +1356,7 @@
         "25834"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "bo3-134382",
@@ -1505,7 +1377,7 @@
         "7430"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "bo3-134383",
@@ -1526,7 +1398,7 @@
         "464"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "bo3-134384",
@@ -1547,7 +1419,7 @@
         "791"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "bo3-134385",
@@ -1568,7 +1440,7 @@
         "476"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "bo3-134386",
@@ -1589,7 +1461,7 @@
         "24956"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "bo3-134387",
@@ -1610,7 +1482,7 @@
         "10398"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "bo3-134861",
@@ -1631,7 +1503,7 @@
         "25394"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "fetchedAt": "2026-11-24T16:21:27.955Z",
       "rosters": [
         {
           "observedAt": "2026-11-24T06:01:44.026Z",
@@ -1686,7 +1558,7 @@
         "23942"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "bo3-135030",
@@ -1707,7 +1579,7 @@
         "25272"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "bo3-134388",
@@ -1728,7 +1600,7 @@
         "790"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "bo3-134389",
@@ -1749,7 +1621,7 @@
         "9974"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "bo3-134862",
@@ -1770,7 +1642,7 @@
         "25763"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "bo3-134891",
@@ -1791,7 +1663,7 @@
         "22418"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "fetchedAt": "2026-11-24T16:21:27.955Z",
       "rosters": [
         {
           "observedAt": "2026-11-24T15:46:07.227Z",
@@ -1876,7 +1748,7 @@
         "24506"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "fetchedAt": "2026-11-24T16:21:27.955Z",
       "rosters": [
         null,
         {
@@ -1931,7 +1803,7 @@
         "18843"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "fetchedAt": "2026-11-24T16:21:27.955Z",
       "rosters": [
         null,
         {
@@ -1986,7 +1858,7 @@
         "25649"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "bo3-135036",
@@ -2007,7 +1879,7 @@
         "25400"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "fetchedAt": "2026-11-24T16:21:27.955Z",
       "rosters": [
         {
           "observedAt": "2026-11-24T12:59:14.756Z",
@@ -2092,7 +1964,7 @@
         "24574"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "bo3-134884",
@@ -2113,7 +1985,7 @@
         "25310"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "bo3-134742",
@@ -2134,7 +2006,7 @@
         "1475"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "bo3-134866",
@@ -2155,7 +2027,7 @@
         "25749"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "bo3-134885",
@@ -2176,7 +2048,7 @@
         "10493"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "bo3-134867",
@@ -2197,7 +2069,7 @@
         "5059"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "bo3-134886",
@@ -2218,7 +2090,7 @@
         "25664"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "bo3-134853",
@@ -2239,7 +2111,7 @@
         "25129"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "fetchedAt": "2026-11-24T16:21:27.955Z",
       "rosters": [
         {
           "observedAt": "2026-11-24T06:01:48.992Z",
@@ -2294,7 +2166,7 @@
         "24977"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "bo3-135040",
@@ -2315,7 +2187,7 @@
         "1059"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "fetchedAt": "2026-11-24T16:21:27.955Z",
       "rosters": [
         {
           "observedAt": "2026-11-24T15:46:07.792Z",
@@ -2370,7 +2242,7 @@
         "21674"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "bo3-134903",
@@ -2391,7 +2263,7 @@
         "3629"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
+      "fetchedAt": "2026-11-24T16:21:27.955Z"
     },
     {
       "id": "bo3-135041",
@@ -2412,7 +2284,7 @@
         "1279"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "fetchedAt": "2026-11-24T16:21:27.955Z",
       "rosters": [
         {
           "observedAt": "2026-11-24T15:46:08.030Z",
@@ -2447,284 +2319,60 @@
         },
         null
       ]
-    },
-    {
-      "id": "dota-schedule-ZxdfK8IxN1:0001",
-      "game": "dota",
-      "a": "Indonesia",
-      "b": "Mongolia",
-      "date": "2026-12-16T03:00:00.000Z",
-      "status": "upcoming",
-      "tournament": "IESF WEC 2026 - December 16-A",
-      "format": "Bo1",
-      "score": null,
-      "providerIds": null,
-      "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
-    },
-    {
-      "id": "dota-schedule-ZxdfK8IxN1:0002",
-      "game": "dota",
-      "a": "Kazakhstan",
-      "b": "Egypt",
-      "date": "2026-12-16T03:00:00.000Z",
-      "status": "upcoming",
-      "tournament": "IESF WEC 2026 - December 16-A",
-      "format": "Bo1",
-      "score": null,
-      "providerIds": null,
-      "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
-    },
-    {
-      "id": "dota-schedule-ZxdfK8IxN1:0003",
-      "game": "dota",
-      "a": "North Macedonia",
-      "b": "Venezuela",
-      "date": "2026-12-16T03:00:00.000Z",
-      "status": "upcoming",
-      "tournament": "IESF WEC 2026 - December 16-A",
-      "format": "Bo1",
-      "score": null,
-      "providerIds": null,
-      "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
-    },
-    {
-      "id": "dota-schedule-ZxdfK8IxN1:0004",
-      "game": "dota",
-      "a": "Indonesia",
-      "b": "Kazakhstan",
-      "date": "2026-12-16T04:30:00.000Z",
-      "status": "upcoming",
-      "tournament": "IESF WEC 2026 - December 16-A",
-      "format": "Bo1",
-      "score": null,
-      "providerIds": null,
-      "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
-    },
-    {
-      "id": "dota-schedule-ZxdfK8IxN1:0005",
-      "game": "dota",
-      "a": "Mongolia",
-      "b": "North Macedonia",
-      "date": "2026-12-16T04:30:00.000Z",
-      "status": "upcoming",
-      "tournament": "IESF WEC 2026 - December 16-A",
-      "format": "Bo1",
-      "score": null,
-      "providerIds": null,
-      "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
-    },
-    {
-      "id": "dota-schedule-ZxdfK8IxN1:0006",
-      "game": "dota",
-      "a": "Venezuela",
-      "b": "Egypt",
-      "date": "2026-12-16T04:30:00.000Z",
-      "status": "upcoming",
-      "tournament": "IESF WEC 2026 - December 16-A",
-      "format": "Bo1",
-      "score": null,
-      "providerIds": null,
-      "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
-    },
-    {
-      "id": "dota-schedule-ZxdfK8IxN2:0001",
-      "game": "dota",
-      "a": "Greece",
-      "b": "Iran",
-      "date": "2026-12-16T06:00:00.000Z",
-      "status": "upcoming",
-      "tournament": "IESF WEC 2026 - December 16-B",
-      "format": "Bo1",
-      "score": null,
-      "providerIds": null,
-      "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
-    },
-    {
-      "id": "dota-schedule-ZxdfK8IxN2:0002",
-      "game": "dota",
-      "a": "New Zealand",
-      "b": "South Africa",
-      "date": "2026-12-16T06:00:00.000Z",
-      "status": "upcoming",
-      "tournament": "IESF WEC 2026 - December 16-B",
-      "format": "Bo1",
-      "score": null,
-      "providerIds": null,
-      "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
-    },
-    {
-      "id": "dota-schedule-ZxdfK8IxN2:0003",
-      "game": "dota",
-      "a": "Belarus",
-      "b": "Argentina",
-      "date": "2026-12-16T06:00:00.000Z",
-      "status": "upcoming",
-      "tournament": "IESF WEC 2026 - December 16-B",
-      "format": "Bo1",
-      "score": null,
-      "providerIds": null,
-      "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
-    },
-    {
-      "id": "dota-schedule-ZxdfK8IxN2:0004",
-      "game": "dota",
-      "a": "Greece",
-      "b": "New Zealand",
-      "date": "2026-12-16T07:30:00.000Z",
-      "status": "upcoming",
-      "tournament": "IESF WEC 2026 - December 16-B",
-      "format": "Bo1",
-      "score": null,
-      "providerIds": null,
-      "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
-    },
-    {
-      "id": "dota-schedule-ZxdfK8IxN2:0005",
-      "game": "dota",
-      "a": "Iran",
-      "b": "Belarus",
-      "date": "2026-12-16T07:30:00.000Z",
-      "status": "upcoming",
-      "tournament": "IESF WEC 2026 - December 16-B",
-      "format": "Bo1",
-      "score": null,
-      "providerIds": null,
-      "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
-    },
-    {
-      "id": "dota-schedule-ZxdfK8IxN2:0006",
-      "game": "dota",
-      "a": "Argentina",
-      "b": "South Africa",
-      "date": "2026-12-16T07:30:00.000Z",
-      "status": "upcoming",
-      "tournament": "IESF WEC 2026 - December 16-B",
-      "format": "Bo1",
-      "score": null,
-      "providerIds": null,
-      "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
-    },
-    {
-      "id": "dota-schedule-ZxdfK8IxN3:0001",
-      "game": "dota",
-      "a": "Indonesia",
-      "b": "North Macedonia",
-      "date": "2026-12-17T03:00:00.000Z",
-      "status": "upcoming",
-      "tournament": "IESF WEC 2026 - December 17-A",
-      "format": "Bo1",
-      "score": null,
-      "providerIds": null,
-      "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
-    },
-    {
-      "id": "dota-schedule-ZxdfK8IxN3:0002",
-      "game": "dota",
-      "a": "Kazakhstan",
-      "b": "Venezuela",
-      "date": "2026-12-17T03:00:00.000Z",
-      "status": "upcoming",
-      "tournament": "IESF WEC 2026 - December 17-A",
-      "format": "Bo1",
-      "score": null,
-      "providerIds": null,
-      "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
-    },
-    {
-      "id": "dota-schedule-ZxdfK8IxN3:0003",
-      "game": "dota",
-      "a": "Mongolia",
-      "b": "Egypt",
-      "date": "2026-12-17T03:00:00.000Z",
-      "status": "upcoming",
-      "tournament": "IESF WEC 2026 - December 17-A",
-      "format": "Bo1",
-      "score": null,
-      "providerIds": null,
-      "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
-    },
-    {
-      "id": "dota-schedule-ZxdfK8IxN3:0004",
-      "game": "dota",
-      "a": "Indonesia",
-      "b": "Venezuela",
-      "date": "2026-12-17T04:30:00.000Z",
-      "status": "upcoming",
-      "tournament": "IESF WEC 2026 - December 17-A",
-      "format": "Bo1",
-      "score": null,
-      "providerIds": null,
-      "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T15:46:05.033Z"
     }
   ],
   "sources": {
     "cs2": {
       "ok": true,
       "source": "bo3.gg (unofficial)",
-      "checkedAt": "2026-11-24T15:46:05.033Z",
+      "checkedAt": "2026-11-24T16:21:27.955Z",
       "fixtures": 61
     },
     "dota": {
       "ok": true,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "checkedAt": "2026-11-24T15:46:05.033Z",
-      "fixtures": 16
+      "checkedAt": "2026-11-24T16:21:27.955Z",
+      "fixtures": 0
     },
     "opendota-live": {
       "ok": true,
       "source": "OpenDota Live",
-      "checkedAt": "2026-11-24T15:46:05.033Z",
-      "fixtures": 2
+      "checkedAt": "2026-11-24T16:21:27.955Z",
+      "fixtures": 0
     },
     "agenda-cs2": {
       "ok": true,
       "source": "Esport Agenda · cs2",
-      "checkedAt": "2026-11-24T15:46:05.033Z",
-      "fixtures": 23
+      "checkedAt": "2026-11-24T16:21:27.955Z",
+      "fixtures": 22
     },
     "agenda-dota": {
       "ok": true,
       "source": "Esport Agenda · dota",
-      "checkedAt": "2026-11-24T15:46:05.033Z",
-      "fixtures": 4
+      "checkedAt": "2026-11-24T16:21:27.955Z",
+      "fixtures": 2
     },
     "pari": {
       "ok": false,
       "source": "PARI",
-      "checkedAt": "2026-11-24T15:46:05.033Z",
+      "checkedAt": "2026-11-24T16:21:27.955Z",
       "error": "Автоматическая линия PARI пока не настроена"
     },
     "cs2-results": {
       "ok": true,
-      "checkedAt": "2026-11-24T15:46:10.239Z",
+      "checkedAt": "2026-11-24T16:21:35.450Z",
       "source": "bo3.gg"
     },
     "dota-results": {
       "ok": true,
-      "checkedAt": "2026-11-24T15:46:10.239Z",
+      "checkedAt": "2026-11-24T16:21:35.450Z",
       "source": "OpenDota"
     }
   },
   "pariCoverage": {
     "matched": 0,
     "onlyPari": 0,
-    "onlySchedule": 88,
+    "onlySchedule": 68,
     "ambiguous": 0
   },
   "label": "Source-labeled fixture and bookmaker snapshots."
