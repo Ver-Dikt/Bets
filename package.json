@@ -11,7 +11,8 @@
     "backfill": "node scripts/backfill.mjs",
     "report": "node scripts/report.mjs",
     "cloudflare:dev": "wrangler dev",
-    "cloudflare:deploy": "wrangler deploy"
+    "cloudflare:deploy": "wrangler deploy",
+    "build:pages": "node scripts/build-pages.mjs"
   },
   "devDependencies": {
     "wrangler": "^4.0.0"
