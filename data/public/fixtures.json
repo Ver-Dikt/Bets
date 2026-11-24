@@ -1,7 +1,24 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-24T05:15:32.397Z",
+  "generatedAt": "2026-11-24T05:16:41.799Z",
   "fixtures": [
+    {
+      "id": "bo3-133422",
+      "game": "cs2",
+      "a": "Eternal Fire",
+      "b": "FlyQuest",
+      "date": "2026-11-24T07:00:00.000Z",
+      "status": "upcoming",
+      "tournament": "PGL Major Singapore 2026 Stage 1",
+      "format": null,
+      "score": null,
+      "providerIds": [
+        "1527",
+        "10398"
+      ],
+      "source": "bo3.gg (unofficial)",
+      "fetchedAt": "2026-11-24T05:16:41.799Z"
+    },
     {
       "id": "dota-schedule-ZxdfK8IxN1:0001",
       "game": "dota",
@@ -14,7 +31,7 @@
       "score": null,
       "providerIds": null,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T05:15:32.397Z"
+      "fetchedAt": "2026-11-24T05:16:41.799Z"
     },
     {
       "id": "dota-schedule-ZxdfK8IxN1:0002",
@@ -28,7 +45,7 @@
       "score": null,
       "providerIds": null,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T05:15:32.397Z"
+      "fetchedAt": "2026-11-24T05:16:41.799Z"
     },
     {
       "id": "dota-schedule-ZxdfK8IxN1:0003",
@@ -42,7 +59,7 @@
       "score": null,
       "providerIds": null,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T05:15:32.397Z"
+      "fetchedAt": "2026-11-24T05:16:41.799Z"
     },
     {
       "id": "dota-schedule-ZxdfK8IxN1:0004",
@@ -56,7 +73,7 @@
       "score": null,
       "providerIds": null,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T05:15:32.397Z"
+      "fetchedAt": "2026-11-24T05:16:41.799Z"
     },
     {
       "id": "dota-schedule-ZxdfK8IxN1:0005",
@@ -70,7 +87,7 @@
       "score": null,
       "providerIds": null,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T05:15:32.397Z"
+      "fetchedAt": "2026-11-24T05:16:41.799Z"
     },
     {
       "id": "dota-schedule-ZxdfK8IxN1:0006",
@@ -84,7 +101,7 @@
       "score": null,
       "providerIds": null,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T05:15:32.397Z"
+      "fetchedAt": "2026-11-24T05:16:41.799Z"
     },
     {
       "id": "dota-schedule-ZxdfK8IxN2:0001",
@@ -98,7 +115,7 @@
       "score": null,
       "providerIds": null,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T05:15:32.397Z"
+      "fetchedAt": "2026-11-24T05:16:41.799Z"
     },
     {
       "id": "dota-schedule-ZxdfK8IxN2:0002",
@@ -112,7 +129,7 @@
       "score": null,
       "providerIds": null,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T05:15:32.397Z"
+      "fetchedAt": "2026-11-24T05:16:41.799Z"
     },
     {
       "id": "dota-schedule-ZxdfK8IxN2:0003",
@@ -126,7 +143,7 @@
       "score": null,
       "providerIds": null,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T05:15:32.397Z"
+      "fetchedAt": "2026-11-24T05:16:41.799Z"
     },
     {
       "id": "dota-schedule-ZxdfK8IxN2:0004",
@@ -140,7 +157,7 @@
       "score": null,
       "providerIds": null,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T05:15:32.397Z"
+      "fetchedAt": "2026-11-24T05:16:41.799Z"
     },
     {
       "id": "dota-schedule-ZxdfK8IxN2:0005",
@@ -154,7 +171,7 @@
       "score": null,
       "providerIds": null,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T05:15:32.397Z"
+      "fetchedAt": "2026-11-24T05:16:41.799Z"
     },
     {
       "id": "dota-schedule-ZxdfK8IxN2:0006",
@@ -168,7 +185,7 @@
       "score": null,
       "providerIds": null,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T05:15:32.397Z"
+      "fetchedAt": "2026-11-24T05:16:41.799Z"
     },
     {
       "id": "dota-schedule-ZxdfK8IxN3:0001",
@@ -182,7 +199,7 @@
       "score": null,
       "providerIds": null,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T05:15:32.397Z"
+      "fetchedAt": "2026-11-24T05:16:41.799Z"
     },
     {
       "id": "dota-schedule-ZxdfK8IxN3:0002",
@@ -196,7 +213,7 @@
       "score": null,
       "providerIds": null,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T05:15:32.397Z"
+      "fetchedAt": "2026-11-24T05:16:41.799Z"
     },
     {
       "id": "dota-schedule-ZxdfK8IxN3:0003",
@@ -210,7 +227,7 @@
       "score": null,
       "providerIds": null,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T05:15:32.397Z"
+      "fetchedAt": "2026-11-24T05:16:41.799Z"
     },
     {
       "id": "dota-schedule-ZxdfK8IxN3:0004",
@@ -224,20 +241,20 @@
       "score": null,
       "providerIds": null,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T05:15:32.397Z"
+      "fetchedAt": "2026-11-24T05:16:41.799Z"
     }
   ],
   "sources": {
     "cs2": {
-      "ok": false,
+      "ok": true,
       "source": "bo3.gg (unofficial)",
-      "checkedAt": "2026-11-24T05:15:32.397Z",
-      "error": "CS2: нераспознанный формат ответа"
+      "checkedAt": "2026-11-24T05:16:41.799Z",
+      "fixtures": 1
     },
     "dota": {
       "ok": true,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "checkedAt": "2026-11-24T05:15:32.397Z",
+      "checkedAt": "2026-11-24T05:16:41.799Z",
       "fixtures": 16
     }
   },
