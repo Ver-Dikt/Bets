@@ -1,4 +1,5 @@
 import {briefRows,priceComparison} from './brief.mjs';
+import {dailyRows,tally} from './daily.mjs';
 import {analyzeFixture,probabilitySteps} from './analysis.mjs';
 import {score} from './engine.mjs';
 import {reconcilePaper} from './settlement.mjs';
@@ -12,7 +13,9 @@ const dateLong=x=>Number.isFinite(Date.parse(x))?new Intl.DateTimeFormat('ru-RU'
 const pct=x=>typeof x==='number'&&Number.isFinite(x)?(x*100).toFixed(1)+'%':'—';
 const closeMatch=probability=>probability<.55;
 const asNum=x=>x==null?'—':Number(x).toFixed(1);
-let matches=[],fixtures=[],journal=[],brief=null,report=null,mapInsights=null,filters={game:'all',archive:'cs2',view:location.hash==='#brief'?'brief':'today',period:'today',tournament:'all',quality:'all'},selected=null,expanded=false,loading=false,fixtureStatus=null;
+let matches=[],fixtures=[],journal=[],brief=null,report=null,mapInsights=null,filters={game:'all',archive:'cs2',view:['#brief','#daily'].includes(location.hash)?location.hash.slice(1):'today',period:'today',tournament:'all',quality:'all'},selected=null,expanded=false,loading=false,fixtureStatus=null;
+const MUS_KEY='bets-mus-picks-v1';
+let mus={};try{mus=JSON.parse(localStorage.getItem(MUS_KEY))??{}}catch{}
 const assessments=new Map();
 function assessment(fixture) {
  if(Date.parse(fixture.date)<=Date.now())return {status:'live'};
@@ -366,6 +369,62 @@ function syncTournaments(){
  select.value=filters.tournament;
 }
 const viewNames={brief:'Твой список · 24 ноября',daily:'Итоги дня',memory:'Опыт и ошибки',learning:'Калибровка',evolution:'Версии моделей',data:'Данные и архив'};
+function renderDaily(root){
+ const chooser=el('input');chooser.type='date';chooser.value=filters.reviewDay??dayFmt.format(Date.now());
+ chooser.setAttribute('aria-label','День журнала');
+ chooser.onchange=()=>{filters.reviewDay=chooser.value;renderWorkspace()};
+ const reload=el('button','tab','Обновить результаты');reload.type='button';reload.onclick=load;
+ const controls=el('div','tabs');controls.append(chooser,reload);root.append(controls);
+ const now=Date.now(),rows=dailyRows({day:chooser.value,fixtures,journal,matches,brief,mus,now});
+ const pari=rows.filter(row=>row.price),musRows=rows.filter(row=>row.musPick);
+ const stats=(title,items,pick)=>{
+  const t=tally(items,pick),grid=el('div','comp-grid');
+  grid.append(compBox('Прогнозы',t.total),compBox('Попадания',t.won),
+   compBox('Ошибки',t.lost),compBox('Ожидают итог',t.pending,'Время старта уже прошло'),
+   compBox('Предстоят',t.upcoming),compBox('Точность',t.won+t.lost?pct(t.won/(t.won+t.lost)):'—','Только сверенные результаты'));
+  root.append(el('h3','analysis-head',title),grid);
+ };
+ stats('BETS · '+rows.length+' записей в журнале и расписании',rows);
+ stats('BETS × PARI · '+pari.length+' событий с котировкой',pari);
+ stats('MUS · переданные выборы',musRows,row=>row.musPick);
+ const stamp=fixtureStatus?.generatedAt;
+ root.append(paragraph('muted',stamp?'Последний опубликованный снимок · '+shortTime(stamp)+'. Время МСК.':'Время обновления расписания неизвестно.'));
+ const tabs=el('div','tabs');
+ const group=filters.dailyGroup??'pari';
+ for(const [key,label] of [['all','Все события'],['pari','С котировкой PARI'],['mus','Выборы MUS']]){
+  const button=el('button','tab'+(group===key?' active':''),label);button.type='button';
+  button.setAttribute('aria-pressed',String(group===key));
+  button.onclick=()=>{filters.dailyGroup=key;renderWorkspace()};
+  tabs.append(button);
+ }
+ root.append(tabs);
+ const shown=group==='all'?rows:group==='mus'?musRows:pari;
+ if(!shown.length)root.append(paragraph('muted','В этой подборке на выбранную дату пока нет записей.'));
+ for(const {event,forecast,price,winner,upcoming,source,musPick,localMus} of shown){
+  const result=winner?(winner===forecast?.pick?'Попадание':forecast?'Ошибка':'Завершён')+' · победитель '+winner:upcoming?'Предстоит':'Ожидаем подтверждённый итог';
+  const row=compBox(shortTime(event.date)+' · '+event.a+' — '+event.b,forecast?forecast.pick+' · '+pct(forecast.probability):'Прогноз BETS отсутствует',
+   result+(source?' · '+source:''));
+  if(price){
+   const index=forecast?.pick===price.a?0:forecast?.pick===price.b?1:-1;
+   const compare=priceComparison(forecast?.probability,price.odds[index]);
+   row.append(paragraph('muted','PARI · '+price.a+' '+price.odds[0]+' / '+price.b+' '+price.odds[1]+' · '+price.kind+
+    (compare&&forecast.probabilityBasis!=='map'?' · порог для выбора BETS '+pct(compare.breakEven)+
+      (compare.delta>0?' · оценка модели выше порога':' · оценка модели не выше порога'):'')));
+  }
+  if(musPick)row.append(paragraph('muted','MUS · '+musPick+(winner?(winner===musPick?' · попадание':' · ошибка'):'')+
+    (localMus?' · запись на устройстве':' · передано пользователем')));
+  const selector=el('select');
+  selector.setAttribute('aria-label','Выбор MUS · '+event.a+' — '+event.b);
+  selector.append(new Option('MUS · нет записи',''),new Option(event.a,event.a),new Option(event.b,event.b));
+  selector.value=musPick??'';
+  selector.onchange=()=>{
+   const next={...mus,[event.id]:selector.value};
+   try{localStorage.setItem(MUS_KEY,JSON.stringify(next));mus=next;renderWorkspace()}
+   catch{row.append(paragraph('muted','Хранилище устройства недоступно. Выбор не сохранён.'))}
+  };
+  row.append(selector);root.append(row);
+ }
+}
 function renderWorkspace(){
  const view=filters.view, panel=$('workspace-report'), root=$('workspace-content');
  const matchesView=view==='today'||view==='live';
@@ -381,32 +440,14 @@ function renderWorkspace(){
  $('workspace-title').textContent=viewNames[view];
  if(view==='brief'){renderBrief(root);return}
  root.replaceChildren();
- if(view==='daily'||view==='memory'){
+ if(view==='daily'){renderDaily(root);return}
+ if(view==='memory'){
   const check=new Map(journal.filter(item=>item.type==='settlement').map(item=>[item.fixtureId,item]));
   const records=journal.filter(item=>item.type==='forecast').map(item=>item.record);
   const resultFor=row=>{
    const result=check.get(row.fixtureId);
    return result?.forecastId&&result.forecastId!==row.id?null:result;
   };
-  if(view==='daily'){
-   const chooser=el('input');chooser.type='date';chooser.value=filters.reviewDay??dayFmt.format(Date.now());
-   chooser.setAttribute('aria-label','День журнала');
-   chooser.onchange=()=>{filters.reviewDay=chooser.value;renderWorkspace()};
-   root.append(chooser);
-   const day=chooser.value;
-   const select=records.filter(row=>dayFmt.format(new Date(row.kickoff))===day);
-   const gaps=journal.filter(e=>e.type==='skip'&&dayFmt.format(new Date(e.kickoff))===day);
-   root.append(paragraph('muted','Расчётов '+select.length+' · сверено '+select.filter(row=>resultFor(row)).length+' · пропусков '+gaps.length));
-   const validation=score(select.filter(row=>resultFor(row)).map(row=>({...row,actual:resultFor(row).result})));
-   if(validation.resolved)root.append(paragraph('muted','Brier '+validation.brier.toFixed(4)+' · Log loss '+validation.logloss.toFixed(4)+' · точность '+pct(validation.wins/validation.resolved)));
-   for(const row of select.slice(-40).reverse()){
-    const result=resultFor(row);
-    root.append(compBox(row.a+' — '+row.b,row.pick+' · '+pct(row.probability),
-      shortTime(row.createdAt)+' · '+row.model+' · '+(result?.result===1?'совпал':result?.result===0?'не совпал':'ожидаем результат')));
-   }
-   for(const gap of gaps.slice(0,40))root.append(compBox(gap.source,gap.a+' — '+gap.b,'Пропуск · '+gap.reason));
-   return;
-  }
   for(const row of [...new Map(records.map(item=>[item.fixtureId,item])).values()].slice().reverse()){
    const result=resultFor(row);
    if(!result?.error)continue;
@@ -517,7 +558,7 @@ function updateFilters(){
  if(!rows.some(row=>row.id===selected?.id))selected=rows[0]??null;
  renderFixtures();renderAnalysis();renderWorkspace();
 }
-for(const btn of document.querySelectorAll('[data-view]'))btn.onclick=()=>{filters.view=btn.dataset.view;history.replaceState(null,'',filters.view==='brief'?'#brief':location.pathname+location.search);updateFilters()};
+for(const btn of document.querySelectorAll('[data-view]'))btn.onclick=()=>{filters.view=btn.dataset.view;history.replaceState(null,'',['brief','daily'].includes(filters.view)?'#'+filters.view:location.pathname+location.search);updateFilters()};
 for(const key of ['period','tournament','quality'])$(key).onchange=()=>{filters[key]=$(key).value;updateFilters()};
 for(const btn of document.querySelectorAll('[data-game]'))btn.onclick=()=>{filters.game=btn.dataset.game;syncTournaments();updateFilters()};
 load();

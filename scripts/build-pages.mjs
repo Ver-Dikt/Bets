@@ -17,7 +17,7 @@ await mkdir(dist,{recursive:true});
 for(const filename of ['index.html','main.js','brief.mjs','brief.json','manifest.webmanifest','sw.js']){
  await copyFile(resolve(root,'site',filename),resolve(dist,filename));
 }
-for(const filename of ['analysis.mjs','settlement.mjs','live.mjs','calibration.mjs','evidence-time.mjs','roster-factor.mjs']){
+for(const filename of ['analysis.mjs','daily.mjs','settlement.mjs','live.mjs','calibration.mjs','evidence-time.mjs','roster-factor.mjs']){
  await copyFile(resolve(root,'src',filename),resolve(dist,filename));
 }
 for(const filename of ['engine.mjs','identity.mjs','icon.svg']){

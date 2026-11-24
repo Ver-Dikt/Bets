@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 // Public GitHub Pages data collector. This is a periodically refreshed snapshot,
 // NOT a streaming live API. Sources are unofficial and may fail/rate-limit.
-import {fetchJson} from '../src/collect.mjs';
+import {fetchJson,fetchCsDay,fetchDotaPage,sleep} from '../src/collect.mjs';
 import {enrichRosters} from '../src/rosters.mjs';
 import {agendaFixtures} from '../src/esportagenda.mjs';
 import {fetchDotaLive} from '../src/opendota-live.mjs';
 import {pandaFixtures} from '../src/pandascore.mjs';
 import {readJournal, updateJournal} from './journal.mjs';
-import {readArchive} from '../src/archive.mjs';
+import {readArchive,mergeArchive} from '../src/archive.mjs';
 import {loadPari, joinPari, sameTeams} from '../src/pari.mjs';
 import {normalizeCSFixtures,normalizeDotaFixtures,mergeFixtures} from '../src/fixtures.mjs';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
@@ -107,7 +107,25 @@ const optionalJson=async file=>JSON.parse(await readFile(file,'utf8').catch(erro
 }));
 const mapInsights=await optionalJson('data/public/map-insights.json');
 const report=await optionalJson('data/private/report.json');
-const updated=updateJournal(before,fixtures,archive.matches,results,recordedAt,mapInsights.insights,report.games);
+const recent=await Promise.allSettled([
+ (async()=>{
+  const current=await fetchCsDay(fetchedAt.slice(0,10),{retries:1});
+  await sleep(1200);
+  const prior=new Date(Date.parse(fetchedAt)-86400000).toISOString().slice(0,10);
+  const previous=await fetchCsDay(prior,{retries:0}).catch(error=>{console.warn('Previous CS2 results:',error.message);return []});
+  return [...previous,...current];
+ })(),
+ fetchDotaPage(null,{retries:0}).then(page=>page.matches)
+]);
+const latest=[];
+for(const [index,entry] of recent.entries()){
+ const key=index===0?'cs2-results':'dota-results';
+ status[key]={ok:entry.status==='fulfilled',checkedAt:new Date().toISOString(),source:index===0?'bo3.gg':'OpenDota'};
+ if(entry.status==='fulfilled')latest.push(...entry.value);
+ else console.warn(key,entry.reason?.message);
+}
+const history=mergeArchive(archive,latest).archive.matches;
+const updated=updateJournal(before,fixtures,history,results,new Date().toISOString(),mapInsights.insights,report.games);
 if(updated.events.length!==before.events.length){
  await mkdir(dirname(journalPath),{recursive:true});
  await writeFile(journalPath,JSON.stringify(updated)+'\n');
