@@ -12,3 +12,5 @@ jobs:
         with:
           node-version: '22'
       - run: npm test
+      - run: npm run build:pages
+      - run: test -s dist/index.html && test -s dist/snapshot.json && test -s dist/main.js
