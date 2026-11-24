@@ -34,9 +34,11 @@ jobs:
           node-version: "22"
       - run: npm run build:pages
       - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v4
         with:
           path: dist
+      - name: Allow GitHub Actions artifact index to update
+        run: sleep 20
       - name: Deploy GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
