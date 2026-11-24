@@ -1,5 +1,6 @@
 import {dailyRows,tally} from './daily.mjs';
 import {analyzeFixture,probabilitySteps} from './analysis.mjs';
+import {decidingMapTotal} from './live.mjs';
 const $=id=>document.getElementById(id);
 const el=(tag,cls='',text=null)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==null)n.textContent=String(text);return n};
 const moscow='Europe/Moscow';
@@ -191,6 +192,15 @@ function renderAnalysis(){
  verdict.append(el('small','',closeMatch(favoriteProbability)?'ПОЧТИ РАВНЫЙ МАТЧ':'МОДЕЛЬНЫЙ ФАВОРИТ'),
   el('b','',r.picked+' · '+pct(favoriteProbability)),paragraph('',r.note));
  root.append(verdict);
+ const total=decidingMapTotal(f.game==='dota'?r.result.factorProbability:r.result.pa,f.format,f.game==='dota'?'map':'series');
+ if(total){
+  const line=String(total.line).replace('.',',');
+  const grid=el('div','comp-grid');
+  grid.append(compBox('ТБ '+line,pct(total.over),f.format==='Bo3'?'Будет 3-я карта':'Будет 5-я карта'),
+              compBox('ТМ '+line,pct(total.under),f.format==='Bo3'?'Закончится на 2-й':'Закончится на 3-й или 4-й'));
+  root.append(el('h3','analysis-head','Тотал карт · '+f.format),grid,
+   paragraph('muted','Оценка предполагает одинаковые шансы на каждой карте. Для тоталов точность ещё не подтверждена.'));
+ }
  const detail=el('details');detail.append(el('summary','','Почему такой прогноз'));root.append(detail);
  drawFactors(detail,r);
  drawReasonSummary(detail,{...r,a:f.a,b:f.b,probabilityA:a,map:r.mapContribution,roster:r.rosterContribution,mapProbability:r.result.factorProbability});
