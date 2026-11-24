@@ -12,5 +12,6 @@ jobs:
         with:
           node-version: '22'
       - run: npm test
+      - run: python3 -m unittest discover -s tests -p 'test_*.py'
       - run: npm run build:pages
-      - run: test -s dist/index.html && test -s dist/snapshot.json && test -s dist/main.js
+      - run: test -s dist/index.html && test -s dist/snapshot.json && test -s dist/fixtures.json && test -s dist/analysis.mjs && test -s dist/map-insights.json && test -s dist/main.js
