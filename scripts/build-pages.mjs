@@ -13,7 +13,7 @@ const safe=archive.matches.filter(m=>m&&typeof m.id==='string'&&['cs2','dota'].i
 })).sort((a,b)=>Date.parse(a.date)-Date.parse(b.date));
 if(safe.length<1)throw Error('No finished games; refusing empty site publication');
 await mkdir(dist,{recursive:true});
-for(const filename of ['index.html','main.js','manifest.webmanifest','sw.js']){
+for(const filename of ['index.html','main.js','analysis.mjs','manifest.webmanifest','sw.js']){
  await copyFile(resolve(root,'site',filename),resolve(dist,filename));
 }
 for(const filename of ['engine.mjs','identity.mjs','icon.svg']){
@@ -31,5 +31,8 @@ for(const game of ['cs2','dota']){
 }
 await writeFile(resolve(dist,'snapshot.json'),JSON.stringify({schemaVersion:1,updatedAt:archive.updatedAt,matches:safe})+'\n');
 await writeFile(resolve(dist,'report.json'),JSON.stringify(publishedReport)+'\n');
+const schedule=await read('data/public/fixtures.json').catch(()=>null);
+const publicSchedule=schedule?.schemaVersion===1&&Array.isArray(schedule.fixtures)?schedule:{schemaVersion:1,generatedAt:null,fixtures:[],sources:{cs2:{ok:false,error:'Not collected'},dota:{ok:false,error:'Not collected'}}};
+await writeFile(resolve(dist,'fixtures.json'),JSON.stringify(publicSchedule)+'\n');
 await writeFile(resolve(dist,'.nojekyll'),'');
 console.log('Bets Pages artifact built:',safe.length,'finished games. Full private archive is not copied to site.');
