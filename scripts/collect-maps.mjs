@@ -11,7 +11,8 @@ let archive={schemaVersion:1,updatedAt:null,matches:[]};
 try{archive=JSON.parse(await readFile(archivePath,'utf8'));if(!Array.isArray(archive.matches))throw Error('Invalid existing map archive')}catch(e){if(e.code!=='ENOENT')throw e}
 let received=0,added=0,conflicts=0;
 const firstOlder=Number.isSafeInteger(archive.backfillOffset)&&archive.backfillOffset>=100?archive.backfillOffset:100;
-const offsets=[0,50,...Array.from({length:10},(_,i)=>firstOlder+i*50)];
+// Fresh pages plus 15 older batches; offsets are persisted to avoid rescanning the same history.
+const offsets=[0,50,...Array.from({length:15},(_,i)=>firstOlder+i*50)];
 for(let page=0;page<offsets.length;page++){
  if(page)await sleep(1800);
  const url=new URL('https://api.bo3.gg/api/v1/matches');
