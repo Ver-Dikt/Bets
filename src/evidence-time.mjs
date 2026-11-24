@@ -5,7 +5,9 @@ const LEGACY_DELAY = 24*3600000;
 export function knownTime(row) {
   const start=Date.parse(row.date);
   const ended=Date.parse(row.finishedAt);
-  return Number.isFinite(ended)&&ended>start ? ended : start+LEGACY_DELAY;
+  const completed=Number.isFinite(ended)&&ended>start ? ended : start+LEGACY_DELAY;
+  const received=Date.parse(row.resultObservedAt);
+  return Number.isFinite(received) ? Math.max(received,completed) : completed;
 }
 
 export function availableAt(rows, cutoff) {

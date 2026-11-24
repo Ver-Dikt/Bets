@@ -10,6 +10,12 @@ on:
       - "src/pandascore.mjs"
       - "src/pari.mjs"
       - "scripts/journal.mjs"
+      - "scripts/journal-integrity.mjs"
+      - "src/research*.mjs"
+      - "src/ratings.mjs"
+      - "src/dota-series.mjs"
+      - "src/cs-results.mjs"
+      - "data/private/research-models.json"
       - "scripts/fixtures.mjs"
       - ".github/workflows/fixtures.yml"
 permissions:
@@ -58,6 +64,9 @@ jobs:
               git rebase --abort || true
               echo "::error::Commit conflict: not overwriting any source code"
               exit 1
+            fi
+            if git show origin/main:data/public/journal.json > "$RUNNER_TEMP/bets-journal-before.json"; then
+              node scripts/check-journal.mjs "$RUNNER_TEMP/bets-journal-before.json" data/public/journal.json || exit 1
             fi
             if git push origin HEAD:main; then exit 0; fi
             sleep 3

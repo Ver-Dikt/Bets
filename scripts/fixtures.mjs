@@ -7,10 +7,13 @@ import {agendaFixtures} from '../src/esportagenda.mjs';
 import {fetchDotaLive} from '../src/opendota-live.mjs';
 import {pandaFixtures} from '../src/pandascore.mjs';
 import {readJournal, updateJournal} from './journal.mjs';
+import {projectResearch} from '../src/research-inference.mjs';
+import {researchArchive} from './research-archive.mjs';
+import {randomUUID} from 'node:crypto';
 import {readArchive,mergeArchive} from '../src/archive.mjs';
 import {loadPari, joinPari, sameTeams} from '../src/pari.mjs';
 import {normalizeCSFixtures,normalizeDotaFixtures,mergeFixtures} from '../src/fixtures.mjs';
-import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {readFile,writeFile,mkdir,rename} from 'node:fs/promises';
 import {resolve,dirname} from 'node:path';
 
 const dest=resolve(process.env.BETS_FIXTURES_PATH??'data/public/fixtures.json');
@@ -73,7 +76,8 @@ for(const [index,entry] of optional.entries()){
   feeds.push(active);
   status[key]={ok:true,source:'PandaScore',checkedAt:fetchedAt,fixtures:active.length};
   for(const row of finished){
-   results.push({...row,discipline:row.game,kind:'series',winner:row.winnerIndex===0?row.a:row.b});
+   results.push({...row,discipline:row.game,kind:'series',wins:row.score,
+    winner:row.winnerIndex===0?row.a:row.b});
   }
  }
 }
@@ -93,10 +97,15 @@ for(const item of secondary){
  }
 }
 const joined=joinPari(merged.filter(row=>!excluded.has(row.id)),pari.lines,new Date().toISOString());
-const archive=await readArchive(resolve(process.env.BETS_ARCHIVE_PATH??'data/private/matches.json'));
+const archive=await researchArchive(await readArchive(resolve(process.env.BETS_ARCHIVE_PATH??'data/private/matches.json')));
+async function atomicWrite(file,data){
+ const temporary=file+'.'+randomUUID()+'.tmp';
+ await writeFile(temporary,JSON.stringify(data)+'\n',{flag:'wx'});
+ await rename(temporary,file);
+}
 const fixtures=await enrichRosters(mergeFixtures(joined.fixtures).slice(0,300),archive.matches,previous?.fixtures??[],fetchedAt);
 const recordedAt=new Date().toISOString();
-const snapshot={schemaVersion:1,generatedAt:recordedAt,fixtures,sources:status,pariCoverage:joined.coverage,
+const snapshot={schemaVersion:1,generatedAt:recordedAt,fixtures:fixtures.map(({score,...row})=>row),sources:status,pariCoverage:joined.coverage,
   label:'Source-labeled fixture and bookmaker snapshots.'};
 await mkdir(dirname(dest),{recursive:true});
 const journalPath=resolve(process.env.BETS_JOURNAL_PATH??'data/public/journal.json');
@@ -107,6 +116,8 @@ const optionalJson=async file=>JSON.parse(await readFile(file,'utf8').catch(erro
 }));
 const mapInsights=await optionalJson('data/public/map-insights.json');
 const report=await optionalJson('data/private/report.json');
+const research=await optionalJson('data/private/research-models.json');
+const maps=await optionalJson('data/private/maps.json');
 const recent=await Promise.allSettled([
  (async()=>{
   const current=await fetchCsDay(fetchedAt.slice(0,10),{retries:1});
@@ -124,13 +135,18 @@ for(const [index,entry] of recent.entries()){
  if(entry.status==='fulfilled')latest.push(...entry.value);
  else console.warn(key,entry.reason?.message);
 }
-const history=mergeArchive(archive,latest).archive.matches;
+const receivedAt=new Date().toISOString();
+const mergedHistory=mergeArchive(archive,latest.map(row=>({...row,resultObservedAt:receivedAt})));
+if(mergedHistory.report.conflicts)console.warn('Match source conflicts:',mergedHistory.report.conflicts);
+const history=mergedHistory.archive.matches;
 const finished=[...results,...latest.filter(row=>row.discipline==='cs2').map(row=>({...row,status:'finished'}))];
-const updated=updateJournal(before,fixtures,history,finished,new Date().toISOString(),mapInsights.insights,report.games);
+const forecastAt=new Date().toISOString();
+const comparisons=projectResearch(research.schemaVersion?research:null,history,maps.matches??[],fixtures,Date.parse(forecastAt));
+const updated=updateJournal(before,fixtures,history,finished,forecastAt,mapInsights.insights,report.games,comparisons);
 if(updated.events.length!==before.events.length){
  await mkdir(dirname(journalPath),{recursive:true});
- await writeFile(journalPath,JSON.stringify(updated)+'\n');
+ await atomicWrite(journalPath,updated);
 }
-await writeFile(dest,JSON.stringify(snapshot,null,2)+'\n');
+await atomicWrite(dest,snapshot);
 console.log('Saved',fixtures.length,'public fixtures, errors:',errors.length);
 if(errors.length)console.log('SOURCE WARNINGS:',errors.join('; '));

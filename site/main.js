@@ -1,6 +1,10 @@
-import {dailyRows,tally} from './daily.mjs';
+import {dailyRows,tally,reviewPeriod,totalTally,errorReview,compareJournalWinners} from './daily.mjs';
 import {analyzeFixture,probabilitySteps} from './analysis.mjs';
-import {decidingMapTotal} from './live.mjs';
+const modelNames={
+ dynamicElo:'Dynamic Elo',glicko2:'Glicko-2',trueSkill:'TrueSkill',bradleyTerry:'Bradley–Terry',
+ bayesian:'Байесовская модель',catBoost:'CatBoost',lightGBM:'LightGBM',legacy:'Контрольная модель',
+ equalChance:'Равные шансы',formatPrior:'Историческая частота'
+};
 const $=id=>document.getElementById(id);
 const el=(tag,cls='',text=null)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==null)n.textContent=String(text);return n};
 const moscow='Europe/Moscow';
@@ -11,8 +15,15 @@ const dateLong=x=>Number.isFinite(Date.parse(x))?new Intl.DateTimeFormat('ru-RU'
 const pct=x=>typeof x==='number'&&Number.isFinite(x)?(x*100).toFixed(1)+'%':'—';
 const closeMatch=probability=>probability<.55;
 const asNum=x=>x==null?'—':Number(x).toFixed(1);
-let matches=[],fixtures=[],journal=[],report=null,mapInsights=null,filters={game:'all',view:['#brief','#daily'].includes(location.hash)?'daily':'today',period:'today',tournament:'all'},selected=null,expanded=false,loading=false,fixtureStatus=null;
+let matches=[],fixtures=[],journal=[],report=null,research=null,mapInsights=null,filters={game:'all',view:['#brief','#daily'].includes(location.hash)?'daily':'today',period:'today',tournament:'all'},selected=null,expanded=false,loading=false,fixtureStatus=null;
 const assessments=new Map();
+const published=new Map();
+function forecastFor(fixture){
+ const forecast=published.get(fixture.id);
+ if(forecast?.kickoff===fixture.date&&forecast.a===fixture.a&&forecast.b===fixture.b&&forecast.format===fixture.format&&
+    forecast.probabilityBasis!=='map')return forecast;
+}
+
 function assessment(fixture) {
  if(Date.parse(fixture.date)<=Date.now())return {status:'live'};
  if(!assessments.has(fixture.id)){
@@ -70,18 +81,13 @@ function renderFixtures(){
   foot.append(el('span','',label.length>48?label.slice(0,45)+'…':label),el('span','',f.format||'Разбор'));
   button.append(meta,name,foot);
   if(f.confirmation?.length)button.append(el('div','meta','Сопоставлено с '+f.confirmation.join(', ')));
-  if(f.status==='upcoming'&&matches.length){
-    try{
-      const result=assessment(f);
-      if(result.status==='ok'){
-        const preview=el('div','fixture-foot');
-        preview.style.borderTop='1px solid #304658';preview.style.paddingTop='9px';
-        const probability=Math.max(result.result.pa,result.result.pb);
-        preview.append(el('span','',closeMatch(probability)?'Почти равный матч':'Прогноз: '+result.picked),el('span','win',pct(probability)));
-        button.append(preview);
-      }else button.append(el('div','meta',assessmentMessage(result.status)));
-    }catch{button.append(el('div','meta','Требуется проверка идентификаторов команд'))}
-  }
+  const saved=forecastFor(f);
+  if(saved){
+   const preview=el('div','fixture-foot');
+   preview.style.borderTop='1px solid #304658';preview.style.paddingTop='9px';
+   preview.append(el('span','',closeMatch(saved.probability)?'Почти равный матч':'Прогноз · '+saved.pick),el('span','win',pct(saved.probability)));
+   button.append(preview);
+  }else button.append(el('div','meta','Прогноз не записан'));
   button.addEventListener('click',()=>{selected=f;renderFixtures();renderAnalysis();if(window.matchMedia('(max-width:820px)').matches)$('analysis-panel').scrollIntoView({behavior:'smooth',block:'start'})});
   root.append(button);
  }
@@ -133,7 +139,7 @@ function drawFactors(root,analysis){
           compBox('Последние 10 · '+selected.b,c.b.wins+'W / '+c.b.losses+'L','Из '+c.b.last+' матчей'),
           compBox('Форма '+selected.a,[5,10,20].map(n=>c.a.form[n].wins+'/'+c.a.form[n].played).join(' · '),'Последние 5 / 10 / 20'),
           compBox('Форма '+selected.b,[5,10,20].map(n=>c.b.form[n].wins+'/'+c.b.form[n].played).join(' · '),'Последние 5 / 10 / 20'),
-          compBox('Личные встречи',c.h2h.count,c.h2h.winsA+' : '+c.h2h.winsB+(c.h2h.lastPlayed?' · '+shortTime(c.h2h.lastPlayed):'')),
+          compBox('Личные встречи',c.h2h.count,c.h2h.winsA+' побед '+selected.a+' · '+c.h2h.winsB+' побед '+selected.b+(c.h2h.lastPlayed?' · '+shortTime(c.h2h.lastPlayed):'')),
           compBox('История дисциплины',c.dataCount,'До начала встречи'));
  root.append(g);
 }
@@ -179,9 +185,14 @@ function renderAnalysis(){
  if(!selected){root.append(errorBlock('Выбери игру из расписания','Подробный разбор сформируется по истории именно этих команд.'));return}
  const f=selected;
  addMeta(root,f);
+ const saved=forecastFor(f);
  const r=assessment(f);
- if(r.status!=='ok'){explainMissing(root,r);root.append(el('div','help','Источник встречи: '+f.source+'. Последняя фиксация расписания: '+shortTime(f.fetchedAt)+'.'));return}
- const a=r.result.pa,b=r.result.pb;
+ if(!saved){
+  if(r.status==='ok')root.append(errorBlock('Прогноз ещё не записан','Сохранённые предматчевые прогнозы появятся после обновления данных.'));
+  else explainMissing(root,r);
+  return;
+ }
+ const a=saved.probabilityA,b=1-a;
  const labels=el('div','prob-labels');
  labels.append(el('div','',pct(a)),el('div','',pct(b)));
  const bar=el('div','prob');bar.setAttribute('role','img');bar.setAttribute('aria-label',pct(a)+' '+f.a+', '+pct(b)+' '+f.b);
@@ -190,36 +201,53 @@ function renderAnalysis(){
  const verdict=el('div','selection');
  const favoriteProbability=Math.max(a,b);
  verdict.append(el('small','',closeMatch(favoriteProbability)?'ПОЧТИ РАВНЫЙ МАТЧ':'МОДЕЛЬНЫЙ ФАВОРИТ'),
-  el('b','',r.picked+' · '+pct(favoriteProbability)),paragraph('',r.note));
+  el('b','',saved.pick+' · '+pct(favoriteProbability)),
+  paragraph('', 'Записано '+shortTime(saved.createdAt)+' · '+(modelNames[saved.model.split('@')[0]]??'Контрольная модель')));
  root.append(verdict);
- const total=decidingMapTotal(f.game==='dota'?r.result.factorProbability:r.result.pa,f.format,f.game==='dota'?'map':'series');
+ const total=saved.total;
  if(total){
   const line=String(total.line).replace('.',',');
   const grid=el('div','comp-grid');
   grid.append(compBox('ТБ '+line,pct(total.over),f.format==='Bo3'?'Будет 3-я карта':'Будет 5-я карта'),
-              compBox('ТМ '+line,pct(total.under),f.format==='Bo3'?'Закончится на 2-й':'Закончится на 3-й или 4-й'));
-  root.append(el('h3','analysis-head','Тотал карт · '+f.format),grid,
-   paragraph('muted','Оценка предполагает одинаковые шансы на каждой карте. Для тоталов точность ещё не подтверждена.'));
+              compBox('ТМ '+line,pct(total.under),f.format==='Bo3'?'Две карты':'Три или четыре карты'));
+  root.append(el('h3','analysis-head','Количество карт · '+f.format),grid,
+   paragraph('muted',total.validated?'Вероятности прошли историческую проверку.':'Исследовательская оценка количества карт.'));
  }
- const detail=el('details');detail.append(el('summary','','Почему такой прогноз'));root.append(detail);
- drawFactors(detail,r);
- drawReasonSummary(detail,{...r,a:f.a,b:f.b,probabilityA:a,map:r.mapContribution,roster:r.rosterContribution,mapProbability:r.result.factorProbability});
+ const detail=el('details');detail.append(el('summary','','Данные и сравнение моделей'));root.append(detail);
+ if(saved.research){
+  const {probabilities,evidence,total}=saved.research;
+  const grid=el('div','comp-grid');
+  for(const [name,p] of Object.entries(probabilities))grid.append(compBox(modelNames[name]??name,pct(p),f.a+' · победа'));
+  detail.append(grid);
+  if(total){
+   const totalGrid=el('div','comp-grid');
+   for(const [name,p] of Object.entries(total.probabilities))totalGrid.append(compBox(modelNames[name]??name,pct(p),'ТБ '+String(total.line).replace('.',',')));
+   detail.append(el('h3','analysis-head','Сравнение прогнозов количества карт'),totalGrid);
+  }
+  const evidenceGrid=el('div','comp-grid');
+  evidenceGrid.append(compBox('Завершённые серии',evidence.seriesA+' / '+evidence.seriesB),compBox('История карт',evidence.mapsA+' / '+evidence.mapsB),
+   compBox('Текущий турнир',evidence.tournamentA+' / '+evidence.tournamentB),compBox('Последний общий патч',evidence.patchA&&evidence.patchB?evidence.patchA+' / '+evidence.patchB:'Нет данных'),
+   compBox('Матчи с подтверждённым составом',evidence.lineupsA+' / '+evidence.lineupsB),compBox('Форма за 10 серий',pct(evidence.formA)+' / '+pct(evidence.formB)));
+  detail.append(el('h3','analysis-head','Что было известно до матча'),evidenceGrid);
+ }else{
+  drawReasonSummary(detail,{...saved,map:saved.evidence?.map,roster:saved.evidence?.roster});
+  if(r.status==='ok')drawFactors(detail,r);
+ }
  drawMapInsight(detail,f);
- if(r.mapContribution)detail.append(compBox('Карты CS2',pct(r.mapContribution.probabilityA),'Вес 20% · сценарий veto'));
  detail.append(el('h3','analysis-head','Составы и игроки'));
  for(const [index,team] of [f.a,f.b].entries()){
-  const roster=f.rosters?.[index];
+  const roster=(saved.profileEvidence??f.rosters)?.[index];
   const players=roster?.players.map(player=>player.name+(player.metric==null?'':f.game==='dota'?' '+pct(player.metric):' '+player.metric.toFixed(2)));
   detail.append(compBox(team,players?.join(' · ')??'Состав недоступен',roster?roster.source+' · '+shortTime(roster.observedAt):''));
  }
- if(r.rosterContribution)detail.append(compBox('Профили игроков',pct(r.rosterContribution.a),'Вес 10% · исследовательский вклад. Стартовые пятёрки и замены требуют проверки.'));
+ if(saved.evidence?.roster)detail.append(compBox('Профили игроков',pct(saved.evidence.roster.a),'Поправка контрольной модели по профилям команд.'));
 
  detail.append(paragraph('muted','Данные встречи: '+f.source+'. Время получения: '+shortTime(f.fetchedAt)+'. Расчёт использует только исходы до старта этого матча.'));
 }
 async function load(){
  if(loading)return;loading=true;
  const read=async(name)=>{const r=await fetch('./'+name+'?v='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error(name+' HTTP '+r.status);return r.json()};
- const [matchesResult,fixtureResult,reportResult,mapResult,journalResult]=await Promise.allSettled([read('snapshot.json'),read('fixtures.json'),read('report.json'),read('map-insights.json'),read('journal.json')]);
+ const [matchesResult,fixtureResult,reportResult,mapResult,journalResult,researchResult]=await Promise.allSettled([read('snapshot.json'),read('fixtures.json'),read('report.json'),read('map-insights.json'),read('journal.json'),read('research.json')]);
  if(matchesResult.status==='fulfilled'&&matchesResult.value?.schemaVersion===1&&Array.isArray(matchesResult.value.matches))
   matches=matchesResult.value.matches.filter(m=>m&&m.id&&m.a&&m.b&&(m.winner===m.a||m.winner===m.b)&&Number.isFinite(Date.parse(m.date))).sort((a,b)=>Date.parse(a.date)-Date.parse(b.date));
  if(fixtureResult.status==='fulfilled'&&fixtureResult.value?.schemaVersion===1&&Array.isArray(fixtureResult.value.fixtures)){
@@ -227,7 +255,14 @@ async function load(){
  }else{fixtureStatus=null;fixtures=[]}
  if(reportResult.status==='fulfilled'&&reportResult.value?.games)report=reportResult.value;
  if(mapResult.status==='fulfilled'&&mapResult.value?.schemaVersion===1)mapInsights=mapResult.value;
- if(journalResult.status==='fulfilled'&&Array.isArray(journalResult.value?.events))journal=journalResult.value.events;
+ if(journalResult.status==='fulfilled'&&Array.isArray(journalResult.value?.events)){
+  journal=journalResult.value.events;
+  published.clear();
+  for(const {type,record} of journal){
+   if(type==='forecast'&&Date.parse(record.createdAt)<Date.parse(record.kickoff))published.set(record.fixtureId,record);
+  }
+ }
+ if(researchResult.status==='fulfilled')research=researchResult.value;
  assessments.clear();
  syncTournaments();
  renderSources();
@@ -246,27 +281,99 @@ function syncTournaments(){
  if(!names.includes(filters.tournament))filters.tournament='all';
  select.value=filters.tournament;
 }
+function historicalResearch(root){
+ if(!research?.version)return;
+ const details=el('details');details.append(el('summary','','Историческая проверка моделей'));root.append(details);
+ details.append(paragraph('muted','Модели обучались, отбирались и калибровались до финального тестового периода.'));
+ for(const [game,report] of Object.entries(research.games)){
+  const label=game==='cs2'?'CS2':'Dota 2';
+  for(const [name,value] of [['Победитель',report.winner],...Object.entries(report.totals)]){
+   details.append(el('h3','analysis-head',label+' · '+name));
+   if(value.status!=='evaluated'){
+    details.append(paragraph('muted','Недостаточно данных для проверки · '+value.eligible+' подтверждённых серий'));continue;
+   }
+   const {models,splits}=value;
+   const since=splits.starts[3].slice(0,10);
+   details.append(paragraph('muted','Финальный тест с '+since+' · '+splits.counts[3]+' серий из '+value.eligible+
+    ' прошедших фильтр данных · '+(value.approved?'прошла порог публикации':'исследовательское сравнение')));
+   const grid=el('div','comp-grid');
+   for(const [model,quality] of Object.entries(models)){
+    grid.append(compBox((modelNames[model]??model)+(model===value.selected?' · выбрана':''),pct(quality.accuracy),
+     quality.correct+' / '+quality.decided+' · Brier '+quality.brier.toFixed(3)+' · Log loss '+quality.logLoss.toFixed(3)+' · ECE '+pct(quality.ece)));
+   }
+   details.append(grid);
+   if(name==='Победитель'){
+    const reliability=el('details');
+    reliability.append(el('summary','','Калибровка · '+(modelNames[value.selected]??value.selected)));
+    const verdict=models[value.selected];
+    const calibration=el('div','comp-grid');
+    for(const bin of verdict.reliability)calibration.append(compBox('Прогноз '+pct(bin.expected),pct(bin.observed),bin.count+' серий · фактическая доля побед'));
+    reliability.append(calibration);
+    for(const [threshold,test] of Object.entries(verdict.confidence??{})){
+     reliability.append(paragraph('muted','Уверенность от '+pct(Number(threshold))+' · '+test.correct+' / '+test.count+' попаданий · охват '+pct(test.coverage)));
+    }
+    details.append(reliability);
+   }
+  }
+ }
+}
 function renderDaily(root){
  const chooser=el('input');chooser.type='date';chooser.value=filters.reviewDay??dayFmt.format(Date.now());
- chooser.setAttribute('aria-label','Дата итогов');
- chooser.onchange=()=>{filters.reviewDay=chooser.value;renderWorkspace()};
+ chooser.setAttribute('aria-label','Конец периода');
+ chooser.onchange=()=>{if(chooser.value)filters.reviewDay=chooser.value;renderWorkspace()};
+ const period=el('select');period.setAttribute('aria-label','Период итогов');
+ period.replaceChildren(...[1,7,14,30,90].map(n=>new Option(n===1?'Один день':n+' дней',n)));
+ period.value=filters.reviewPeriod??1;
+ period.onchange=()=>{filters.reviewPeriod=Number(period.value);renderWorkspace()};
+ const game=el('select');game.setAttribute('aria-label','Дисциплина итогов');
+ game.replaceChildren(new Option('Все игры','all'),new Option('CS2','cs2'),new Option('Dota 2','dota'));
+ game.value=filters.reviewGame??'all';
+ game.onchange=()=>{filters.reviewGame=game.value;renderWorkspace()};
  const reload=el('button','tab','Обновить');reload.type='button';reload.onclick=load;
- const controls=el('div','tabs');controls.append(chooser,reload);root.append(controls);
- const rows=dailyRows({day:chooser.value,fixtures:[],journal,matches,now:Date.now()}).filter(row=>row.forecast);
+ const controls=el('div','tabs');controls.append(chooser,period,game,reload);root.append(controls);
+ const rows=dailyRows({day:chooser.value,from:reviewPeriod(chooser.value,Number(period.value)),fixtures:[],journal,matches,now:Date.now()})
+  .filter(row=>row.forecast&&row.forecast.probabilityBasis!=='map'&&(game.value==='all'||row.forecast.game===game.value));
  const t=tally(rows), grid=el('div','comp-grid');
- grid.append(compBox('Записано прогнозов',t.total),compBox('Попадания',t.won),compBox('Промахи',t.lost),
-  compBox('Ждём результата',t.pending),compBox('Матчи впереди',t.upcoming),
+ grid.append(compBox('Прогнозы победителя',t.total),compBox('Попадания',t.won),compBox('Промахи',t.lost),
+  compBox('Ждём подтверждения',t.pending),compBox('Матчи впереди',t.upcoming),
   compBox('Точность',t.won+t.lost?pct(t.won/(t.won+t.lost)):'—',t.won+t.lost+' сверено'));
  root.append(grid);
- if(!rows.length)root.append(paragraph('muted','На эту дату ещё нет записанных прогнозов.'));
- for(const {forecast,winner,upcoming,total,totalSaved,totalActual} of rows){
-  const result=winner?(winner===forecast.pick?'Попадание':'Промах')+' · победитель '+winner:upcoming?'Предстоит':'Ждём результата';
+ const totals=totalTally(rows);
+ if(totals.total){
+  const grid=el('div','comp-grid');
+  grid.append(compBox('Количество карт · прогнозы',totals.total),compBox('Сверено',totals.resolved),
+   compBox('Точность',totals.decisive?pct(totals.correct/totals.decisive):'—',totals.correct+' / '+totals.decisive+' прогнозов с выбором'));
+  root.append(grid);
+ }
+ const review=errorReview(rows);
+ if(review.misses){
+  const details=el('details');details.append(el('summary','','Разбор промахов · '+review.misses),
+   paragraph('muted',review.confident+' ошибок при вероятности от 65% · '+review.disagreement+' с расхождением с контрольной моделью'));
+  for(const {forecast,winner,error} of review.latest)details.append(compBox(forecast.a+' — '+forecast.b,
+   forecast.pick+' · '+pct(forecast.probability),'Победитель '+winner+(error?.disagreement?' · контрольная модель выбрала иначе':'')));
+  root.append(details);
+ }
+ const comparison=compareJournalWinners(rows);
+ if(comparison.length){
+  const details=el('details');
+  details.append(el('summary','','Сравнение на записанных прогнозах'));
+  const grid=el('div','comp-grid');
+  for(const stat of comparison)grid.append(compBox(modelNames[stat.name]??stat.name,stat.correct+' / '+stat.decided,'Сверено '+stat.settled+' · Brier '+stat.brier.toFixed(3)));
+  details.append(grid);
+  root.append(details);
+ }
+ historicalResearch(root);
+ if(!rows.length)root.append(paragraph('muted','За этот период нет записанных прогнозов.'));
+ for(const {forecast,winner,upcoming,total,totalSaved,totalActual,actualMaps,source} of rows){
+  const result=winner?(winner===forecast.pick?'Попадание':'Промах')+' · победитель '+winner:upcoming?'Предстоит':'Ждём подтверждения';
   const row=compBox(shortTime(forecast.kickoff)+' · '+forecast.a+' — '+forecast.b,forecast.pick+' · '+pct(forecast.probability),result);
-  if(total){
-   const line=String(total.line).replace('.',','), actual=typeof totalActual==='boolean'?' · итог '+(totalActual?'ТБ ':'ТМ ')+line:' · ждём счёт серии';
-   row.append(paragraph('muted','ТБ '+line+' '+pct(total.over)+' / ТМ '+line+' '+pct(total.under)+actual+
-    (totalSaved?'':' · пересчёт по записи')));
-  }
+  if(totalSaved){
+   const line=String(total.line).replace('.',',');
+   row.append(paragraph('muted','Предматчевый тотал · ТБ '+line+' '+pct(total.over)+' / ТМ '+line+' '+pct(total.under)));
+   if(typeof totalActual==='boolean')row.append(paragraph('muted','Итог · '+actualMaps+' карт · '+(totalActual?'ТБ ':'ТМ ')+line));
+   else row.append(paragraph('muted','Количество карт ждёт подтверждения'));
+  }else if(actualMaps!==null)row.append(paragraph('muted','Итог · '+actualMaps+' карт'));
+  if(source)row.append(paragraph('muted','Источник итога · '+source));
   root.append(row);
  }
 }

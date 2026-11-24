@@ -6,7 +6,8 @@ export function dotaSeries(rows){
  const groups = new Map();
  for(const row of rows){
   if(row.discipline!=='dota'||row.kind!=='map'||!row.seriesId||![0,1,2].includes(row.seriesType)||
-     !Array.isArray(row.providerTeamIds)||row.providerTeamIds.some(id=>!id))continue;
+     !Array.isArray(row.providerTeamIds)||row.providerTeamIds.length!==2||row.providerTeamIds.some(id=>!id)||
+     row.providerTeamIds[0]===row.providerTeamIds[1]||![row.a,row.b].includes(row.winner))continue;
   const grouped=groups.get(row.seriesId)??[];
   grouped.push(row);
   groups.set(row.seriesId,grouped);
@@ -22,13 +23,18 @@ export function dotaSeries(rows){
    const winnerId=map.providerTeamIds[map.winner===map.a?0:1];
    wins[ids.indexOf(winnerId)]++;
   }
-  const index=wins.indexOf(target);
-  if(index===-1||wins[1-index]>=target)continue;
+  const final=maps.at(-1);
+  const finalWinner=final.providerTeamIds[final.winner===final.a?0:1];
+  const index=ids.indexOf(finalWinner);
+  if(index===-1||wins[index]!==target||wins[1-index]>=target)continue;
   const finishedAt=Math.max(...maps.map(row=>Date.parse(row.finishedAt)));
   if(!Number.isFinite(finishedAt))continue;
+  const patches=new Set(maps.map(row=>row.patch));
+  const observed=Math.max(...maps.map(row=>Date.parse(row.resultObservedAt)||0));
+  const resultObservedAt=observed?new Date(observed).toISOString():null;
   series.push({id:'od-series-'+seriesId,game:'dota',discipline:'dota',kind:'series',
    a:first.a,b:first.b,date:first.date,winner:index===0?first.a:first.b,source:'OpenDota series',
-   tournament:first.tournament,format:'Bo'+(target*2-1),finishedAt:new Date(finishedAt).toISOString(),wins});
+   tournament:first.tournament,providerTeamIds:ids,resultObservedAt,patch:patches.size===1?first.patch:null,format:'Bo'+(target*2-1),finishedAt:new Date(finishedAt).toISOString(),wins});
  }
  return series;
 }
@@ -54,6 +60,9 @@ export function matchDotaResults(records, maps){
  }
  return [...candidates.values()].filter(rows=>rows.length===1).map(([{record,series}])=>{
   const winner=series.winner===(sameTeams(record,series)===1?series.a:series.b)?record.a:record.b;
-  return {...series,id:record.fixtureId,a:record.a,b:record.b,winner,seriesId:series.id};
+  const direct=sameTeams(record,series)===1;
+  return {...series,id:record.fixtureId,a:record.a,b:record.b,winner,
+   providerTeamIds:direct?series.providerTeamIds:[...series.providerTeamIds].reverse(),
+   wins:direct?series.wins:[...series.wins].reverse(),seriesId:series.id};
  });
 }

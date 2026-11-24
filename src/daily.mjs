@@ -9,7 +9,11 @@ const recordedMus={
  'bo3-133422':'FlyQuest'
 };
 
-export function dailyRows({day,fixtures,journal,matches,brief,mus={},now}){
+export function dailyRows({day,from=day,fixtures,journal,matches,brief,mus={},now}){
+ const inPeriod=value=>{
+  const key=moscowDay(value);
+  return key!==null&&key>=from&&key<=day;
+ };
  const events=new Map(), forecasts=new Map(), settlements=new Map(), scores=new Map();
  const prices=new Map((brief?.fixtures??[]).filter(row=>row.publicPrice).map(row=>[row.id,row]));
  const put=(id,row)=>{if(id)events.set(id,{...events.get(id),...row,id});};
@@ -26,12 +30,12 @@ export function dailyRows({day,fixtures,journal,matches,brief,mus={},now}){
   if(event.type==='series-score')scores.set(event.forecastId,event);
  }
  for(const row of fixtures)put(row.id,row);
- const pending=[...forecasts.values()].filter(p=>!settlements.has(p.id)&&p.probabilityBasis!=='map'&&moscowDay(p.kickoff)===day);
+ const pending=[...forecasts.values()].filter(p=>!settlements.has(p.id)&&p.probabilityBasis!=='map'&&inPeriod(p.kickoff));
  const checked=new Map(reconcilePaper(pending.map(p=>({...p,actual:null})),matches,new Date(now).toISOString()).records.map(p=>[p.id,p]));
  const rows=[];
  for(const event of events.values()){
   const forecast=forecasts.get(event.id);
-  if(moscowDay(forecast?.kickoff??event.date)!==day)continue;
+  if(!inPeriod(forecast?.kickoff??event.date))continue;
   const settlement=settlements.get(forecast?.id), archive=checked.get(forecast?.id);
   const actual=settlement?.result??archive?.actual;
   const winner=actual===1?forecast.pick:actual===0?(forecast.pick===forecast.a?forecast.b:forecast.a):null;
@@ -47,7 +51,7 @@ export function dailyRows({day,fixtures,journal,matches,brief,mus={},now}){
   rows.push({event,forecast,price,winner,actual,musPick,total,
    totalSaved:Boolean(forecast?.total),totalActual:total&&score?.format===forecast.format?score.maps>total.line:null,
    upcoming:Date.parse(forecast?.kickoff??event.date)>now,
-   source:settlement?.source??archive?.resolvedFrom, localMus:Object.hasOwn(mus,event.id)});
+   error:settlement?.error, actualMaps:score?.maps??null, source:settlement?.source??archive?.resolvedFrom, localMus:Object.hasOwn(mus,event.id)});
  }
  return rows.sort((a,b)=>Date.parse(a.event.date)-Date.parse(b.event.date));
 }
@@ -58,4 +62,45 @@ export function tally(rows, pick=row=>row.forecast?.pick){
  const lost=forecasts.filter(row=>row.winner&&row.winner!==pick(row)).length;
  const upcoming=forecasts.filter(row=>!row.winner&&row.upcoming).length;
  return {total:forecasts.length,won,lost,upcoming,pending:forecasts.length-won-lost-upcoming};
+}
+
+export function reviewPeriod(day, days) {
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(day)||![1,7,14,30,90].includes(days))throw Error('Invalid review period');
+ return new Date(Date.parse(day+'T00:00:00Z')-(days-1)*86400000).toISOString().slice(0,10);
+}
+
+export function totalTally(rows) {
+ const forecasts=rows.filter(row=>row.totalSaved);
+ const resolved=forecasts.filter(row=>typeof row.totalActual==='boolean');
+ const decisive=resolved.filter(row=>row.total.over!==.5);
+ return {total:forecasts.length,resolved:resolved.length,decisive:decisive.length,
+  correct:decisive.filter(row=>(row.total.over>.5)===row.totalActual).length,
+  brier:resolved.length?resolved.reduce((sum,row)=>sum+(row.total.over-Number(row.totalActual))**2,0)/resolved.length:null};
+}
+
+export function errorReview(rows) {
+ const misses=rows.filter(row=>row.actual===0);
+ return {misses:misses.length, confident:misses.filter(row=>row.forecast.probability>=.65).length,
+  disagreement:misses.filter(row=>row.error?.disagreement===true).length,
+  latest:misses.sort((a,b)=>Date.parse(b.forecast.kickoff)-Date.parse(a.forecast.kickoff)).slice(0,12)};
+}
+
+export function compareJournalWinners(rows) {
+ const audited=rows.filter(row=>row.winner&&row.forecast?.research?.probabilities);
+ const buckets=new Map();
+ for(const {forecast,winner} of audited){
+  const actual=Number(winner===forecast.a);
+  for(const [name,p] of Object.entries(forecast.research.probabilities)){
+   if(name==='equalChance'||!Number.isFinite(p))continue;
+   const bucket=buckets.get(name)??{settled:0,decided:0,correct:0,brier:0};
+   bucket.settled++;
+   if(p!==.5){
+    bucket.decided++;
+    if(Number(p>.5)===actual)bucket.correct++;
+   }
+   bucket.brier+=(p-actual)**2;
+   buckets.set(name,bucket);
+  }
+ }
+ return [...buckets].map(([name,result])=>({name,...result,brier:result.brier/result.settled}));
 }

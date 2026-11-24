@@ -1,10 +1,14 @@
 import {readFile} from 'node:fs/promises';
 import {analyzeFixture} from '../src/analysis.mjs';
 import {reconcilePaper} from '../src/settlement.mjs';
+import {matchCsResults} from '../src/cs-results.mjs';
 import {matchDotaResults} from '../src/dota-series.mjs';
 import {seriesChance,seriesUpdate,forecastTotal} from '../src/live.mjs';
+import {appendJournal, verifyJournal} from './journal-integrity.mjs';
+import {observedMaps} from '../src/research.mjs';
 
-export function updateJournal(before, fixtures, history, series, recordedAt, maps={},report={}) {
+export function updateJournal(before, fixtures, history, series, recordedAt, maps={},report={},research=new Map()) {
+  verifyJournal(before);
   const time=Date.parse(recordedAt);
   const received=fixture=>time>=Date.parse(fixture.fetchedAt)&&time-Date.parse(fixture.fetchedAt)<5*60000;
   const events=[...before.events];
@@ -13,70 +17,90 @@ export function updateJournal(before, fixtures, history, series, recordedAt, map
   const gaps=new Set(events.filter(item=>item.type==='skip').map(item=>item.fixtureId));
   const live=new Map(events.filter(item=>item.type==='live').map(item=>[item.fixtureId,item]));
   for(const fixture of fixtures){
+    if(settled.has(fixture.id))continue;
     if(fixture.status!=='upcoming'||Date.parse(fixture.date)<=time||!received(fixture))continue;
     const previous=forecasts.get(fixture.id);
     const rosters=fixture.rosters?.map(roster=>roster?.players.map(player=>player.id).sort().join(':'));
     const sameInputs=previous?.kickoff===fixture.date&&previous.format===fixture.format&&previous.rosters?.join(',')===rosters?.join(',');
-    if(sameInputs&&time-Date.parse(previous.createdAt)<6*3600000)continue;
+    const challenger=research.get(fixture.id);
+    const sameVersion=previous?.research?.version===challenger?.version;
+    if(sameInputs&&sameVersion&&time-Date.parse(previous.createdAt)<6*3600000)continue;
     const forecast=analyzeFixture(fixture,history,'','',time,maps[fixture.id],report[fixture.game]?.calibration);
-    if(forecast.status!=='ok'){
-      if(!gaps.has(fixture.id))events.push({type:'skip',fixtureId:fixture.id,a:fixture.a,b:fixture.b,
-        game:fixture.game,kickoff:fixture.date,recordedAt,source:fixture.source,reason:forecast.status});
+    if(forecast.status!=='ok'||forecast.probabilityBasis==='map'){
+      if(!gaps.has(fixture.id)){
+        events.push({type:'skip',fixtureId:fixture.id,a:fixture.a,b:fixture.b,
+          game:fixture.game,kickoff:fixture.date,recordedAt,source:fixture.source,reason:forecast.status==='ok'?'unknown-series-format':forecast.status});
+        gaps.add(fixture.id);
+      }
       continue;
     }
-    const {pa,pb,model}=forecast.result;
+    const control=forecast.result;
+    const selected=challenger?.approved&&Number.isFinite(challenger.probabilities[challenger.selected]);
+    const pa=selected?challenger.probabilities[challenger.selected]:control.pa;
+    const model=selected?challenger.selected+'@'+challenger.version:control.model;
+    const probabilityBasis=selected?'series':forecast.probabilityBasis;
+    const pick=pa>=.5?fixture.a:fixture.b;
     const record={id:fixture.id+'@'+recordedAt,fixtureId:fixture.id,game:fixture.game,
-      a:fixture.a,b:fixture.b,pick:forecast.picked,probability:Math.max(pa,pb),probabilityA:pa,mapProbability:forecast.result.factorProbability,probabilityBasis:forecast.probabilityBasis,
+      a:fixture.a,b:fixture.b,pick,probability:Math.max(pa,1-pa),probabilityA:pa,mapProbability:selected?null:control.factorProbability,probabilityBasis,
       rosters,format:fixture.format,tournament:fixture.tournament,kickoff:fixture.date,createdAt:recordedAt,model,actual:null,
-      source:fixture.source,evidence:{historyA:forecast.comparisons.a.count,historyB:forecast.comparisons.b.count,
+      source:fixture.source, providerIds:fixture.providerIds, research:challenger,
+      control:challenger?{probabilityA:control.pa,model:control.model}:undefined,
+      profileEvidence:fixture.rosters?.map(profile=>profile&&Date.parse(profile.observedAt)<=time?profile:null),
+      evidence:{historyA:forecast.comparisons.a.count,historyB:forecast.comparisons.b.count,
       map:forecast.mapContribution,roster:forecast.rosterContribution},reasons:forecast.reasons,calibrationDelta:forecast.calibrationDelta,
       odds:fixture.pari?.mode==='feed'&&Date.parse(fixture.pari.freshUntil)>time?fixture.pari.odds:null};
-    if(sameInputs&&previous.model===record.model&&Math.abs(previous.probabilityA-pa)<.01)continue;
-    const total=forecastTotal(record);
-    if(total)record.total=total;
+    if(sameInputs&&sameVersion&&previous.model===record.model&&Math.abs(previous.probabilityA-pa)<.01)continue;
+    const candidateTotal=challenger?.total;
+    const over=candidateTotal?.approved?candidateTotal.probabilities[candidateTotal.selected]:null;
+    const total=Number.isFinite(over)?{line:candidateTotal.line,over,under:1-over,model:candidateTotal.selected,validated:true}
+      :forecastTotal({...record,probabilityA:control.pa,mapProbability:control.factorProbability,probabilityBasis:forecast.probabilityBasis});
+    if(total)record.total={...total,model:total.model??'legacy-independent-maps',validated:total.validated??false};
     forecasts.set(fixture.id,record);
     events.push({type:'forecast',record});
   }
   const eligible=[...forecasts.values()].filter(record=>!settled.has(record.fixtureId)&&record.probabilityBasis!=='map');
   const finished=series.filter(row=>row.status==='finished');
   const all=[...forecasts.values()].filter(record=>record.probabilityBasis!=='map');
-  const completed=[...history,...finished,...matchDotaResults(all.filter(record=>!finished.some(row=>row.id===record.fixtureId)),history)];
+  const needsLink=all.filter(record=>!finished.some(row=>row.id===record.fixtureId));
+  const completed=[...history,...finished,...matchCsResults(needsLink,history),...matchDotaResults(needsLink,history)];
   const result=reconcilePaper(eligible,completed,recordedAt);
   for(const record of result.records){
     if(record.actual===null)continue;
     events.push({type:'settlement',forecastId:record.id,fixtureId:record.fixtureId,result:record.actual,checkedAt:record.checkedAt,
-      verifiedMatchId:record.verifiedMatchId,source:record.resolvedFrom,
-      error:record.actual===0?{kind:'upset',brier:record.probability**2,knownFactors:record.reasons.map(reason=>reason.name),
-        hypothesis:'Проверить покрытие истории и согласованность факторов. Причина расхождения не установлена.'}:null});
+      verifiedMatchId:record.sourceMatchId??record.verifiedMatchId,source:record.resolvedFrom,
+      error:record.actual===0?{kind:'upset',brier:record.probability**2,knownFactors:(record.reasons??[]).map(reason=>reason.name),
+        disagreement:record.control?((record.control.probabilityA>=.5)!==(record.probabilityA>=.5)):null,
+        hypothesis:'Причина промаха пока неизвестна.'}:null});
   }
   const scores=new Set(events.filter(item=>item.type==='series-score').map(item=>item.forecastId));
   const byId=new Map(completed.map(row=>[row.id,row]));
   const scoreCandidates=all.filter(p=>!scores.has(p.id)&&['Bo3','Bo5'].includes(p.format));
   for(const p of reconcilePaper(scoreCandidates,completed,recordedAt).records){
     if(p.actual===null)continue;
-    const match=byId.get(p.verifiedMatchId), wins=match?.wins??match?.score;
-    const target=p.format==='Bo3'?2:3;
-    if(match?.format!==p.format||!Array.isArray(wins)||wins.length!==2||
-      !wins.every(n=>Number.isInteger(n)&&n>=0)||Math.max(...wins)!==target||Math.min(...wins)>=target)continue;
-    events.push({type:'series-score',fixtureId:p.fixtureId,forecastId:p.id,format:p.format,maps:wins[0]+wins[1],
+    const match=byId.get(p.verifiedMatchId);
+    const maps=match?.format===p.format?observedMaps({...match,wins:match.wins??match.score}):null;
+    if(maps===null)continue;
+    events.push({type:'series-score',fixtureId:p.fixtureId,forecastId:p.id,format:p.format,maps,
       checkedAt:recordedAt,source:match.source});
   }
   for(const fixture of fixtures){
     if(fixture.status!=='live'||!fixture.score||!received(fixture))continue;
     const base=forecasts.get(fixture.id);
     if(!base||base.a!==fixture.a||base.b!==fixture.b||base.format!==fixture.format)continue;
-    const pa=fixture.game==='dota'
-      ? seriesChance(base.mapProbability??base.probabilityA,base.format,fixture.score)
+    const pa=base.probabilityBasis==='series-projected'&&Number.isFinite(base.mapProbability)
+      ? seriesChance(base.mapProbability,base.format,fixture.score)
       : seriesUpdate(base.probabilityA,base.format,fixture.score);
-    if(pa===null||live.get(fixture.id)?.score.join(':')===fixture.score.join(':'))continue;
+    const mapsPlayed=fixture.score.reduce((sum,n)=>sum+n,0);
+    const previous=live.get(fixture.id), previousMaps=previous?.mapsPlayed??previous?.score?.reduce((sum,n)=>sum+n,0);
+    if(pa===null||(previousMaps!=null&&mapsPlayed<=previousMaps))continue;
     events.push({type:'live',fixtureId:fixture.id,observedAt:recordedAt,source:fixture.source,
-      score:fixture.score,probabilityA:pa,version:'series-state-v1'});
+      mapsPlayed,probabilityA:pa,version:'series-state-v2'});
   }
-  return {schemaVersion:1,events};
+  return appendJournal(before,events.slice(before.events.length));
 }
 
 export const readJournal=async file=>{
-  try{return JSON.parse(await readFile(file,'utf8'))}catch(error){
+  try{return verifyJournal(JSON.parse(await readFile(file,'utf8')))}catch(error){
     if(error.code!=='ENOENT')throw error;
     return {schemaVersion:1,events:[]};
   }

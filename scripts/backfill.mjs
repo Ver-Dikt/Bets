@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Build a private real-data archive incrementally. Never simulates a failed source.
 import {readArchive,mergeArchive,writeArchive,DEFAULT_ARCHIVE} from '../src/archive.mjs';
+import {enrichDotaMatches} from '../src/dota-details.mjs';
 import {days,isoDay,fetchCsDay,fetchDotaPage,sleep} from '../src/collect.mjs';
 import {resolve} from 'node:path';
 
@@ -56,7 +57,9 @@ async function main(){
    if(total.requests)await sleep(delay);
    const page=await fetchDotaPage(cursor);total.requests++;
    const matches=page.matches.filter(x=>x.date.slice(0,10)>=since);
-   const report=await mergeAndSave(matches,args.includes('--continue')&&page.cursor!==null?{dotaOlderCursor:page.cursor}:{});
+   const details=index===0&&!args.includes('--continue')?await enrichDotaMatches(matches):null;
+   if(details?.failed)console.warn('OpenDota detail checks failed:', details.failed, 'of', details.checked);
+   const report=await mergeAndSave(details?.rows??matches,args.includes('--continue')&&page.cursor!==null?{dotaOlderCursor:page.cursor}:{});
    console.log('[Dota]',index+1,'received',page.sourceRows,'after date filter',matches.length,'added',report.added);
    if(page.sourceRows===0||page.cursor===null||page.cursor===cursor||page.cursor===previous)break;
    previous=cursor;cursor=page.cursor;
