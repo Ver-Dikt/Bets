@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {analyzeFixture} from '../site/analysis.mjs';
+import {analyzeFixture} from '../src/analysis.mjs';
 const rows=Array.from({length:25},(_,i)=>({id:'cs-'+i,discipline:'cs2',date:new Date(Date.UTC(2026,0,1+i)).toISOString(),
  a:'Alpha',b:'Bravo',winner:i%3?'Alpha':'Bravo',source:'test'}));
 test('future CS2 card generates factor-level reasons only with history',()=>{
