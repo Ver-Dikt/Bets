@@ -1,6 +1,7 @@
 // Normalize map-level CS2 scores from bo3.gg. Never turn series results into map results.
 // Independent implementation following fields observed in public provider responses.
 const POOL=new Set(['Ancient','Anubis','Dust2','Inferno','Mirage','Nuke','Train','Vertigo','Overpass','Cache','Cobblestone']);
+const NAMES={de_ancient:'Ancient',de_anubis:'Anubis',de_dust2:'Dust2',de_inferno:'Inferno',de_mirage:'Mirage',de_nuke:'Nuke',de_train:'Train',de_vertigo:'Vertigo',de_overpass:'Overpass',de_cache:'Cache',de_cbble:'Cobblestone'};
 export function normalizeCSMaps(payload){
  if(!payload||!Array.isArray(payload.results))throw Error('bo3.gg map history schema changed');
  const rows=[];
@@ -8,7 +9,7 @@ export function normalizeCSMaps(payload){
   if(match?.id==null||!Array.isArray(match.games))continue;
   for(let i=0;i<match.games.length;i++){
    const game=match.games[i];
-   const mapName=String(game?.map_name??'').trim();
+   const raw=String(game?.map_name??'').trim();const mapName=NAMES[raw.toLowerCase()]??raw;
    if(!POOL.has(mapName))continue;
    const winId=game?.winner_team_clan?.team?.id,loseId=game?.loser_team_clan?.team?.id;
    if(winId==null||loseId==null||String(winId)===String(loseId))continue;
