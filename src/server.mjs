@@ -7,7 +7,8 @@ import fs from 'node:fs/promises';
 import {existsSync} from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
-const publicDir=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../public');
+const projectRoot=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const publicDir=existsSync(path.join(projectRoot,'dist','index.html'))?path.join(projectRoot,'dist'):path.join(projectRoot,'public');
 // Prefer the private GitHub Actions archive when present; never expose this file as a static asset.
 const archivePath=()=>process.env.BETS_ARCHIVE_PATH||(existsSync(path.resolve('data/private/matches.json'))?path.resolve('data/private/matches.json'):DEFAULT_ARCHIVE);
 const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.svg':'image/svg+xml','.webmanifest':'application/manifest+json'};
