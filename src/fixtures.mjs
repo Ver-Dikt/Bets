@@ -6,9 +6,9 @@ const iso=x=>{
 };
 const name=x=>typeof x==='string'?x.trim():typeof x?.name==='string'?x.name.trim():'';
 const lookup=(obj,id)=>obj&&typeof obj==='object'?(obj[String(id)]||obj[Number(id)]||null):null;
-const list=data=>Array.isArray(data)?data:Array.isArray(data?.data)?data.data:Array.isArray(data?.data?.matches)?data.data.matches:Array.isArray(data?.matches)?data.matches:[];
+const list=data=>Array.isArray(data)?data:Array.isArray(data?.results)?data.results:Array.isArray(data?.data)?data.data:Array.isArray(data?.data?.results)?data.data.results:Array.isArray(data?.data?.matches)?data.data.matches:Array.isArray(data?.matches)?data.matches:[];
 export function normalizeCSFixtures(payload,{fetchedAt=new Date().toISOString()}={}){
- if(!payload||typeof payload!=='object'||!('data' in payload))throw Error('CS2: нераспознанный формат ответа');
+ if(!payload||typeof payload!=='object'||(!('data' in payload)&&!Array.isArray(payload.results)))throw Error('CS2: нераспознанный формат ответа');
  const included=payload.included??{},teams=included.teams??{};
  const leagues=included.tournaments??included.leagues??{};
  const out=[];
@@ -16,8 +16,8 @@ export function normalizeCSFixtures(payload,{fetchedAt=new Date().toISOString()}
   if(!m||m.id==null)continue;
   const status=String(m.status??m.parsed_status??'').toLowerCase();
   if(!['upcoming','current','live','scheduled'].includes(status))continue;
-  const a=name(m.team1_name)||name(m.team1)||name(lookup(teams,m.team1_id));
-  const b=name(m.team2_name)||name(m.team2)||name(lookup(teams,m.team2_id));
+  const a=name(m.team1_name)||name(m.team1)||name(m.teams?.[0])||name(lookup(teams,m.team1_id));
+  const b=name(m.team2_name)||name(m.team2)||name(m.teams?.[1])||name(lookup(teams,m.team2_id));
   const date=iso(m.start_date??m.begin_at??m.startsAt??m.start_time);
   if(!a||!b||a===b||!date)continue;
   const tournament=name(m.tournament_name)||name(m.tournament)||name(lookup(leagues,m.tournament_id??m.tournament));
