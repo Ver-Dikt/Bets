@@ -21,7 +21,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   deploy:
-    # Do not attempt publication while repository is Private.
+    # Publish the historical research preview only after the repository becomes public.
     if: github.event.repository.private == false
     environment:
       name: github-pages
