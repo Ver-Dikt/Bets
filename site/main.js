@@ -7,7 +7,7 @@ const shortTime=x=>Number.isFinite(Date.parse(x))?dateFmt.format(new Date(x)):'�
 const dateLong=x=>Number.isFinite(Date.parse(x))?new Intl.DateTimeFormat('ru-RU',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(x)):'Время неизвестно';
 const pct=x=>typeof x==='number'&&Number.isFinite(x)?(x*100).toFixed(1)+'%':'—';
 const asNum=x=>x==null?'—':Number(x).toFixed(1);
-let matches=[],fixtures=[],report=null,filters={game:'all',archive:'cs2'},selected=null,expanded=false,loading=false,fixtureStatus=null;
+let matches=[],fixtures=[],report=null,mapInsights=null,filters={game:'all',archive:'cs2'},selected=null,expanded=false,loading=false,fixtureStatus=null;
 const PAPER_KEY='bets-paper-v2';
 let paper=[];try{const o=JSON.parse(localStorage.getItem(PAPER_KEY)||'[]');if(Array.isArray(o))paper=o}catch{}
 const errorBlock=(title,sub)=>{const root=el('div','empty');root.append(el('strong','',title));if(sub){root.append(el('p','',sub))}return root};
@@ -114,6 +114,28 @@ function drawFactors(root,analysis){
           compBox('История дисциплины',c.dataCount,'До начала встречи'));
  root.append(g);
 }
+function drawMapInsight(root,f){
+ if(f.game!=='cs2')return;
+ const record=mapInsights?.insights?.[f.id];
+ root.append(el('h3','analysis-head','Статистика карт · отдельная модель'));
+ if(!record){root.append(paragraph('muted','Для этого матча пока нет подтверждённой карты результатов. Никаких фиктивных veto или процентов.'));return}
+ if(record.status==='insufficient-maps'){
+  root.append(paragraph('muted','Сыгранных карт в источнике: '+f.a+' — '+record.teamAMaps+', '+f.b+' — '+record.teamBMaps+'. Для модели нужно минимум '+record.required+' карт каждой команде.'));return;
+ }
+ if(record.status!=='map-analysis'){
+  root.append(paragraph('muted','Отдельный расчёт карт недоступен: '+(record.status||'нет данных')+'.'));return;
+ }
+ root.append(paragraph('muted','Собранные результаты карт: '+f.a+' — '+record.teamAMaps+', '+f.b+' — '+record.teamBMaps+'. Расчёт выполняет исходный MIT-модуль MapModel из csgopred.'));
+ const names=new Set(Array.isArray(record.vetoEstimate)?record.vetoEstimate:[]);
+ for(const m of (record.maps||[]).slice().sort((a,b)=>Math.abs(b.probA-.5)-Math.abs(a.probA-.5)).slice(0,7)){
+  const box=el('div','factor'),head=el('div','factor-title');
+  head.append(el('span','',m.map+(names.has(m.map)?' · симуляция veto':'')),el('span','contribution',pct(m.probA)));
+  box.append(head,paragraph('factor-description','История карты: '+f.a+' '+m.mapsA+' · '+f.b+' '+m.mapsB));
+  const bar=el('div','factor-progress'),fill=el('div');fill.style.width=(m.probA*100)+'%';bar.append(fill);box.append(bar);root.append(box);
+ }
+ if(Number.isFinite(record.seriesProbabilityA))root.append(el('div','help','Сценарная вероятность серии по карте-модели: '+pct(record.seriesProbabilityA)+' на '+f.a+'. Это отдельная гипотеза, она не входит в общий ансамбль до независимой проверки.'));
+ root.append(paragraph('warn',record.caution||'Расчёт карт исследовательский.'));
+}
 function drawOdds(root,analysis,f){
  root.append(el('h3','analysis-head','Рыночная линия · ввод вручную'));
  root.append(paragraph('muted','Букмекерские коэффициенты не загружаются автоматически. Впиши котировки на один и тот же исход и рынок, чтобы оценить EV; без них нельзя подтвердить преимущество.'));
@@ -167,6 +189,7 @@ function renderAnalysis(){
  verdict.append(el('small','','МОДЕЛЬНЫЙ ФАВОРИТ'),el('b','',r.picked+' · '+pct(Math.max(a,b))),paragraph('',r.note));
  root.append(verdict);
  drawFactors(root,r);
+ drawMapInsight(root,f);
  root.append(el('div','help','Почему этот выбор: модель суммирует три оценки с весами 65% / 25% / 10%. Результат исторический и некалиброванный; рейтинг не знает о заменах игроков, картах и актуальном патче.'));
  drawOdds(root,r,f);
  root.append(paragraph('muted','Данные встречи: '+f.source+'. Время получения: '+shortTime(f.fetchedAt)+'. Расчёт использует только исходы до старта этого матча.'));
@@ -209,13 +232,14 @@ function renderJournal(){
 async function load(){
  if(loading)return;loading=true;
  const read=async(name)=>{const r=await fetch('./'+name+'?v='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error(name+' HTTP '+r.status);return r.json()};
- const [matchesResult,fixtureResult,reportResult]=await Promise.allSettled([read('snapshot.json'),read('fixtures.json'),read('report.json')]);
+ const [matchesResult,fixtureResult,reportResult,mapResult]=await Promise.allSettled([read('snapshot.json'),read('fixtures.json'),read('report.json'),read('map-insights.json')]);
  if(matchesResult.status==='fulfilled'&&matchesResult.value?.schemaVersion===1&&Array.isArray(matchesResult.value.matches))
   matches=matchesResult.value.matches.filter(m=>m&&m.id&&m.a&&m.b&&(m.winner===m.a||m.winner===m.b)&&Number.isFinite(Date.parse(m.date))).sort((a,b)=>Date.parse(a.date)-Date.parse(b.date));
  if(fixtureResult.status==='fulfilled'&&fixtureResult.value?.schemaVersion===1&&Array.isArray(fixtureResult.value.fixtures)){
   fixtureStatus=fixtureResult.value;fixtures=fixtureStatus.fixtures.filter(f=>f&&f.id&&f.a&&f.b&&Number.isFinite(Date.parse(f.date))&&['cs2','dota'].includes(f.game));
  }else{fixtureStatus=null;fixtures=[]}
  if(reportResult.status==='fulfilled'&&reportResult.value?.games)report=reportResult.value;
+ if(mapResult.status==='fulfilled'&&mapResult.value?.schemaVersion===1)mapInsights=mapResult.value;
  renderSources();renderMetrics();renderFixtures();renderArchive();renderQuality();
  const available=activeFixtures();
  if(!selected&&available.length)selected=available[0];
