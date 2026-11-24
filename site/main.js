@@ -1,3 +1,4 @@
+import {briefRows,priceComparison} from './brief.mjs';
 import {analyzeFixture} from './analysis.mjs';
 import {score} from './engine.mjs';
 import {reconcilePaper} from './settlement.mjs';
@@ -10,7 +11,7 @@ const shortTime=x=>Number.isFinite(Date.parse(x))?dateFmt.format(new Date(x)):'�
 const dateLong=x=>Number.isFinite(Date.parse(x))?new Intl.DateTimeFormat('ru-RU',{timeZone:moscow,day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(x)):'Время неизвестно';
 const pct=x=>typeof x==='number'&&Number.isFinite(x)?(x*100).toFixed(1)+'%':'—';
 const asNum=x=>x==null?'—':Number(x).toFixed(1);
-let matches=[],fixtures=[],journal=[],report=null,mapInsights=null,filters={game:'all',archive:'cs2',view:'today',period:'today',tournament:'all',quality:'all'},selected=null,expanded=false,loading=false,fixtureStatus=null;
+let matches=[],fixtures=[],journal=[],brief=null,report=null,mapInsights=null,filters={game:'all',archive:'cs2',view:location.hash==='#brief'?'brief':'today',period:'today',tournament:'all',quality:'all'},selected=null,expanded=false,loading=false,fixtureStatus=null;
 const assessments=new Map();
 function assessment(fixture) {
  if(Date.parse(fixture.date)<=Date.now())return {status:'live'};
@@ -328,7 +329,7 @@ function renderJournal(){
 async function load(){
  if(loading)return;loading=true;
  const read=async(name)=>{const r=await fetch('./'+name+'?v='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error(name+' HTTP '+r.status);return r.json()};
- const [matchesResult,fixtureResult,reportResult,mapResult,journalResult]=await Promise.allSettled([read('snapshot.json'),read('fixtures.json'),read('report.json'),read('map-insights.json'),read('journal.json')]);
+ const [matchesResult,fixtureResult,reportResult,mapResult,journalResult,briefResult]=await Promise.allSettled([read('snapshot.json'),read('fixtures.json'),read('report.json'),read('map-insights.json'),read('journal.json'),read('brief.json')]);
  if(matchesResult.status==='fulfilled'&&matchesResult.value?.schemaVersion===1&&Array.isArray(matchesResult.value.matches))
   matches=matchesResult.value.matches.filter(m=>m&&m.id&&m.a&&m.b&&(m.winner===m.a||m.winner===m.b)&&Number.isFinite(Date.parse(m.date))).sort((a,b)=>Date.parse(a.date)-Date.parse(b.date));
  if(fixtureResult.status==='fulfilled'&&fixtureResult.value?.schemaVersion===1&&Array.isArray(fixtureResult.value.fixtures)){
@@ -337,6 +338,7 @@ async function load(){
  if(reportResult.status==='fulfilled'&&reportResult.value?.games)report=reportResult.value;
  if(mapResult.status==='fulfilled'&&mapResult.value?.schemaVersion===1)mapInsights=mapResult.value;
  if(journalResult.status==='fulfilled'&&Array.isArray(journalResult.value?.events))journal=journalResult.value.events;
+ if(briefResult.status==='fulfilled'&&Array.isArray(briefResult.value?.fixtures))brief=briefResult.value;
  assessments.clear();
  reconcileJournal();renderJournal();
  syncTournaments();
@@ -358,7 +360,7 @@ function syncTournaments(){
  if(!names.includes(filters.tournament))filters.tournament='all';
  select.value=filters.tournament;
 }
-const viewNames={daily:'Итоги дня',memory:'Опыт и ошибки',learning:'Калибровка',evolution:'Версии моделей',data:'Данные и архив'};
+const viewNames={brief:'Твой список · 24 ноября',daily:'Итоги дня',memory:'Опыт и ошибки',learning:'Калибровка',evolution:'Версии моделей',data:'Данные и архив'};
 function renderWorkspace(){
  const view=filters.view, panel=$('workspace-report'), root=$('workspace-content');
  const matchesView=view==='today'||view==='live';
@@ -372,6 +374,7 @@ function renderWorkspace(){
  }
  if(matchesView)return;
  $('workspace-title').textContent=viewNames[view];
+ if(view==='brief'){renderBrief(root);return}
  root.replaceChildren();
  if(view==='daily'||view==='memory'){
   const check=new Map(journal.filter(item=>item.type==='settlement').map(item=>[item.fixtureId,item]));
@@ -437,13 +440,81 @@ function renderWorkspace(){
  for(const [game,data] of Object.entries(report?.games??{}))root.append(compBox(game.toUpperCase(),data.rows+' результатов',
    shortTime(data.earliest)+' — '+shortTime(data.latest)));
 }
+function renderBrief(root){
+ if(!brief){root.append(errorBlock('Список пока не загружен'));return}
+ const opened=new Set([...root.querySelectorAll('details[open]')].map(node=>node.dataset.matchId));
+ root.replaceChildren();
+ const rows=briefRows(brief.fixtures,fixtures,journal,matches,Date.now());
+ const labels={upcoming:'Предстоит',live:'Live · снимок',started:'Время старта прошло · ожидаем счёт',finished:'Завершён'};
+ root.append(paragraph('muted',rows.length+' матчей · '+rows.filter(row=>row.forecast).length+' матчей с записанной оценкой. Время по Москве.'));
+ root.append(paragraph('muted','Шанс победы оценивает модель. Порог безубыточности зависит только от коэффициента. Результаты сверяются с журналом.'));
+ for(const {fixture:f,forecast,settlement,live,gap,result,status} of rows){
+  const stored=brief.fixtures.find(row=>row.id===f.id);
+  const details=el('details','brief-match');
+  details.dataset.matchId=f.id;
+  details.open=opened.has(f.id);
+  const summary=el('summary');
+  summary.append(el('small','',shortTime(f.date)+' · '+(f.game==='cs2'?'CS2':'Dota 2')+' · '+labels[status]),
+    el('span','',f.a+' — '+f.b));
+  if(forecast)summary.append(el('small','','Предматчевый прогноз · '+forecast.pick+' '+pct(forecast.probability)));
+  else summary.append(el('small','',assessmentMessage(gap?.reason)));
+  details.append(summary);
+  const current=status==='upcoming'&&f.status==='upcoming'?assessment(f):null;
+  if(current?.status==='ok'){
+   const {a,b,h2h}=current.comparisons;
+   details.append(paragraph('','Расчёт по свежему архиву · '+current.picked+' '+pct(Math.max(current.result.pa,current.result.pb))));
+   const facts=el('ul');
+   facts.append(el('li','',f.a+' — Elo '+asNum(a.rating)+', '+a.count+' результатов, победы '+a.wins+' из последних '+a.last+'.'),
+    el('li','',f.b+' — Elo '+asNum(b.rating)+', '+b.count+' результатов, победы '+b.wins+' из последних '+b.last+'.'),
+    el('li','','Очные встречи · '+h2h.winsA+':'+h2h.winsB+' по '+h2h.count+' результатам в архиве.'));
+   if(current.probabilityBasis==='series-projected'){
+    const one=current.picked===f.a?current.result.factorProbability:1-current.result.factorProbability;
+    facts.append(el('li','','Шанс на одну карту · '+pct(one)+'. Оценка BO3 предполагает независимость карт.'));
+   }
+   details.append(facts);
+  }
+  if(forecast){
+   const factorList=el('ul');
+   for(const reason of forecast.reasons??[]){
+    const expected=reason.a>=.5?forecast.a:forecast.b;
+    factorList.append(el('li','',reason.name+' · вес '+pct(reason.weight)+' · '+expected+' '+pct(Math.max(reason.a,1-reason.a))+'. '+reason.description));
+   }
+   details.append(paragraph('muted','Факторы сохранённого прогноза · записано '+shortTime(forecast.createdAt)+' · '+forecast.model));
+   if(factorList.childElementCount)details.append(factorList);
+   const extra=[];
+   if(forecast.evidence?.map)extra.push('карты CS2');
+   if(forecast.evidence?.roster)extra.push('профили игроков');
+   if(extra.length)details.append(paragraph('muted','Дополнительные факторы: '+extra.join(', ')+'.'));
+   if(forecast.probabilityBasis==='series-projected')details.append(paragraph('muted','Шанс на серию рассчитан из модели карт. Отдельная калибровка серии пока не подтверждена.'));
+   const price=stored.publicPrice;
+   if(price&&forecast.probabilityBasis!=='map'){
+    const index=forecast.pick===stored.a?0:forecast.pick===stored.b?1:-1;
+    const odds=price.odds[index];
+    const comparison=priceComparison(forecast.probability,odds);
+    if(comparison){
+     const link=el('a','','PARI');link.href=price.url;link.target='_blank';link.rel='noopener noreferrer';
+     const line=paragraph('muted','');line.append(link,' · снимок '+price.observedAt+' · '+odds.toFixed(2)+' на '+forecast.pick+
+        ' · порог безубыточности '+pct(comparison.breakEven)+' · разница к сохранённой оценке '+(comparison.delta>=0?'+':'')+(comparison.delta*100).toFixed(1)+' п.п.');
+     details.append(line);
+    }
+   }
+  }
+  if(!forecast&&gap)details.append(paragraph('muted','Прогноз пропущен. '+assessmentMessage(gap.reason)+'.'));
+  if(result)details.append(paragraph('','Победитель · '+result.winner+' · '+result.source));
+  if(settlement)details.append(paragraph('','Прогноз '+(settlement.result===1?'совпал':'не совпал')+' · сверено '+shortTime(settlement.checkedAt)));
+  if(live&&status!=='finished')details.append(paragraph('','Сохранённая Live-оценка · '+shortTime(live.observedAt)+' · '+f.a+' '+pct(live.probabilityA)+' · карты '+live.score.join(':')));
+  if((status==='live'||status==='started')&&!live)details.append(paragraph('muted','Для Live-пересчёта нужен подтверждённый снимок счёта.'));
+  if(f.tournament)details.append(paragraph('muted',f.tournament+(f.format?' · '+f.format:'')));
+  root.append(details);
+ }
+}
 function updateFilters(){
  expanded=false;
  const rows=activeFixtures();
  if(!rows.some(row=>row.id===selected?.id))selected=rows[0]??null;
  renderFixtures();renderAnalysis();renderWorkspace();
 }
-for(const btn of document.querySelectorAll('[data-view]'))btn.onclick=()=>{filters.view=btn.dataset.view;updateFilters()};
+for(const btn of document.querySelectorAll('[data-view]'))btn.onclick=()=>{filters.view=btn.dataset.view;history.replaceState(null,'',filters.view==='brief'?'#brief':location.pathname+location.search);updateFilters()};
 for(const key of ['period','tournament','quality'])$(key).onchange=()=>{filters[key]=$(key).value;updateFilters()};
 for(const btn of document.querySelectorAll('[data-game]'))btn.onclick=()=>{filters.game=btn.dataset.game;syncTournaments();updateFilters()};
 load();

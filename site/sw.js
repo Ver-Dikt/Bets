@@ -1,6 +1,6 @@
-const CACHE = 'bets-pages-v5';
-const DATA = new Set(['snapshot.json','report.json','fixtures.json','map-insights.json','journal.json','release.json']);
-const ASSETS = ['./','./main.js','./analysis.mjs','./settlement.mjs','./engine.mjs','./identity.mjs',
+const CACHE = 'bets-pages-v6';
+const DATA = new Set(['snapshot.json','report.json','fixtures.json','map-insights.json','journal.json','release.json','brief.json']);
+const ASSETS = ['./','./main.js','./brief.mjs','./analysis.mjs','./settlement.mjs','./engine.mjs','./identity.mjs',
   './live.mjs','./calibration.mjs','./evidence-time.mjs','./roster-factor.mjs','./manifest.webmanifest','./icon.svg',...[...DATA].map(name=>'./'+name)];
 
 self.addEventListener('install', event=>{
