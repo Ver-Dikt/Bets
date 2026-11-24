@@ -11,6 +11,8 @@ on:
       - ".github/workflows/maps.yml"
 permissions:
   contents: write
+  pages: write
+  id-token: write
 concurrency:
   group: bets-map-sync
   cancel-in-progress: false
@@ -54,3 +56,13 @@ jobs:
             sleep 3
           done
           exit 1
+
+  publish:
+    name: Publish latest verified Bets snapshots
+    needs: maps
+    if: needs.maps.result == 'success'
+    uses: ./.github/workflows/pages.yml
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
