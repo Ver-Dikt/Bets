@@ -18,6 +18,7 @@ const config=[
 for(const src of config){
  try{
   const payload=await fetchJson(src.url,{retries:1});
+  if(src.key==='cs2') console.log('CS2 response structure:',JSON.stringify({rootKeys:Object.keys(payload??{}),dataKeys:Object.keys(payload?.data??{}).slice(0,20),matchesKeys:Object.keys(payload?.matches??{}).slice(0,5),sample:Array.isArray(payload)?payload[0]:Array.isArray(payload?.data)?payload.data[0]:Array.isArray(payload?.matches)?payload.matches[0]:null}).slice(0,6000));
   let normalized=src.parser(payload,{fetchedAt});
   // Real upcoming data are future fixtures. Live states may already have begun,
   // but must expire in the client if this snapshot becomes stale.
