@@ -34,5 +34,8 @@ await writeFile(resolve(dist,'report.json'),JSON.stringify(publishedReport)+'\n'
 const schedule=await read('data/public/fixtures.json').catch(()=>null);
 const publicSchedule=schedule?.schemaVersion===1&&Array.isArray(schedule.fixtures)?schedule:{schemaVersion:1,generatedAt:null,fixtures:[],sources:{cs2:{ok:false,error:'Not collected'},dota:{ok:false,error:'Not collected'}}};
 await writeFile(resolve(dist,'fixtures.json'),JSON.stringify(publicSchedule)+'\n');
+const mapData=await read('data/public/map-insights.json').catch(()=>null);
+const pubMap=mapData?.schemaVersion===1&&mapData.insights?mapData:{schemaVersion:1,generatedAt:null,historicalMaps:0,insights:{}};
+await writeFile(resolve(dist,'map-insights.json'),JSON.stringify(pubMap)+'\n');
 await writeFile(resolve(dist,'.nojekyll'),'');
 console.log('Bets Pages artifact built:',safe.length,'finished games. Full private archive is not copied to site.');
