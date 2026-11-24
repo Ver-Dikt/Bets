@@ -36,6 +36,10 @@ async def main() -> int:
         print("CS2API actual upstream client: response received, payload root is",
               type(payload).__name__,
               "keys", list(payload)[:12] if isinstance(payload, dict) else "array length "+str(len(payload)))
+        sample = (payload.get("results") or [{}])[0] if isinstance(payload, dict) else {}
+        if isinstance(sample, dict):
+            print("CS2API first public fixture fields:", list(sample.keys())[:35])
+            print("CS2API public fixture detail:", json.dumps({k: sample.get(k) for k in ("id","status","parsed_status","start_date","team1_id","team2_id","team1","team2","tournament","teams")},ensure_ascii=False,default=str)[:1700])
         return 0
     except Exception as error:
         print("CS2API client could not retrieve fixtures:", str(error)[:400], file=sys.stderr)
