@@ -21,7 +21,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   deploy:
-    # Publish the historical research preview only after the repository becomes public.
+    # Publish historical research preview. GitHub Pages source selected as Actions by owner.
     if: github.event.repository.private == false
     environment:
       name: github-pages
