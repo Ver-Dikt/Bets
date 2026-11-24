@@ -2,6 +2,7 @@ import {dailyRows,tally,reviewPeriod,totalTally,errorReview,compareJournalWinner
 import {analyzeFixture,probabilitySteps} from './analysis.mjs';
 const modelNames={
  dynamicElo:'Dynamic Elo',glicko2:'Glicko-2',trueSkill:'TrueSkill',bradleyTerry:'Bradley–Terry',
+ ratingBlend:'Ансамбль рейтингов',hybridBlend:'Ансамбль рейтингов и деревьев',
  bayesian:'Байесовская модель',catBoost:'CatBoost',lightGBM:'LightGBM',legacy:'Контрольная модель',
  equalChance:'Равные шансы',formatPrior:'Историческая частота'
 };
@@ -335,13 +336,13 @@ function renderDaily(root){
   .filter(row=>row.forecast&&row.forecast.probabilityBasis!=='map'&&(game.value==='all'||row.forecast.game===game.value));
  const t=tally(rows), grid=el('div','comp-grid');
  grid.append(compBox('Прогнозы победителя',t.total),compBox('Попадания',t.won),compBox('Промахи',t.lost),
-  compBox('Ждём подтверждения',t.pending),compBox('Матчи впереди',t.upcoming),
+  compBox('Технические исходы',t.technical??0),compBox('Ждём подтверждения',t.pending),compBox('Матчи впереди',t.upcoming),
   compBox('Точность',t.won+t.lost?pct(t.won/(t.won+t.lost)):'—',t.won+t.lost+' сверено'));
  root.append(grid);
  const totals=totalTally(rows);
  if(totals.total){
   const grid=el('div','comp-grid');
-  grid.append(compBox('Количество карт · прогнозы',totals.total),compBox('Сверено',totals.resolved),
+  grid.append(compBox('Количество карт · прогнозы',totals.total),compBox('Сверено',totals.resolved),compBox('Технические исходы',totals.technical),compBox('Ждём подтверждения',totals.pending),
    compBox('Точность',totals.decisive?pct(totals.correct/totals.decisive):'—',totals.correct+' / '+totals.decisive+' прогнозов с выбором'));
   root.append(grid);
  }
@@ -364,14 +365,14 @@ function renderDaily(root){
  }
  historicalResearch(root);
  if(!rows.length)root.append(paragraph('muted','За этот период нет записанных прогнозов.'));
- for(const {forecast,winner,upcoming,total,totalSaved,totalActual,actualMaps,source} of rows){
-  const result=winner?(winner===forecast.pick?'Попадание':'Промах')+' · победитель '+winner:upcoming?'Предстоит':'Ждём подтверждения';
+ for(const {forecast,winner,upcoming,total,totalSaved,totalActual,actualMaps,source,technical} of rows){
+  const result=technical?'Технический исход':winner?(winner===forecast.pick?'Попадание':'Промах')+' · победитель '+winner:upcoming?'Предстоит':'Ждём подтверждения';
   const row=compBox(shortTime(forecast.kickoff)+' · '+forecast.a+' — '+forecast.b,forecast.pick+' · '+pct(forecast.probability),result);
   if(totalSaved){
    const line=String(total.line).replace('.',',');
    row.append(paragraph('muted','Предматчевый тотал · ТБ '+line+' '+pct(total.over)+' / ТМ '+line+' '+pct(total.under)));
    if(typeof totalActual==='boolean')row.append(paragraph('muted','Итог · '+actualMaps+' карт · '+(totalActual?'ТБ ':'ТМ ')+line));
-   else row.append(paragraph('muted','Количество карт ждёт подтверждения'));
+   else if(!technical)row.append(paragraph('muted','Количество карт ждёт подтверждения'));
   }else if(actualMaps!==null)row.append(paragraph('muted','Итог · '+actualMaps+' карт'));
   if(source)row.append(paragraph('muted','Источник итога · '+source));
   root.append(row);

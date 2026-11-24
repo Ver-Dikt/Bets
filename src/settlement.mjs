@@ -1,5 +1,15 @@
 // Resolve a paper forecast ONLY by same provider match ID and verified result.
 // Dota schedule matches must first be linked to a complete OpenDota series.
+export function verifiedMapCount(match) {
+ const limit=Number(match.format?.slice(2));
+ if(match.resultKind==='technical'||![1,3,5,7].includes(limit))return null;
+ const target=(limit+1)/2;
+ if(Number.isInteger(match.mapCount)&&match.mapCount>=target&&match.mapCount<=limit)return match.mapCount;
+ const wins=match.wins??match.score;
+ if(!Array.isArray(wins)||wins.length!==2||wins.some(n=>!Number.isInteger(n)||n<0))return null;
+ const side=match.winner===match.a?0:match.winner===match.b?1:-1;
+ return side>=0&&wins[side]===target&&wins[1-side]<target?wins[0]+wins[1]:null;
+}
 export function reconcilePaper(records,finished,checkedAt=new Date().toISOString()){
  if(!Array.isArray(records)||!Array.isArray(finished))throw Error('Invalid paper journal input');
  const byId=new Map(),conflicts=new Set();
@@ -9,8 +19,11 @@ export function reconcilePaper(records,finished,checkedAt=new Date().toISOString
   const previous=byId.get(m.id);
   if(previous&&(previous.discipline!==m.discipline||previous.winner!==m.winner||
      ![previous.a,previous.b].includes(m.a)||![previous.a,previous.b].includes(m.b)||
-     previous.date!==m.date))conflicts.add(m.id);
-  byId.set(m.id,m);
+     (previous.date!==m.date&&!previous.verifiedReview&&!m.verifiedReview)||
+     (previous.resultKind??null)!==(m.resultKind??null)&&(previous.verifiedReview||m.verifiedReview)||
+     (verifiedMapCount(previous)!=null&&verifiedMapCount(m)!=null&&verifiedMapCount(previous)!==verifiedMapCount(m))))conflicts.add(m.id);
+  if((previous?.resultKind!=='technical'||m.resultKind==='technical')&&
+     (!m.verifiedReview||!previous||previous.verifiedReview||verifiedMapCount(previous)===null))byId.set(m.id,m);
  }
  let resolved=0;
  const updated=records.map(rec=>{
@@ -31,14 +44,16 @@ export function reconcilePaper(records,finished,checkedAt=new Date().toISOString
    const ordered=match.a===rec.a?match.providerTeamIds:[...match.providerTeamIds].reverse();
    if(ordered.some((id,i)=>String(id)!==String(rec.providerIds[i])))return rec;
   }
-  if(isAgendaCs&&(!/^cs-\d+$/.test(match.matchedProviderId??'')||!match.source?.startsWith('bo3.gg')))return rec;
-  if(isDotaSeries&&!(match.source==='OpenDota series'&&match.seriesId&&match.kind==='series'))return rec;
+  if(isAgendaCs&&((!/^cs-\d+$/.test(match.matchedProviderId??'')||!match.source?.startsWith('bo3.gg'))&&!match.verifiedReview))return rec;
+  if(isDotaSeries&&!(match.source==='OpenDota series'&&match.seriesId&&match.kind==='series')&&!match.verifiedReview)return rec;
   if(![match.a,match.b].includes(rec.a)||![match.a,match.b].includes(rec.b)||rec.a===rec.b)return rec;
   if(rec.pick!==match.a&&rec.pick!==match.b)return rec;
   if(match.winner!==match.a&&match.winner!==match.b)return rec;
-  resolved++;
-  return {...rec,actual:match.winner===rec.pick?1:0,checkedAt,
-    resolvedFrom:match.source||'finished provider record',verifiedMatchId:match.id,sourceMatchId:match.matchedProviderId??match.seriesId??match.id};
+  const technical=match.resultKind==='technical';
+  if(!technical)resolved++;
+  const mapCount=match.format===rec.format?verifiedMapCount(match):null;
+  return {...rec,actual:technical?null:Number(match.winner===rec.pick),technical,mapCount,checkedAt,
+    resolvedFrom:match.source||'finished provider record',verifiedMatchId:match.id,sourceUrl:match.sourceUrl,sourceMatchId:match.matchedProviderId??match.seriesId??match.id};
  });
  return {records:updated,resolvedNew:resolved};
 }

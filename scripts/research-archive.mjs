@@ -2,6 +2,7 @@ import {readFile} from 'node:fs/promises';
 import {gunzipSync} from 'node:zlib';
 import {mergeArchive} from '../src/archive.mjs';
 
+export const yearArchivePath='data/private/year-results.json';
 export const recoveredPath = 'data/private/recovered-results.json';
 export async function readRecovered(file = recoveredPath) {
   let raw;
@@ -19,6 +20,6 @@ export async function readRecovered(file = recoveredPath) {
 }
 
 export async function researchArchive(archive) {
-  const recovered = await readRecovered();
-  return mergeArchive(archive, recovered).archive;
+  const sources=await Promise.all([readRecovered(),readRecovered(yearArchivePath)]);
+  return mergeArchive(archive,sources.flat()).archive;
 }

@@ -23,3 +23,17 @@ npm run build:pages
 ```
 
 The GitHub research workflow produces a candidate artifact. The versioned production artifact in `data/private/research-models.json` changes only when a reviewed candidate is committed. Its input hashes fingerprint the matches, recovered results and map archives. The recovered results supplement consists of normalized provider records, compressed to reduce repo size. It can be decoded with `readRecovered` from `scripts/research-archive.mjs`. Existing provider IDs, winners and dates are protected by the archive merge rules.
+
+## One-year replay and result reconciliation
+
+The year supplement consists of normalized bo3.gg and OpenDota captures. CS2 sampling in the earlier part of the year is intermittent. OpenDota omits unlinked or incomplete series. Reproduce the study without inventing any games:
+
+```sh
+node scripts/year-study.mjs - 2025-11-24 2026-11-24 data/tmp/year-study.json
+python3 scripts/train-research.py data/tmp/year-study.json data/tmp/year-models.json --repeat --parity data/tmp/year-parity.json
+node scripts/verify-research.mjs data/tmp/year-models.json data/tmp/year-parity.json
+```
+
+The active CS2 winner model was also evaluated on the same November cohort as the previous release. The Dota 2 challenger and revised map totals remain research candidates based on the recent shared test.
+
+The fixture collector rechecks recent CS2 results by match ID and paginates recent OpenDota maps as needed. FACEIT ESEA cross-checking is available when `BETS_FACEIT_TOKEN` and `BETS_FACEIT_CHAMPIONSHIPS` are configured and the provider permits the use case. The operator can also point `BETS_RESULT_REVIEW_PATH` at an array of manually checked results. Each entry supplies `fixtureId`, both team names `a` and `b`, `winner`, `format`, `startedAt`, `finishedAt` or `observedAt`, and an HTTPS match source `url`. Optional `mapCount` is checked against the format. A forfeit can use `resultKind: "technical"`. Manual reviews are settlement evidence and are excluded from training. Contradictory evidence cannot create a new automatic settlement.

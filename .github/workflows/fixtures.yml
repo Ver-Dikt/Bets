@@ -15,6 +15,7 @@ on:
       - "src/ratings.mjs"
       - "src/dota-series.mjs"
       - "src/cs-results.mjs"
+      - "src/result-sources.mjs"
       - "data/private/research-models.json"
       - "scripts/fixtures.mjs"
       - ".github/workflows/fixtures.yml"
@@ -47,6 +48,8 @@ jobs:
       - name: Fetch CS2 and Dota 2 verified upcoming snapshots
         env:
           BETS_PARI_FEED_URL: ${{ secrets.BETS_PARI_FEED_URL }}
+          BETS_FACEIT_TOKEN: ${{ secrets.BETS_FACEIT_TOKEN }}
+          BETS_FACEIT_CHAMPIONSHIPS: ${{ vars.BETS_FACEIT_CHAMPIONSHIPS }}
           BETS_PANDASCORE_TOKEN: ${{ secrets.BETS_PANDASCORE_TOKEN }}
         run: node scripts/fixtures.mjs
       - name: Commit public fixtures snapshot

@@ -11,6 +11,7 @@ on:
       - "src/research*.mjs"
       - "data/private/research-models.json"
       - "data/private/recovered-results.json"
+      - "data/private/year-results.json"
       - ".github/workflows/research.yml"
   pull_request:
     paths:
@@ -40,7 +41,7 @@ jobs:
         run: |
           mkdir -p data/tmp
           node scripts/research-data.mjs
-          python scripts/train-research.py data/tmp/research-data.json data/tmp/research-models.json --parity data/tmp/research-parity.json
+          python scripts/train-research.py data/tmp/research-data.json data/tmp/research-models.json --repeat --parity data/tmp/research-parity.json
           node scripts/verify-research.mjs data/tmp/research-models.json data/tmp/research-parity.json
       - uses: actions/upload-artifact@v4
         with:

@@ -17,7 +17,7 @@ export const featureNames = [
 ];
 const day = 86400000;
 const pairKey = (a, b) => [a, b].sort().join('\u0000');
-const valid = row => row?.a && row.b && row.a !== row.b && [row.a, row.b].includes(row.winner) && Number.isFinite(Date.parse(row.date));
+const valid = row => row?.resultKind!=='technical' && row?.a && row.b && row.a !== row.b && [row.a, row.b].includes(row.winner) && Number.isFinite(Date.parse(row.date));
 const normalizedTag = value => typeof value === 'string' && value.trim() ? value.trim().toLowerCase() : null;
 const mean = values => values.length ? values.reduce((sum, x) => sum + x, 0) / values.length : 0;
 const sorted = rows => [...rows].sort((a, b) => Date.parse(a.date) - Date.parse(b.date) || a.id.localeCompare(b.id));

@@ -27,7 +27,7 @@ export function analyzeFixture(fixture,archive,oddsA='',oddsB='',now=Date.now(),
  if(!Number.isFinite(start))return {status:'error',error:'Invalid fixture date'};
  const cutoff=new Date(Math.min(start,now)).toISOString();
  if(fixture.status==='live'||start<=now)return {status:'live',note:'Матч начался'};
- const normalized=canonicalizeMatches(archive.filter(row=>row.discipline===game));
+ const normalized=canonicalizeMatches(archive.filter(row=>row.discipline===game&&row.resultKind!=='technical'));
  const matches=history(availableAt(normalized,cutoff),game,cutoff);
  const ids=fixture.providerIds??[];
  const provider=game==='cs2'?'bo3':'opendota';

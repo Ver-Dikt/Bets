@@ -3,6 +3,7 @@
 import {execFileSync} from 'node:child_process';
 import {readFile,writeFile,copyFile,mkdir} from 'node:fs/promises';
 import {resolve} from 'node:path';
+import {verifiedMapCount} from '../src/settlement.mjs';
 import {readJournal} from './journal.mjs';
 import {researchArchive} from './research-archive.mjs';
 const root=resolve(process.cwd()),dist=resolve(root,'dist');
@@ -12,6 +13,7 @@ if(archive.schemaVersion!==1||!Array.isArray(archive.matches))throw Error('Canno
 const safe=archive.matches.filter(m=>m&&typeof m.id==='string'&&['cs2','dota'].includes(m.discipline)&&typeof m.a==='string'&&typeof m.b==='string'&&(m.winner===m.a||m.winner===m.b)&&Number.isFinite(Date.parse(m.date))).map(m=>({
   id:m.id,discipline:m.discipline,date:m.date,a:m.a,b:m.b,winner:m.winner,
   finishedAt:m.finishedAt??null,resultObservedAt:m.resultObservedAt??null,source:m.source,kind:m.kind,format:m.format||null,tournament:m.tournament||null,
+  resultKind:m.resultKind??null,mapCount:verifiedMapCount(m),
   providerTeamIds:Array.isArray(m.providerTeamIds)?m.providerTeamIds:null
 })).sort((a,b)=>Date.parse(a.date)-Date.parse(b.date));
 if(safe.length<1)throw Error('No finished games; refusing empty site publication');

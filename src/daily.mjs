@@ -14,7 +14,7 @@ export function dailyRows({day,from=day,fixtures,journal,matches,brief,mus={},no
   const key=moscowDay(value);
   return key!==null&&key>=from&&key<=day;
  };
- const events=new Map(), forecasts=new Map(), settlements=new Map(), scores=new Map();
+ const events=new Map(), forecasts=new Map(), settlements=new Map(), scores=new Map(), technicalResults=new Map();
  const prices=new Map((brief?.fixtures??[]).filter(row=>row.publicPrice).map(row=>[row.id,row]));
  const put=(id,row)=>{if(id)events.set(id,{...events.get(id),...row,id});};
  for(const row of brief?.fixtures??[])put(row.id,row);
@@ -27,17 +27,20 @@ export function dailyRows({day,from=day,fixtures,journal,matches,brief,mus={},no
    put(p.fixtureId,{a:p.a,b:p.b,date:p.kickoff,game:p.game});
   }
   if(event.type==='settlement'&&(event.result===0||event.result===1))settlements.set(event.forecastId,event);
+  if(event.type==='technical-result')technicalResults.set(event.fixtureId,event);
   if(event.type==='series-score')scores.set(event.forecastId,event);
  }
  for(const row of fixtures)put(row.id,row);
- const pending=[...forecasts.values()].filter(p=>!settlements.has(p.id)&&p.probabilityBasis!=='map'&&inPeriod(p.kickoff));
+ const pending=[...forecasts.values()].filter(p=>p.probabilityBasis!=='map'&&inPeriod(p.kickoff));
  const checked=new Map(reconcilePaper(pending.map(p=>({...p,actual:null})),matches,new Date(now).toISOString()).records.map(p=>[p.id,p]));
  const rows=[];
  for(const event of events.values()){
   const forecast=forecasts.get(event.id);
   if(!inPeriod(forecast?.kickoff??event.date))continue;
   const settlement=settlements.get(forecast?.id), archive=checked.get(forecast?.id);
-  const actual=settlement?.result??archive?.actual;
+  const technicalResult=technicalResults.get(event.id);
+  const technical=Boolean(technicalResult||archive?.technical);
+  const actual=technical?null:settlement?.result??archive?.actual;
   const winner=actual===1?forecast.pick:actual===0?(forecast.pick===forecast.a?forecast.b:forecast.a):null;
   const reference=prices.get(event.id);
   const price=event.pari?.odds&&event.pari.mode==='feed'&&Date.parse(event.pari.freshUntil)>now
@@ -48,10 +51,11 @@ export function dailyRows({day,from=day,fixtures,journal,matches,brief,mus={},no
   const musPick=Object.hasOwn(mus,event.id)?mus[event.id]:recordedMus[event.id];
   const total=forecast&&(forecast.total??forecastTotal(forecast));
   const score=scores.get(forecast?.id);
-  rows.push({event,forecast,price,winner,actual,musPick,total,
-   totalSaved:Boolean(forecast?.total),totalActual:total&&score?.format===forecast.format?score.maps>total.line:null,
+  const actualMaps=technical?null:score?.format===forecast?.format&&score?score.maps:archive?.mapCount??null;
+  rows.push({event,forecast,price,winner,actual,musPick,total,technical,
+   totalSaved:Boolean(forecast?.total),totalActual:total&&actualMaps!==null?actualMaps>total.line:null,
    upcoming:Date.parse(forecast?.kickoff??event.date)>now,
-   error:settlement?.error, actualMaps:score?.maps??null, source:settlement?.source??archive?.resolvedFrom, localMus:Object.hasOwn(mus,event.id)});
+   error:technical?null:settlement?.error, actualMaps, source:technicalResult?.source??settlement?.source??archive?.resolvedFrom, localMus:Object.hasOwn(mus,event.id)});
  }
  return rows.sort((a,b)=>Date.parse(a.event.date)-Date.parse(b.event.date));
 }
@@ -60,8 +64,9 @@ export function tally(rows, pick=row=>row.forecast?.pick){
  const forecasts=rows.filter(row=>pick(row));
  const won=forecasts.filter(row=>row.winner===pick(row)).length;
  const lost=forecasts.filter(row=>row.winner&&row.winner!==pick(row)).length;
- const upcoming=forecasts.filter(row=>!row.winner&&row.upcoming).length;
- return {total:forecasts.length,won,lost,upcoming,pending:forecasts.length-won-lost-upcoming};
+ const technical=forecasts.filter(row=>row.technical).length;
+ const upcoming=forecasts.filter(row=>!row.technical&&!row.winner&&row.upcoming).length;
+ return {total:forecasts.length,won,lost,upcoming,pending:forecasts.length-won-lost-upcoming-technical,...(technical?{technical}:{})};
 }
 
 export function reviewPeriod(day, days) {
@@ -73,7 +78,8 @@ export function totalTally(rows) {
  const forecasts=rows.filter(row=>row.totalSaved);
  const resolved=forecasts.filter(row=>typeof row.totalActual==='boolean');
  const decisive=resolved.filter(row=>row.total.over!==.5);
- return {total:forecasts.length,resolved:resolved.length,decisive:decisive.length,
+ const technical=forecasts.filter(row=>row.technical).length;
+ return {total:forecasts.length,resolved:resolved.length,decisive:decisive.length,technical,pending:forecasts.length-resolved.length-technical,
   correct:decisive.filter(row=>(row.total.over>.5)===row.totalActual).length,
   brier:resolved.length?resolved.reduce((sum,row)=>sum+(row.total.over-Number(row.totalActual))**2,0)/resolved.length:null};
 }

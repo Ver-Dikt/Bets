@@ -13,6 +13,7 @@ on:
       - "data/private/report.json"
       - "data/private/research-models.json"
       - "data/private/recovered-results.json"
+      - "data/private/year-results.json"
       - "src/daily.mjs"
       - "data/public/fixtures.json"
       - "data/public/map-insights.json"

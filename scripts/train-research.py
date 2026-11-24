@@ -129,6 +129,11 @@ def raw_probabilities(rows, line, models, model_names, prior):
             first = model.predict_proba(x)[:, 1]
             second = model.predict_proba(mirror)[:, 1]
         result[name] = (first + (1 - second if line is None else second)) / 2
+    if line is None:
+        rating_models = [result[key] for key in ('dynamicElo', 'glicko2', 'trueSkill', 'bradleyTerry')]
+        result['ratingBlend'] = np.mean(rating_models, axis=0)
+        if 'catBoost' in result and 'lightGBM' in result:
+            result['hybridBlend'] = .50 * result['ratingBlend'] + .25 * (result['catBoost'] + result['lightGBM'])
     return result
 
 
@@ -211,6 +216,7 @@ def main():
     parser.add_argument('data', type=Path)
     parser.add_argument('bundle', type=Path)
     parser.add_argument('--parity', type=Path)
+    parser.add_argument('--repeat', action='store_true', help='Evaluate two earlier disjoint chronological test windows')
     args = parser.parse_args()
     data = json.loads(args.data.read_text())
     version = 'research-v1-' + hashlib.sha256(args.data.read_bytes() + Path(__file__).read_bytes()).hexdigest()[:12]
@@ -226,6 +232,11 @@ def main():
                   'coverage': {'withMapEvidence': featured,
                     'withLineupEvidence': sum(min(row['metadata']['lineupsA'], row['metadata']['lineupsB']) > 0 for row in eligible), 'withPatchEvidence': sum(
                     min(row['metadata']['patchA'], row['metadata']['patchB']) > 0 for row in eligible)}}
+        if args.repeat:
+            report['earlierWindows'] = [
+                evaluate(eligible[:int(len(eligible) * share)], data['modelNames'])[0]
+                for share in (.60, .80)
+            ]
         models = {'winner': winner_bundle, 'totals': {}}
         parity[game] = {'winner': winner_parity, 'totals': {}}
         for fmt, line in TOTAL_LINES.items():

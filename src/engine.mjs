@@ -1,7 +1,7 @@
 // Bets research models: no future leakage and no bookmaker probabilities as inputs.
 // These are uncalibrated baselines until forward validation on real historical datasets.
 export const sigmoid=points=>1/(1+10**(-points/400));
-const valid=m=>m&&m.a&&m.b&&m.a!==m.b&&(m.winner===m.a||m.winner===m.b)&&Number.isFinite(Date.parse(m.date));
+const valid=m=>m&&m.resultKind!=='technical'&&m.a&&m.b&&m.a!==m.b&&(m.winner===m.a||m.winner===m.b)&&Number.isFinite(Date.parse(m.date));
 export function history(matches,discipline,before){
  const cutoff=Date.parse(before);
  if(!Number.isFinite(cutoff))throw Error('Некорректная дата');

@@ -1,23 +1,23 @@
 import {readFile} from 'node:fs/promises';
 import {analyzeFixture} from '../src/analysis.mjs';
-import {reconcilePaper} from '../src/settlement.mjs';
+import {reconcilePaper,verifiedMapCount} from '../src/settlement.mjs';
 import {matchCsResults} from '../src/cs-results.mjs';
 import {matchDotaResults} from '../src/dota-series.mjs';
 import {seriesChance,seriesUpdate,forecastTotal} from '../src/live.mjs';
 import {appendJournal, verifyJournal} from './journal-integrity.mjs';
-import {observedMaps} from '../src/research.mjs';
 
-export function updateJournal(before, fixtures, history, series, recordedAt, maps={},report={},research=new Map()) {
+export function updateJournal(before, fixtures, history, series, recordedAt, maps={},report={},research=new Map(),reviewed=[]) {
   verifyJournal(before);
   const time=Date.parse(recordedAt);
   const received=fixture=>time>=Date.parse(fixture.fetchedAt)&&time-Date.parse(fixture.fetchedAt)<5*60000;
   const events=[...before.events];
   const forecasts=new Map(events.filter(item=>item.type==='forecast').map(item=>[item.record.fixtureId,item.record]));
   const settled=new Set(events.filter(item=>item.type==='settlement').map(item=>item.fixtureId));
+  const technical=new Set(events.filter(item=>item.type==='technical-result').map(item=>item.fixtureId));
   const gaps=new Set(events.filter(item=>item.type==='skip').map(item=>item.fixtureId));
   const live=new Map(events.filter(item=>item.type==='live').map(item=>[item.fixtureId,item]));
   for(const fixture of fixtures){
-    if(settled.has(fixture.id))continue;
+    if(settled.has(fixture.id)||technical.has(fixture.id))continue;
     if(fixture.status!=='upcoming'||Date.parse(fixture.date)<=time||!received(fixture))continue;
     const previous=forecasts.get(fixture.id);
     const rosters=fixture.rosters?.map(roster=>roster?.players.map(player=>player.id).sort().join(':'));
@@ -58,27 +58,32 @@ export function updateJournal(before, fixtures, history, series, recordedAt, map
     forecasts.set(fixture.id,record);
     events.push({type:'forecast',record});
   }
-  const eligible=[...forecasts.values()].filter(record=>!settled.has(record.fixtureId)&&record.probabilityBasis!=='map');
   const finished=series.filter(row=>row.status==='finished');
   const all=[...forecasts.values()].filter(record=>record.probabilityBasis!=='map');
   const needsLink=all.filter(record=>!finished.some(row=>row.id===record.fixtureId));
-  const completed=[...history,...finished,...matchCsResults(needsLink,history),...matchDotaResults(needsLink,history)];
-  const result=reconcilePaper(eligible,completed,recordedAt);
+  const completed=[...history,...finished,...matchCsResults(needsLink,history),...matchDotaResults(needsLink,history),...reviewed];
+  const result=reconcilePaper(all.filter(p=>!technical.has(p.fixtureId)),completed,recordedAt);
   for(const record of result.records){
-    if(record.actual===null)continue;
+    if(record.technical){
+      technical.add(record.fixtureId);
+      events.push({type:'technical-result',forecastId:record.id,fixtureId:record.fixtureId,
+        checkedAt:record.checkedAt,verifiedMatchId:record.sourceMatchId,source:record.resolvedFrom,sourceUrl:record.sourceUrl});
+      continue;
+    }
+    if(record.actual===null||settled.has(record.fixtureId))continue;
     events.push({type:'settlement',forecastId:record.id,fixtureId:record.fixtureId,result:record.actual,checkedAt:record.checkedAt,
-      verifiedMatchId:record.sourceMatchId??record.verifiedMatchId,source:record.resolvedFrom,
+      verifiedMatchId:record.sourceMatchId??record.verifiedMatchId,source:record.resolvedFrom,sourceUrl:record.sourceUrl,
       error:record.actual===0?{kind:'upset',brier:record.probability**2,knownFactors:(record.reasons??[]).map(reason=>reason.name),
         disagreement:record.control?((record.control.probabilityA>=.5)!==(record.probabilityA>=.5)):null,
         hypothesis:'Причина промаха пока неизвестна.'}:null});
   }
   const scores=new Set(events.filter(item=>item.type==='series-score').map(item=>item.forecastId));
   const byId=new Map(completed.map(row=>[row.id,row]));
-  const scoreCandidates=all.filter(p=>!scores.has(p.id)&&['Bo3','Bo5'].includes(p.format));
+  const scoreCandidates=all.filter(p=>!technical.has(p.fixtureId)&&!scores.has(p.id)&&['Bo3','Bo5'].includes(p.format));
   for(const p of reconcilePaper(scoreCandidates,completed,recordedAt).records){
     if(p.actual===null)continue;
     const match=byId.get(p.verifiedMatchId);
-    const maps=match?.format===p.format?observedMaps({...match,wins:match.wins??match.score}):null;
+    const maps=match?.format===p.format?verifiedMapCount(match):null;
     if(maps===null)continue;
     events.push({type:'series-score',fixtureId:p.fixtureId,forecastId:p.id,format:p.format,maps,
       checkedAt:recordedAt,source:match.source});

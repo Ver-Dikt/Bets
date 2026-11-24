@@ -5,6 +5,7 @@ export const researchLabels = {
   dynamicElo: 'Dynamic Elo', glicko2: 'Glicko-2', trueSkill: 'TrueSkill',
   bradleyTerry: 'Bradley–Terry', bayesian: 'Байесовская модель',
   catBoost: 'CatBoost', lightGBM: 'LightGBM', legacy: 'Контрольная модель',
+  ratingBlend:'Ансамбль рейтингов',hybridBlend:'Ансамбль рейтингов и деревьев',
   equalChance: 'Равные шансы', formatPrior: 'Историческая частота'
 };
 
@@ -41,6 +42,10 @@ export function inferResearch(example, bundle, target) {
     const direct = probability(model, example.vector);
     const reverse = probability(model, example.mirrored);
     result[name] = (direct + (winner ? 1 - reverse : reverse)) / 2;
+  }
+  if(winner&&bundle.calibration.ratingBlend){
+    result.ratingBlend=(result.dynamicElo+result.glicko2+result.trueSkill+result.bradleyTerry)/4;
+    if(bundle.calibration.hybridBlend)result.hybridBlend=.5*result.ratingBlend+.25*(result.catBoost+result.lightGBM);
   }
   for (const [name, p] of Object.entries(result)) {
     const [slope, intercept] = bundle.calibration[name];

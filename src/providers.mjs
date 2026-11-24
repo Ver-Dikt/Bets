@@ -24,7 +24,7 @@ export function normalizeBo3(payload){
    const winnerId=String(m.winner_team_id),t1=String(m.team1_id),t2=String(m.team2_id);
    const when=Date.parse(m.start_date);
    if(!a||!b||a===b||!(winnerId===t1||winnerId===t2)||!Number.isFinite(when)||m.id==null||
-    (m.status!=null&&m.status!=='finished'))continue;
+    (m.status!=null&&!['finished','defwin'].includes(m.status)))continue;
    const tournament=tournaments[String(m.tournament)]?.name??null;
    const ended=Date.parse(m.end_date);
    const format=Number.isSafeInteger(m.bo_type)&&[1,3,5,7].includes(m.bo_type)?'Bo'+m.bo_type:
@@ -32,9 +32,10 @@ export function normalizeBo3(payload){
    const score=[m.team1_score,m.team2_score];
    const target=(Number(format?.slice(2))+1)/2;
    const index=winnerId===t1?0:1;
-   const wins=score.every(n=>Number.isSafeInteger(n)&&n>=0)&&score[index]===target&&score[1-index]<target?score:null;
+   const technical=m.status==='defwin';
+   const wins=!technical&&score.every(n=>Number.isSafeInteger(n)&&n>=0)&&score[index]===target&&score[1-index]<target?score:null;
    result.push({finishedAt:Number.isFinite(ended)&&ended>when?new Date(ended).toISOString():null,id:'cs-'+m.id,discipline:'cs2',date:new Date(when).toISOString(),a,b,winner:winnerId===t1?a:b,
-    source:'bo3.gg (unofficial)',kind:'series',format,...(wins?{wins}:{}),
+    source:'bo3.gg (unofficial)',kind:'series',format,...(technical?{resultKind:'technical'}:{}),...(wins?{wins}:{}),
     tournament:typeof tournament==='string'?tournament:null, tier:['s','a','b','c','d'].includes(tier?.tier??m.tier)?(tier?.tier??m.tier):null,
     providerTeamIds:[t1,t2]});
   }

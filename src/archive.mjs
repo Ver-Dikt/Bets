@@ -32,7 +32,7 @@ export function mergeArchive(archive,incoming){
   if([0,1].some(i=>oldIds[i]!=null&&newIds[i]!=null&&String(oldIds[i])!==String(newIds[i]))){conflicts++;continue}
   const mergedIds=[0,1].map(i=>oldIds[i]??newIds[i]??null);
   const finishedAt=previous.finishedAt??item.finishedAt??null;
-  const details=Object.fromEntries(['seriesId','seriesType','tournament','format','wins','patch','lineups','leagueId','tier'].filter(key=>previous[key]==null&&item[key]!=null).map(key=>[key,item[key]]));
+  const details=Object.fromEntries(['seriesId','seriesType','tournament','format','wins','patch','lineups','leagueId','tier','resultKind'].filter(key=>previous[key]==null&&item[key]!=null).map(key=>[key,item[key]]));
   if(Object.keys(details).length||mergedIds.some((id,i)=>id!=null&&oldIds[i]==null)||finishedAt!==null&&!previous.finishedAt)
    byId.set(item.id,{...previous,...details,providerTeamIds:mergedIds,finishedAt});
   duplicates++;

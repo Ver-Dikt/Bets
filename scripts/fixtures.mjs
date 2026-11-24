@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 // Public GitHub Pages data collector. This is a periodically refreshed snapshot,
 // NOT a streaming live API. Sources are unofficial and may fail/rate-limit.
-import {fetchJson,fetchCsDay,fetchDotaPage,sleep} from '../src/collect.mjs';
+import {fetchJson,fetchCsDay,sleep} from '../src/collect.mjs';
 import {enrichRosters} from '../src/rosters.mjs';
 import {agendaFixtures} from '../src/esportagenda.mjs';
 import {fetchDotaLive} from '../src/opendota-live.mjs';
 import {pandaFixtures} from '../src/pandascore.mjs';
+import {auditResult,csResultsById,faceitResults,latestUnresolved,recentDotaResults} from '../src/result-sources.mjs';
 import {readJournal, updateJournal} from './journal.mjs';
 import {projectResearch} from '../src/research-inference.mjs';
 import {researchArchive} from './research-archive.mjs';
@@ -118,6 +119,7 @@ const mapInsights=await optionalJson('data/public/map-insights.json');
 const report=await optionalJson('data/private/report.json');
 const research=await optionalJson('data/private/research-models.json');
 const maps=await optionalJson('data/private/maps.json');
+const tracked=latestUnresolved(before.events,Date.now());
 const recent=await Promise.allSettled([
  (async()=>{
   const current=await fetchCsDay(fetchedAt.slice(0,10),{retries:1});
@@ -126,12 +128,13 @@ const recent=await Promise.allSettled([
   const previous=await fetchCsDay(prior,{retries:0}).catch(error=>{console.warn('Previous CS2 results:',error.message);return []});
   return [...previous,...current];
  })(),
- fetchDotaPage(null,{retries:0}).then(page=>page.matches)
+ recentDotaResults(tracked),
+ csResultsById(tracked)
 ]);
 const latest=[];
 for(const [index,entry] of recent.entries()){
- const key=index===0?'cs2-results':'dota-results';
- status[key]={ok:entry.status==='fulfilled',checkedAt:new Date().toISOString(),source:index===0?'bo3.gg':'OpenDota'};
+ const key=['cs2-results','dota-results','cs2-results-by-id'][index];
+ status[key]={ok:entry.status==='fulfilled',checkedAt:new Date().toISOString(),source:index===1?'OpenDota':'bo3.gg'};
  if(entry.status==='fulfilled')latest.push(...entry.value);
  else console.warn(key,entry.reason?.message);
 }
@@ -141,8 +144,22 @@ if(mergedHistory.report.conflicts)console.warn('Match source conflicts:',mergedH
 const history=mergedHistory.archive.matches;
 const finished=[...results,...latest.filter(row=>row.discipline==='cs2').map(row=>({...row,status:'finished'}))];
 const forecastAt=new Date().toISOString();
+let reviewed=[];
+if(process.env.BETS_RESULT_REVIEW_PATH){
+ const entries=JSON.parse(await readFile(resolve(process.env.BETS_RESULT_REVIEW_PATH),'utf8'));
+ if(!Array.isArray(entries))throw Error('Invalid manual results manifest');
+ reviewed=entries.map(entry=>auditResult(entry,tracked.find(r=>r.fixtureId===entry.fixtureId),Date.parse(forecastAt))).filter(Boolean);
+ status.reviewed={ok:true,source:'Ручная сверка',results:reviewed.length,rejected:entries.length-reviewed.length};
+}
+try{
+ const external=await faceitResults(tracked,Date.parse(forecastAt),{token:process.env.BETS_FACEIT_TOKEN,championships:process.env.BETS_FACEIT_CHAMPIONSHIPS});
+ if(external){
+  reviewed.push(...external);
+  status.faceit={ok:true,source:'FACEIT',results:external.length};
+ }else status.faceit={ok:false,source:'FACEIT',error:'Ключ или ID чемпионатов не настроены'};
+}catch(error){status.faceit={ok:false,source:'FACEIT',error:error.message};}
 const comparisons=projectResearch(research.schemaVersion?research:null,history,maps.matches??[],fixtures,Date.parse(forecastAt));
-const updated=updateJournal(before,fixtures,history,finished,forecastAt,mapInsights.insights,report.games,comparisons);
+const updated=updateJournal(before,fixtures,history,finished,forecastAt,mapInsights.insights,report.games,comparisons,reviewed);
 if(updated.events.length!==before.events.length){
  await mkdir(dirname(journalPath),{recursive:true});
  await atomicWrite(journalPath,updated);

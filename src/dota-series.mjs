@@ -50,7 +50,7 @@ export function matchDotaResults(records, maps){
   if(record.game!=='dota'||!record.format||!record.tournament)continue;
   const matches=available.filter(series=>{
    const delta=Date.parse(series.date)-Date.parse(record.kickoff);
-   return delta>=-10*60000&&delta<=90*60000&&record.format===series.format&&
+   return delta>=-60*60000&&delta<=90*60000&&Date.parse(series.date)>Date.parse(record.createdAt)&&record.format===series.format&&
      tournamentKey(record.tournament)===tournamentKey(series.tournament)&&sameTeams(record,series);
   });
   if(matches.length!==1)continue;
