@@ -23,8 +23,9 @@ on:
         required: false
         type: string
   schedule:
-    - cron: "17 6 * * *"
+    - cron: "17 6,17 * * *"
   push:
+    branches: [main]
     paths:
       - ".github/workflows/collect.yml"
 permissions:

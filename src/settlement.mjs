@@ -14,6 +14,7 @@ export function reconcilePaper(records,finished,checkedAt=new Date().toISOString
   if(!isBo3&&!isPanda&&!isDotaSeries)return rec;
   const match=byId.get(isBo3?'cs-'+rec.fixtureId.slice(4):rec.fixtureId);
   if(!match||match.discipline!==rec.game||!Number.isFinite(Date.parse(match.date))||Date.parse(match.date)<=from)return rec;
+  if(Date.parse(match.date)>=Date.parse(checkedAt))return rec;
   if(match.finishedAt&&Date.parse(match.finishedAt)>Date.parse(checkedAt))return rec;
   if(isDotaSeries&&!(match.source==='OpenDota series'&&match.seriesId&&match.kind==='series'))return rec;
   if(![match.a,match.b].includes(rec.a)||![match.a,match.b].includes(rec.b)||rec.a===rec.b)return rec;

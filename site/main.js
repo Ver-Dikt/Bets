@@ -376,6 +376,10 @@ function renderWorkspace(){
  if(view==='daily'||view==='memory'){
   const check=new Map(journal.filter(item=>item.type==='settlement').map(item=>[item.fixtureId,item]));
   const records=journal.filter(item=>item.type==='forecast').map(item=>item.record);
+  const resultFor=row=>{
+   const result=check.get(row.fixtureId);
+   return result?.forecastId&&result.forecastId!==row.id?null:result;
+  };
   if(view==='daily'){
    const chooser=el('input');chooser.type='date';chooser.value=filters.reviewDay??dayFmt.format(Date.now());
    chooser.setAttribute('aria-label','День журнала');
@@ -384,9 +388,11 @@ function renderWorkspace(){
    const day=chooser.value;
    const select=records.filter(row=>dayFmt.format(new Date(row.kickoff))===day);
    const gaps=journal.filter(e=>e.type==='skip'&&dayFmt.format(new Date(e.kickoff))===day);
-   root.append(paragraph('muted','Расчётов '+select.length+' · сверено '+select.filter(row=>check.has(row.fixtureId)).length+' · пропусков '+gaps.length));
+   root.append(paragraph('muted','Расчётов '+select.length+' · сверено '+select.filter(row=>resultFor(row)).length+' · пропусков '+gaps.length));
+   const validation=score(select.filter(row=>resultFor(row)).map(row=>({...row,actual:resultFor(row).result})));
+   if(validation.resolved)root.append(paragraph('muted','Brier '+validation.brier.toFixed(4)+' · Log loss '+validation.logloss.toFixed(4)+' · точность '+pct(validation.wins/validation.resolved)));
    for(const row of select.slice(-40).reverse()){
-    const result=check.get(row.fixtureId);
+    const result=resultFor(row);
     root.append(compBox(row.a+' — '+row.b,row.pick+' · '+pct(row.probability),
       shortTime(row.createdAt)+' · '+row.model+' · '+(result?.result===1?'совпал':result?.result===0?'не совпал':'ожидаем результат')));
    }
@@ -394,10 +400,10 @@ function renderWorkspace(){
    return;
   }
   for(const row of [...new Map(records.map(item=>[item.fixtureId,item])).values()].slice().reverse()){
-   const result=check.get(row.fixtureId);
+   const result=resultFor(row);
    if(!result?.error)continue;
    root.append(compBox(row.a+' — '+row.b,'Выбранная команда проиграла',
-     'Brier '+result.error.brier.toFixed(3)+' · '+result.error.knownFactors.join(', ')));
+     'Brier '+result.error.brier.toFixed(3)+' · '+result.error.knownFactors.join(', ')+(result.error.hypothesis?' · '+result.error.hypothesis:'')));
   }
   if(!root.childElementCount)root.append(errorBlock('Пока нет сверенных расхождений'));
   return;

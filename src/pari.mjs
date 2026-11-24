@@ -9,7 +9,7 @@ const aliases = {
   cs2: new Map([
     ['teamliquid', 'liquid'], ['bcg', 'bcgame'], ['fazeclan', 'faze'],
     ['donstuesports', 'donstu'], ['misaesports', 'misa'], ['dramaesports', 'drama'],
-    ['havugaming', 'havu'], ['kuusamogg', 'kuusamo'], ['dendelecs','dendele'],
+    ['havugaming', 'havu'], ['kuusamogg', 'kuusamo'], ['dendelecs','dendele'], ['pvision','parivision'],
   ]),
   dota: new Map([['aurora','auroragaming'],['spiritacademy','teamspiritacademy'],
     ['innercirclexinsanity','innercircle'],['liquid','teamliquid']]),

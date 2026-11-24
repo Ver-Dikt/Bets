@@ -40,9 +40,10 @@ export function updateJournal(before, fixtures, history, series, recordedAt, map
   const result=reconcilePaper(eligible,completed,recordedAt);
   for(const record of result.records){
     if(record.actual===null)continue;
-    events.push({type:'settlement',fixtureId:record.fixtureId,result:record.actual,checkedAt:record.checkedAt,
+    events.push({type:'settlement',forecastId:record.id,fixtureId:record.fixtureId,result:record.actual,checkedAt:record.checkedAt,
       verifiedMatchId:record.verifiedMatchId,source:record.resolvedFrom,
-      error:record.actual===0?{kind:'upset',brier:record.probability**2,knownFactors:record.reasons.map(reason=>reason.name)}:null});
+      error:record.actual===0?{kind:'upset',brier:record.probability**2,knownFactors:record.reasons.map(reason=>reason.name),
+        hypothesis:'Проверить покрытие истории и согласованность факторов. Причина расхождения не установлена.'}:null});
   }
   for(const fixture of fixtures){
     if(fixture.status!=='live'||!fixture.score||!received(fixture))continue;

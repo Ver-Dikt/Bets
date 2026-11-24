@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {joinPari,parsePari} from '../src/pari.mjs';
+import {joinPari,parsePari,sameTeams} from '../src/pari.mjs';
 import {parseAgenda} from '../src/esportagenda.mjs';
 import {availableAt} from '../src/evidence-time.mjs';
 import {scaleProbability,timeCalibration} from '../src/calibration.mjs';
@@ -25,6 +25,10 @@ test('PARI reverses prices when provider team order is reversed',()=>{
  assert.equal(ambiguous.coverage.ambiguous,1);
  assert.equal(ambiguous.fixtures.some(row=>row.pari),false);
  assert.equal(joinPari([fixture],lines,'2026-11-24T06:01:00Z').coverage.matched,0);
+});
+
+test('the Esport Agenda PVISION alias resolves to the main PARIVISION fixture',()=>{
+ assert.equal(sameTeams({game:'cs2',a:'PVISION',b:'DENDELE CS'},{game:'cs2',a:'PARIVISION',b:'DENDELE'}),1);
 });
 
 test('Agenda accepts exact dated fixtures and reads separately displayed Bo format',()=>{

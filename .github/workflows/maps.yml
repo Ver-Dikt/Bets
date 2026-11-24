@@ -4,6 +4,7 @@ on:
   schedule:
     - cron: "21 */6 * * *"
   push:
+    branches: [main]
     paths:
       - "src/maps.mjs"
       - "scripts/collect-maps.mjs"
