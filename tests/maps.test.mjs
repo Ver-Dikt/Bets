@@ -18,3 +18,9 @@ test('duplicate map keeps first verified record',()=>{
  assert.equal(r.added,0);assert.equal(r.conflicts,0);assert.equal(r.matches.length,1);
 });
 test('no data must not produce map statistics',()=>assert.deepEqual(normalizeCSMaps({results:[]}),[]));
+
+test('real bo3 API de_mirage code is normalized to known map pool',()=>{
+ const payload={results:[{id:77,start_date:'2026-11-24T04:00:00Z',games:[{begin_at:'2026-11-24T04:08:17.000+00:00',map_name:'de_mirage',winner_clan_score:13,loser_clan_score:6,winner_team_clan:{team:{id:1430}},loser_team_clan:{team:{id:759}}}]}]};
+ const m=normalizeCSMaps(payload);assert.equal(m.length,1);assert.equal(m[0].map,'Mirage');
+ assert.equal(m[0].a,'bo3:1430');assert.equal(m[0].scoreA,13);
+});
