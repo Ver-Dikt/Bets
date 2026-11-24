@@ -1,52 +1,52 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-24T06:05:50.854609+00:00",
+  "generatedAt": "2026-11-24T06:08:44.669554+00:00",
   "source": "verified bo3.gg map scores via MIT Aokua/csgopred map model",
-  "historicalMaps": 5564,
+  "historicalMaps": 7127,
   "insights": {
     "agenda-cs2-1789259": {
       "status": "missing-team-identifiers"
     },
     "bo3-133418": {
       "status": "map-analysis",
-      "teamAMaps": 45,
-      "teamBMaps": 30,
+      "teamAMaps": 51,
+      "teamBMaps": 39,
       "maps": [
         {
           "map": "Ancient",
-          "probA": 0.5226389193104041,
-          "mapsA": 14,
-          "mapsB": 7
+          "probA": 0.5322892824332777,
+          "mapsA": 17,
+          "mapsB": 8
         },
         {
           "map": "Anubis",
-          "probA": 0.5271371589790753,
+          "probA": 0.532626704935368,
           "mapsA": 5,
-          "mapsB": 2
+          "mapsB": 3
         },
         {
           "map": "Dust2",
-          "probA": 0.4652189701345895,
+          "probA": 0.4660592852067533,
           "mapsA": 9,
           "mapsB": 0
         },
         {
           "map": "Inferno",
-          "probA": 0.44062443485005254,
-          "mapsA": 9,
-          "mapsB": 9
+          "probA": 0.42950743616030207,
+          "mapsA": 12,
+          "mapsB": 10
         },
         {
           "map": "Mirage",
-          "probA": 0.46064056504941553,
+          "probA": 0.4355472770058762,
           "mapsA": 8,
-          "mapsB": 7
+          "mapsB": 10
         },
         {
           "map": "Nuke",
-          "probA": 0.492149269015207,
+          "probA": 0.5121947685031313,
           "mapsA": 0,
-          "mapsB": 5
+          "mapsB": 8
         },
         {
           "map": "Train",
@@ -60,54 +60,54 @@
         "24956"
       ],
       "format": "Bo1",
-      "availableAt": "2026-11-24T06:05:49.619456+00:00",
+      "availableAt": "2026-11-24T06:08:43.687264+00:00",
       "model": "Aokua/csgopred MapModel · MIT",
       "caution": "Map Elo exploratory and not calibrated. Includes only recorded maps. No confirmed veto. Veto is SIMULATED, not official picks/bans.",
       "vetoEstimate": [
-        "Inferno"
+        "Ancient"
       ],
-      "seriesProbabilityA": 0.44062443485005254
+      "seriesProbabilityA": 0.5322892824332777
     },
     "bo3-133421": {
       "status": "map-analysis",
-      "teamAMaps": 45,
-      "teamBMaps": 36,
+      "teamAMaps": 49,
+      "teamBMaps": 43,
       "maps": [
         {
           "map": "Ancient",
-          "probA": 0.4758317594132825,
-          "mapsA": 11,
+          "probA": 0.4684994521237163,
+          "mapsA": 13,
           "mapsB": 0
         },
         {
           "map": "Anubis",
-          "probA": 0.5042194137703443,
+          "probA": 0.504324839912666,
           "mapsA": 6,
           "mapsB": 2
         },
         {
           "map": "Dust2",
-          "probA": 0.48574877303922265,
-          "mapsA": 9,
-          "mapsB": 4
+          "probA": 0.4846218044732633,
+          "mapsA": 10,
+          "mapsB": 5
         },
         {
           "map": "Inferno",
-          "probA": 0.4837652894685458,
+          "probA": 0.4780725313328102,
           "mapsA": 0,
-          "mapsB": 11
+          "mapsB": 13
         },
         {
           "map": "Mirage",
-          "probA": 0.5632018478907018,
+          "probA": 0.5714068765538879,
           "mapsA": 10,
-          "mapsB": 10
+          "mapsB": 12
         },
         {
           "map": "Nuke",
-          "probA": 0.43722871867449026,
-          "mapsA": 9,
-          "mapsB": 9
+          "probA": 0.42797678818755563,
+          "mapsA": 10,
+          "mapsB": 11
         },
         {
           "map": "Train",
@@ -121,54 +121,54 @@
         "6062"
       ],
       "format": "Bo1",
-      "availableAt": "2026-11-24T06:05:49.642276+00:00",
+      "availableAt": "2026-11-24T06:08:43.706077+00:00",
       "model": "Aokua/csgopred MapModel · MIT",
       "caution": "Map Elo exploratory and not calibrated. Includes only recorded maps. No confirmed veto. Veto is SIMULATED, not official picks/bans.",
       "vetoEstimate": [
         "Anubis"
       ],
-      "seriesProbabilityA": 0.5042194137703443
+      "seriesProbabilityA": 0.504324839912666
     },
     "bo3-133422": {
       "status": "map-analysis",
-      "teamAMaps": 61,
-      "teamBMaps": 38,
+      "teamAMaps": 69,
+      "teamBMaps": 42,
       "maps": [
         {
           "map": "Ancient",
-          "probA": 0.5769710931788881,
-          "mapsA": 18,
-          "mapsB": 6
+          "probA": 0.5925083054813431,
+          "mapsA": 20,
+          "mapsB": 7
         },
         {
           "map": "Anubis",
-          "probA": 0.44226083024603946,
-          "mapsA": 11,
-          "mapsB": 5
+          "probA": 0.43614778548452365,
+          "mapsA": 13,
+          "mapsB": 6
         },
         {
           "map": "Dust2",
-          "probA": 0.40463236422635307,
-          "mapsA": 14,
-          "mapsB": 10
+          "probA": 0.4118774460081003,
+          "mapsA": 16,
+          "mapsB": 11
         },
         {
           "map": "Inferno",
-          "probA": 0.3995845502238275,
-          "mapsA": 7,
+          "probA": 0.3980825959620447,
+          "mapsA": 8,
           "mapsB": 15
         },
         {
           "map": "Mirage",
-          "probA": 0.4449734943087669,
-          "mapsA": 11,
+          "probA": 0.4391637002019266,
+          "mapsA": 12,
           "mapsB": 0
         },
         {
           "map": "Nuke",
-          "probA": 0.4912947290241207,
+          "probA": 0.48404951317349343,
           "mapsA": 0,
-          "mapsB": 2
+          "mapsB": 3
         },
         {
           "map": "Train",
@@ -182,54 +182,54 @@
         "10398"
       ],
       "format": "Bo1",
-      "availableAt": "2026-11-24T06:05:49.664498+00:00",
+      "availableAt": "2026-11-24T06:08:43.723297+00:00",
       "model": "Aokua/csgopred MapModel · MIT",
       "caution": "Map Elo exploratory and not calibrated. Includes only recorded maps. No confirmed veto. Veto is SIMULATED, not official picks/bans.",
       "vetoEstimate": [
         "Ancient"
       ],
-      "seriesProbabilityA": 0.5769710931788881
+      "seriesProbabilityA": 0.5925083054813431
     },
     "bo3-134582": {
       "status": "map-analysis",
       "teamAMaps": 30,
-      "teamBMaps": 98,
+      "teamBMaps": 103,
       "maps": [
         {
           "map": "Ancient",
-          "probA": 0.44258920842961685,
+          "probA": 0.4431640703791483,
           "mapsA": 12,
           "mapsB": 25
         },
         {
           "map": "Anubis",
-          "probA": 0.46778017129495,
+          "probA": 0.46227262138183156,
           "mapsA": 3,
-          "mapsB": 6
+          "mapsB": 7
         },
         {
           "map": "Dust2",
-          "probA": 0.5929544278149362,
+          "probA": 0.5788293657292907,
           "mapsA": 4,
-          "mapsB": 13
+          "mapsB": 15
         },
         {
           "map": "Inferno",
-          "probA": 0.5450538508666081,
+          "probA": 0.5448572505848813,
           "mapsA": 1,
           "mapsB": 5
         },
         {
           "map": "Mirage",
-          "probA": 0.4074605746054267,
+          "probA": 0.4089963458116392,
           "mapsA": 10,
-          "mapsB": 35
+          "mapsB": 36
         },
         {
           "map": "Nuke",
-          "probA": 0.5479718548860825,
+          "probA": 0.5514215026890359,
           "mapsA": 0,
-          "mapsB": 14
+          "mapsB": 15
         },
         {
           "map": "Train",
@@ -243,7 +243,7 @@
         "24681"
       ],
       "format": "Bo3",
-      "availableAt": "2026-11-24T06:05:49.686356+00:00",
+      "availableAt": "2026-11-24T06:08:43.740753+00:00",
       "model": "Aokua/csgopred MapModel · MIT",
       "caution": "Map Elo exploratory and not calibrated. Includes only recorded maps. No confirmed veto. Veto is SIMULATED, not official picks/bans.",
       "vetoEstimate": [
@@ -251,7 +251,7 @@
         "Ancient",
         "Anubis"
       ],
-      "seriesProbabilityA": 0.4775449371442775
+      "seriesProbabilityA": 0.47495459900245596
     },
     "bo3-134856": {
       "status": "insufficient-maps",
@@ -268,43 +268,43 @@
     "bo3-134857": {
       "status": "map-analysis",
       "teamAMaps": 16,
-      "teamBMaps": 19,
+      "teamBMaps": 28,
       "maps": [
         {
           "map": "Ancient",
-          "probA": 0.501970600063291,
+          "probA": 0.5077691596719923,
           "mapsA": 2,
-          "mapsB": 5
+          "mapsB": 6
         },
         {
           "map": "Anubis",
-          "probA": 0.4918828359662951,
+          "probA": 0.5193635545755807,
           "mapsA": 4,
-          "mapsB": 3
+          "mapsB": 6
         },
         {
           "map": "Dust2",
-          "probA": 0.5084679952181982,
+          "probA": 0.5088119191228397,
           "mapsA": 2,
           "mapsB": 0
         },
         {
           "map": "Inferno",
-          "probA": 0.5099278304786187,
+          "probA": 0.5186497045196061,
           "mapsA": 4,
-          "mapsB": 3
+          "mapsB": 5
         },
         {
           "map": "Mirage",
-          "probA": 0.5106634758383741,
+          "probA": 0.5230601765623553,
           "mapsA": 0,
-          "mapsB": 6
+          "mapsB": 8
         },
         {
           "map": "Nuke",
-          "probA": 0.4979047144205633,
+          "probA": 0.49796703841723866,
           "mapsA": 4,
-          "mapsB": 2
+          "mapsB": 3
         },
         {
           "map": "Train",
@@ -318,7 +318,7 @@
         "22418"
       ],
       "format": "Bo3",
-      "availableAt": "2026-11-24T06:05:49.751064+00:00",
+      "availableAt": "2026-11-24T06:08:43.792402+00:00",
       "model": "Aokua/csgopred MapModel · MIT",
       "caution": "Map Elo exploratory and not calibrated. Includes only recorded maps. No confirmed veto. Veto is SIMULATED, not official picks/bans.",
       "vetoEstimate": [
@@ -326,30 +326,30 @@
         "Nuke",
         "Dust2"
       ],
-      "seriesProbabilityA": 0.5041717247792209
+      "seriesProbabilityA": 0.5072743369640416
     },
     "bo3-134896": {
       "status": "map-analysis",
-      "teamAMaps": 39,
-      "teamBMaps": 23,
+      "teamAMaps": 47,
+      "teamBMaps": 26,
       "maps": [
         {
           "map": "Ancient",
-          "probA": 0.4598013143555669,
-          "mapsA": 8,
-          "mapsB": 9
+          "probA": 0.4661335181019105,
+          "mapsA": 11,
+          "mapsB": 10
         },
         {
           "map": "Anubis",
-          "probA": 0.5178524369256495,
-          "mapsA": 13,
+          "probA": 0.5293978070739565,
+          "mapsA": 14,
           "mapsB": 3
         },
         {
           "map": "Dust2",
-          "probA": 0.5519949363090417,
-          "mapsA": 8,
-          "mapsB": 6
+          "probA": 0.6085115878590596,
+          "mapsA": 11,
+          "mapsB": 7
         },
         {
           "map": "Inferno",
@@ -359,14 +359,14 @@
         },
         {
           "map": "Mirage",
-          "probA": 0.5512641086048854,
+          "probA": 0.5572228988680957,
           "mapsA": 5,
-          "mapsB": 5
+          "mapsB": 6
         },
         {
           "map": "Nuke",
-          "probA": 0.459325612105823,
-          "mapsA": 5,
+          "probA": 0.45081893625445973,
+          "mapsA": 6,
           "mapsB": 0
         },
         {
@@ -381,7 +381,7 @@
         "22861"
       ],
       "format": "Bo3",
-      "availableAt": "2026-11-24T06:05:49.772500+00:00",
+      "availableAt": "2026-11-24T06:08:43.809920+00:00",
       "model": "Aokua/csgopred MapModel · MIT",
       "caution": "Map Elo exploratory and not calibrated. Includes only recorded maps. No confirmed veto. Veto is SIMULATED, not official picks/bans.",
       "vetoEstimate": [
@@ -389,7 +389,7 @@
         "Inferno",
         "Anubis"
       ],
-      "seriesProbabilityA": 0.4888268756406082
+      "seriesProbabilityA": 0.4977656625879335
     },
     "agenda-cs2-1818188": {
       "status": "missing-team-identifiers"
@@ -401,37 +401,37 @@
       "maps": [
         {
           "map": "Ancient",
-          "probA": 0.4644982332384348,
+          "probA": 0.4657187111702166,
           "mapsA": 12,
           "mapsB": 1
         },
         {
           "map": "Anubis",
-          "probA": 0.48232400097169986,
+          "probA": 0.4816541317926102,
           "mapsA": 6,
           "mapsB": 0
         },
         {
           "map": "Dust2",
-          "probA": 0.48676751952940195,
+          "probA": 0.4885274566407133,
           "mapsA": 9,
           "mapsB": 3
         },
         {
           "map": "Inferno",
-          "probA": 0.5176340625384231,
+          "probA": 0.5173225626487257,
           "mapsA": 3,
           "mapsB": 1
         },
         {
           "map": "Mirage",
-          "probA": 0.5950639365631647,
+          "probA": 0.5934575520901677,
           "mapsA": 20,
           "mapsB": 4
         },
         {
           "map": "Nuke",
-          "probA": 0.5092651465445067,
+          "probA": 0.5092449661566618,
           "mapsA": 2,
           "mapsB": 1
         },
@@ -447,7 +447,7 @@
         "25636"
       ],
       "format": "Bo3",
-      "availableAt": "2026-11-24T06:05:49.794265+00:00",
+      "availableAt": "2026-11-24T06:08:43.829288+00:00",
       "model": "Aokua/csgopred MapModel · MIT",
       "caution": "Map Elo exploratory and not calibrated. Includes only recorded maps. No confirmed veto. Veto is SIMULATED, not official picks/bans.",
       "vetoEstimate": [
@@ -455,47 +455,47 @@
         "Dust2",
         "Anubis"
       ],
-      "seriesProbabilityA": 0.4933545424001098
+      "seriesProbabilityA": 0.493744783650944
     },
     "bo3-134638": {
       "status": "map-analysis",
-      "teamAMaps": 24,
+      "teamAMaps": 44,
       "teamBMaps": 43,
       "maps": [
         {
           "map": "Ancient",
-          "probA": 0.4326978232590895,
-          "mapsA": 6,
+          "probA": 0.4465042665847598,
+          "mapsA": 15,
           "mapsB": 13
         },
         {
           "map": "Anubis",
-          "probA": 0.5109094872481196,
-          "mapsA": 2,
+          "probA": 0.511228698831053,
+          "mapsA": 3,
           "mapsB": 2
         },
         {
           "map": "Dust2",
-          "probA": 0.48857409313806016,
-          "mapsA": 5,
+          "probA": 0.49887580316740576,
+          "mapsA": 9,
           "mapsB": 5
         },
         {
           "map": "Inferno",
-          "probA": 0.4965461772957822,
-          "mapsA": 1,
+          "probA": 0.494502167934862,
+          "mapsA": 2,
           "mapsB": 0
         },
         {
           "map": "Mirage",
-          "probA": 0.4348793804265562,
-          "mapsA": 5,
+          "probA": 0.40981489103700436,
+          "mapsA": 9,
           "mapsB": 12
         },
         {
           "map": "Nuke",
-          "probA": 0.45274117182420365,
-          "mapsA": 5,
+          "probA": 0.45539307488309155,
+          "mapsA": 6,
           "mapsB": 11
         },
         {
@@ -510,7 +510,7 @@
         "1093"
       ],
       "format": "Bo3",
-      "availableAt": "2026-11-24T06:05:49.815286+00:00",
+      "availableAt": "2026-11-24T06:08:43.846661+00:00",
       "model": "Aokua/csgopred MapModel · MIT",
       "caution": "Map Elo exploratory and not calibrated. Includes only recorded maps. No confirmed veto. Veto is SIMULATED, not official picks/bans.",
       "vetoEstimate": [
@@ -518,48 +518,48 @@
         "Ancient",
         "Inferno"
       ],
-      "seriesProbabilityA": 0.4700716720855417
+      "seriesProbabilityA": 0.4761109617175681
     },
     "bo3-134584": {
       "status": "map-analysis",
-      "teamAMaps": 41,
-      "teamBMaps": 44,
+      "teamAMaps": 65,
+      "teamBMaps": 61,
       "maps": [
         {
           "map": "Ancient",
-          "probA": 0.4922281886798816,
-          "mapsA": 10,
-          "mapsB": 6
+          "probA": 0.4825875624797342,
+          "mapsA": 16,
+          "mapsB": 10
         },
         {
           "map": "Anubis",
-          "probA": 0.5083184684143454,
-          "mapsA": 0,
-          "mapsB": 3
+          "probA": 0.509643626815018,
+          "mapsA": 2,
+          "mapsB": 5
         },
         {
           "map": "Dust2",
-          "probA": 0.5337243293334909,
-          "mapsA": 7,
-          "mapsB": 14
+          "probA": 0.5383357972057223,
+          "mapsA": 9,
+          "mapsB": 18
         },
         {
           "map": "Inferno",
-          "probA": 0.4728980961568148,
-          "mapsA": 5,
+          "probA": 0.4200216901070132,
+          "mapsA": 10,
           "mapsB": 0
         },
         {
           "map": "Mirage",
-          "probA": 0.40896734924980516,
-          "mapsA": 14,
-          "mapsB": 14
+          "probA": 0.3940467642489024,
+          "mapsA": 19,
+          "mapsB": 17
         },
         {
           "map": "Nuke",
-          "probA": 0.4093506122134377,
-          "mapsA": 5,
-          "mapsB": 7
+          "probA": 0.4370105284945892,
+          "mapsA": 9,
+          "mapsB": 11
         },
         {
           "map": "Train",
@@ -573,44 +573,44 @@
         "22009"
       ],
       "format": "Bo3",
-      "availableAt": "2026-11-24T06:05:49.836370+00:00",
+      "availableAt": "2026-11-24T06:08:43.863802+00:00",
       "model": "Aokua/csgopred MapModel · MIT",
       "caution": "Map Elo exploratory and not calibrated. Includes only recorded maps. No confirmed veto. Veto is SIMULATED, not official picks/bans.",
       "vetoEstimate": [
-        "Ancient",
+        "Train",
         "Mirage",
-        "Anubis"
+        "Ancient"
       ],
-      "seriesProbabilityA": 0.4547452327291104
+      "seriesProbabilityA": 0.4383171633643183
     },
     "bo3-134639": {
       "status": "insufficient-maps",
-      "teamAMaps": 30,
+      "teamAMaps": 57,
       "teamBMaps": 8,
       "required": 10
     },
     "bo3-134979": {
       "status": "map-analysis",
       "teamAMaps": 16,
-      "teamBMaps": 40,
+      "teamBMaps": 43,
       "maps": [
         {
           "map": "Ancient",
-          "probA": 0.552707236886458,
+          "probA": 0.5514597026862813,
           "mapsA": 3,
           "mapsB": 14
         },
         {
           "map": "Anubis",
-          "probA": 0.5231368570058041,
+          "probA": 0.5232297508570064,
           "mapsA": 3,
           "mapsB": 4
         },
         {
           "map": "Dust2",
-          "probA": 0.4752113016199192,
+          "probA": 0.4788923402778339,
           "mapsA": 5,
-          "mapsB": 0
+          "mapsB": 1
         },
         {
           "map": "Inferno",
@@ -620,15 +620,15 @@
         },
         {
           "map": "Mirage",
-          "probA": 0.5779099395878602,
+          "probA": 0.585395111927727,
           "mapsA": 1,
-          "mapsB": 13
+          "mapsB": 14
         },
         {
           "map": "Nuke",
-          "probA": 0.5341875902116723,
+          "probA": 0.5254712457713081,
           "mapsA": 3,
-          "mapsB": 9
+          "mapsB": 10
         },
         {
           "map": "Train",
@@ -642,7 +642,7 @@
         "5440"
       ],
       "format": "Bo3",
-      "availableAt": "2026-11-24T06:05:49.880670+00:00",
+      "availableAt": "2026-11-24T06:08:43.899072+00:00",
       "model": "Aokua/csgopred MapModel · MIT",
       "caution": "Map Elo exploratory and not calibrated. Includes only recorded maps. No confirmed veto. Veto is SIMULATED, not official picks/bans.",
       "vetoEstimate": [
@@ -650,52 +650,52 @@
         "Inferno",
         "Ancient"
       ],
-      "seriesProbabilityA": 0.5451618777840875
+      "seriesProbabilityA": 0.5401833314348723
     },
     "bo3-132989": {
       "status": "insufficient-maps",
       "teamAMaps": 6,
-      "teamBMaps": 15,
+      "teamBMaps": 26,
       "required": 10
     },
     "bo3-134966": {
       "status": "map-analysis",
       "teamAMaps": 21,
-      "teamBMaps": 30,
+      "teamBMaps": 34,
       "maps": [
         {
           "map": "Ancient",
-          "probA": 0.5042268756100632,
+          "probA": 0.5198649301296019,
           "mapsA": 6,
-          "mapsB": 7
+          "mapsB": 8
         },
         {
           "map": "Anubis",
-          "probA": 0.5321166151272391,
+          "probA": 0.5159999188719314,
           "mapsA": 5,
-          "mapsB": 7
+          "mapsB": 9
         },
         {
           "map": "Dust2",
-          "probA": 0.5055823653796169,
+          "probA": 0.5055299199869349,
           "mapsA": 2,
           "mapsB": 0
         },
         {
           "map": "Inferno",
-          "probA": 0.5,
+          "probA": 0.4965461772957822,
           "mapsA": 0,
-          "mapsB": 0
+          "mapsB": 1
         },
         {
           "map": "Mirage",
-          "probA": 0.480724221987153,
+          "probA": 0.47883290298553866,
           "mapsA": 8,
           "mapsB": 4
         },
         {
           "map": "Nuke",
-          "probA": 0.48047366047087126,
+          "probA": 0.4804823703987916,
           "mapsA": 0,
           "mapsB": 12
         },
@@ -711,39 +711,39 @@
         "22190"
       ],
       "format": "Bo3",
-      "availableAt": "2026-11-24T06:05:49.923626+00:00",
+      "availableAt": "2026-11-24T06:08:43.933536+00:00",
       "model": "Aokua/csgopred MapModel · MIT",
       "caution": "Map Elo exploratory and not calibrated. Includes only recorded maps. No confirmed veto. Veto is SIMULATED, not official picks/bans.",
       "vetoEstimate": [
-        "Dust2",
+        "Anubis",
         "Nuke",
-        "Ancient"
+        "Dust2"
       ],
-      "seriesProbabilityA": 0.4951423722158875
+      "seriesProbabilityA": 0.5010095584010774
     },
     "agenda-cs2-1832008": {
       "status": "missing-team-identifiers"
     },
     "bo3-134967": {
       "status": "map-analysis",
-      "teamAMaps": 10,
+      "teamAMaps": 21,
       "teamBMaps": 13,
       "maps": [
         {
           "map": "Ancient",
-          "probA": 0.5192243900064785,
-          "mapsA": 0,
-          "mapsB": 4
-        },
-        {
-          "map": "Anubis",
-          "probA": 0.4956946988515385,
+          "probA": 0.5268082098578213,
           "mapsA": 3,
           "mapsB": 4
         },
         {
+          "map": "Anubis",
+          "probA": 0.4965779754661024,
+          "mapsA": 5,
+          "mapsB": 4
+        },
+        {
           "map": "Dust2",
-          "probA": 0.5067724964527454,
+          "probA": 0.506732618917045,
           "mapsA": 1,
           "mapsB": 1
         },
@@ -755,14 +755,14 @@
         },
         {
           "map": "Mirage",
-          "probA": 0.4695847061371018,
-          "mapsA": 6,
+          "probA": 0.4763925135115672,
+          "mapsA": 7,
           "mapsB": 2
         },
         {
           "map": "Nuke",
-          "probA": 0.5,
-          "mapsA": 0,
+          "probA": 0.5072411320752467,
+          "mapsA": 5,
           "mapsB": 0
         },
         {
@@ -777,15 +777,15 @@
         "21439"
       ],
       "format": "Bo3",
-      "availableAt": "2026-11-24T06:05:49.944799+00:00",
+      "availableAt": "2026-11-24T06:08:43.950989+00:00",
       "model": "Aokua/csgopred MapModel · MIT",
       "caution": "Map Elo exploratory and not calibrated. Includes only recorded maps. No confirmed veto. Veto is SIMULATED, not official picks/bans.",
       "vetoEstimate": [
-        "Dust2",
+        "Nuke",
         "Inferno",
         "Anubis"
       ],
-      "seriesProbabilityA": 0.497169603162419
+      "seriesProbabilityA": 0.4978456304462834
     },
     "bo3-134976": {
       "status": "insufficient-maps",
@@ -798,44 +798,44 @@
     },
     "bo3-134968": {
       "status": "map-analysis",
-      "teamAMaps": 58,
-      "teamBMaps": 19,
+      "teamAMaps": 72,
+      "teamBMaps": 28,
       "maps": [
         {
           "map": "Ancient",
-          "probA": 0.4899507969123094,
+          "probA": 0.49535303382470824,
           "mapsA": 1,
-          "mapsB": 5
+          "mapsB": 6
         },
         {
           "map": "Anubis",
-          "probA": 0.5421771526610322,
-          "mapsA": 12,
-          "mapsB": 3
+          "probA": 0.5916495691835103,
+          "mapsA": 14,
+          "mapsB": 6
         },
         {
           "map": "Dust2",
-          "probA": 0.5486177492336332,
-          "mapsA": 16,
+          "probA": 0.5627255896048468,
+          "mapsA": 21,
           "mapsB": 0
         },
         {
           "map": "Inferno",
-          "probA": 0.5648791358510948,
-          "mapsA": 10,
-          "mapsB": 3
+          "probA": 0.5800388229911684,
+          "mapsA": 11,
+          "mapsB": 5
         },
         {
           "map": "Mirage",
-          "probA": 0.4871543346750497,
-          "mapsA": 11,
-          "mapsB": 6
+          "probA": 0.5361660620173638,
+          "mapsA": 15,
+          "mapsB": 8
         },
         {
           "map": "Nuke",
-          "probA": 0.4709763883672229,
-          "mapsA": 8,
-          "mapsB": 2
+          "probA": 0.4565137873700411,
+          "mapsA": 10,
+          "mapsB": 3
         },
         {
           "map": "Train",
@@ -849,26 +849,26 @@
         "22418"
       ],
       "format": "Bo3",
-      "availableAt": "2026-11-24T06:05:49.987431+00:00",
+      "availableAt": "2026-11-24T06:08:43.987279+00:00",
       "model": "Aokua/csgopred MapModel · MIT",
       "caution": "Map Elo exploratory and not calibrated. Includes only recorded maps. No confirmed veto. Veto is SIMULATED, not official picks/bans.",
       "vetoEstimate": [
-        "Dust2",
+        "Anubis",
         "Ancient",
-        "Anubis"
+        "Dust2"
       ],
-      "seriesProbabilityA": 0.5404140623557097
+      "seriesProbabilityA": 0.5749175250163476
     },
     "bo3-132990": {
       "status": "map-analysis",
-      "teamAMaps": 40,
-      "teamBMaps": 57,
+      "teamAMaps": 48,
+      "teamBMaps": 68,
       "maps": [
         {
           "map": "Ancient",
-          "probA": 0.5318162355124748,
+          "probA": 0.5378218323308217,
           "mapsA": 6,
-          "mapsB": 12
+          "mapsB": 13
         },
         {
           "map": "Anubis",
@@ -878,27 +878,27 @@
         },
         {
           "map": "Dust2",
-          "probA": 0.4735708470556208,
-          "mapsA": 7,
-          "mapsB": 3
+          "probA": 0.45936513948908175,
+          "mapsA": 10,
+          "mapsB": 7
         },
         {
           "map": "Inferno",
-          "probA": 0.5035525875296973,
-          "mapsA": 5,
-          "mapsB": 9
+          "probA": 0.49647857207712814,
+          "mapsA": 6,
+          "mapsB": 10
         },
         {
           "map": "Mirage",
-          "probA": 0.534949867605339,
-          "mapsA": 11,
-          "mapsB": 16
+          "probA": 0.5327405804103059,
+          "mapsA": 13,
+          "mapsB": 17
         },
         {
           "map": "Nuke",
-          "probA": 0.5644930946920694,
-          "mapsA": 11,
-          "mapsB": 17
+          "probA": 0.553280655016602,
+          "mapsA": 13,
+          "mapsB": 21
         },
         {
           "map": "Train",
@@ -912,7 +912,7 @@
         "2868"
       ],
       "format": "Bo3",
-      "availableAt": "2026-11-24T06:05:50.009597+00:00",
+      "availableAt": "2026-11-24T06:08:44.004380+00:00",
       "model": "Aokua/csgopred MapModel · MIT",
       "caution": "Map Elo exploratory and not calibrated. Includes only recorded maps. No confirmed veto. Veto is SIMULATED, not official picks/bans.",
       "vetoEstimate": [
@@ -920,30 +920,30 @@
         "Inferno",
         "Anubis"
       ],
-      "seriesProbabilityA": 0.5340228411108834
+      "seriesProbabilityA": 0.5248796135468651
     },
     "bo3-134585": {
       "status": "map-analysis",
-      "teamAMaps": 60,
-      "teamBMaps": 79,
+      "teamAMaps": 75,
+      "teamBMaps": 97,
       "maps": [
         {
           "map": "Ancient",
-          "probA": 0.5446669984670647,
-          "mapsA": 14,
-          "mapsB": 17
+          "probA": 0.5507241396172801,
+          "mapsA": 17,
+          "mapsB": 20
         },
         {
           "map": "Anubis",
-          "probA": 0.4358642623462165,
-          "mapsA": 4,
-          "mapsB": 14
+          "probA": 0.42957494850703676,
+          "mapsA": 5,
+          "mapsB": 18
         },
         {
           "map": "Dust2",
-          "probA": 0.5356285366591699,
-          "mapsA": 10,
-          "mapsB": 16
+          "probA": 0.5740847165540836,
+          "mapsA": 14,
+          "mapsB": 22
         },
         {
           "map": "Inferno",
@@ -953,14 +953,14 @@
         },
         {
           "map": "Mirage",
-          "probA": 0.5064085356544031,
-          "mapsA": 14,
-          "mapsB": 18
+          "probA": 0.4729813647737909,
+          "mapsA": 15,
+          "mapsB": 23
         },
         {
           "map": "Nuke",
-          "probA": 0.5391244822546887,
-          "mapsA": 18,
+          "probA": 0.5346621933809451,
+          "mapsA": 24,
           "mapsB": 14
         },
         {
@@ -975,56 +975,56 @@
         "24506"
       ],
       "format": "Bo3",
-      "availableAt": "2026-11-24T06:05:50.031279+00:00",
+      "availableAt": "2026-11-24T06:08:44.021879+00:00",
       "model": "Aokua/csgopred MapModel · MIT",
       "caution": "Map Elo exploratory and not calibrated. Includes only recorded maps. No confirmed veto. Veto is SIMULATED, not official picks/bans.",
       "vetoEstimate": [
         "Ancient",
-        "Inferno",
-        "Dust2"
+        "Mirage",
+        "Inferno"
       ],
-      "seriesProbabilityA": 0.5401477675631172
+      "seriesProbabilityA": 0.5118527521955354
     },
     "bo3-134640": {
       "status": "map-analysis",
-      "teamAMaps": 51,
-      "teamBMaps": 27,
+      "teamAMaps": 72,
+      "teamBMaps": 36,
       "maps": [
         {
           "map": "Ancient",
-          "probA": 0.39545571464453344,
-          "mapsA": 13,
-          "mapsB": 8
+          "probA": 0.39334549527846807,
+          "mapsA": 14,
+          "mapsB": 9
         },
         {
           "map": "Anubis",
-          "probA": 0.5085590397593307,
-          "mapsA": 5,
+          "probA": 0.4976532935590335,
+          "mapsA": 7,
           "mapsB": 0
         },
         {
           "map": "Dust2",
-          "probA": 0.4984773056535957,
-          "mapsA": 3,
+          "probA": 0.486199406781298,
+          "mapsA": 5,
           "mapsB": 4
         },
         {
           "map": "Inferno",
-          "probA": 0.5049968720352078,
-          "mapsA": 5,
-          "mapsB": 1
+          "probA": 0.5063742966444708,
+          "mapsA": 8,
+          "mapsB": 3
         },
         {
           "map": "Mirage",
-          "probA": 0.3957781581041114,
-          "mapsA": 15,
-          "mapsB": 7
+          "probA": 0.3944574271578728,
+          "mapsA": 21,
+          "mapsB": 10
         },
         {
           "map": "Nuke",
-          "probA": 0.342050718557534,
-          "mapsA": 10,
-          "mapsB": 7
+          "probA": 0.2604745812974028,
+          "mapsA": 17,
+          "mapsB": 10
         },
         {
           "map": "Train",
@@ -1038,55 +1038,55 @@
         "20697"
       ],
       "format": "Bo3",
-      "availableAt": "2026-11-24T06:05:50.054420+00:00",
+      "availableAt": "2026-11-24T06:08:44.039465+00:00",
       "model": "Aokua/csgopred MapModel · MIT",
       "caution": "Map Elo exploratory and not calibrated. Includes only recorded maps. No confirmed veto. Veto is SIMULATED, not official picks/bans.",
       "vetoEstimate": [
-        "Anubis",
-        "Nuke",
-        "Ancient"
+        "Inferno",
+        "Ancient",
+        "Anubis"
       ],
-      "seriesProbabilityA": 0.3727500708588873
+      "seriesProbabilityA": 0.44868335193619924
     },
     "bo3-134972": {
       "status": "map-analysis",
-      "teamAMaps": 13,
+      "teamAMaps": 25,
       "teamBMaps": 11,
       "maps": [
         {
           "map": "Ancient",
-          "probA": 0.49829519363942626,
-          "mapsA": 5,
+          "probA": 0.5094272702750101,
+          "mapsA": 9,
           "mapsB": 2
         },
         {
           "map": "Anubis",
-          "probA": 0.497696912420561,
-          "mapsA": 2,
+          "probA": 0.4975134384665209,
+          "mapsA": 3,
           "mapsB": 1
         },
         {
           "map": "Dust2",
-          "probA": 0.5137087835609013,
-          "mapsA": 4,
+          "probA": 0.5077820772749587,
+          "mapsA": 6,
           "mapsB": 3
         },
         {
           "map": "Inferno",
-          "probA": 0.5,
-          "mapsA": 0,
+          "probA": 0.5135871342799426,
+          "mapsA": 3,
           "mapsB": 0
         },
         {
           "map": "Mirage",
-          "probA": 0.5056276530005309,
-          "mapsA": 2,
+          "probA": 0.5055653477530734,
+          "mapsA": 3,
           "mapsB": 0
         },
         {
           "map": "Nuke",
-          "probA": 0.5117960021430089,
-          "mapsA": 0,
+          "probA": 0.5082999834278021,
+          "mapsA": 1,
           "mapsB": 5
         },
         {
@@ -1101,19 +1101,19 @@
         "24535"
       ],
       "format": "Bo3",
-      "availableAt": "2026-11-24T06:05:50.076690+00:00",
+      "availableAt": "2026-11-24T06:08:44.056812+00:00",
       "model": "Aokua/csgopred MapModel · MIT",
       "caution": "Map Elo exploratory and not calibrated. Includes only recorded maps. No confirmed veto. Veto is SIMULATED, not official picks/bans.",
       "vetoEstimate": [
-        "Dust2",
         "Inferno",
-        "Anubis"
+        "Mirage",
+        "Ancient"
       ],
-      "seriesProbabilityA": 0.5057028479907312
+      "seriesProbabilityA": 0.5142884504278213
     },
     "bo3-134784": {
       "status": "insufficient-maps",
-      "teamAMaps": 24,
+      "teamAMaps": 32,
       "teamBMaps": 0,
       "required": 10
     },
@@ -1132,49 +1132,49 @@
     "bo3-134969": {
       "status": "insufficient-maps",
       "teamAMaps": 9,
-      "teamBMaps": 5,
+      "teamBMaps": 18,
       "required": 10
     },
     "bo3-134970": {
       "status": "map-analysis",
-      "teamAMaps": 28,
-      "teamBMaps": 44,
+      "teamAMaps": 34,
+      "teamBMaps": 61,
       "maps": [
         {
           "map": "Ancient",
-          "probA": 0.5059751250688664,
+          "probA": 0.5120634906953021,
           "mapsA": 6,
-          "mapsB": 6
+          "mapsB": 10
         },
         {
           "map": "Anubis",
-          "probA": 0.5001253577822441,
+          "probA": 0.5098560146053668,
           "mapsA": 2,
-          "mapsB": 3
+          "mapsB": 5
         },
         {
           "map": "Dust2",
-          "probA": 0.5599014927861993,
-          "mapsA": 8,
-          "mapsB": 14
+          "probA": 0.5731598962512711,
+          "mapsA": 10,
+          "mapsB": 18
         },
         {
           "map": "Inferno",
-          "probA": 0.4944107075207153,
-          "mapsA": 2,
+          "probA": 0.49280955836269513,
+          "mapsA": 3,
           "mapsB": 0
         },
         {
           "map": "Mirage",
-          "probA": 0.4798873630581228,
+          "probA": 0.46570784964093365,
           "mapsA": 8,
-          "mapsB": 14
+          "mapsB": 17
         },
         {
           "map": "Nuke",
-          "probA": 0.43353895294569883,
-          "mapsA": 2,
-          "mapsB": 7
+          "probA": 0.4204445419691881,
+          "mapsA": 5,
+          "mapsB": 11
         },
         {
           "map": "Train",
@@ -1188,15 +1188,15 @@
         "22009"
       ],
       "format": "Bo3",
-      "availableAt": "2026-11-24T06:05:50.189440+00:00",
+      "availableAt": "2026-11-24T06:08:44.144189+00:00",
       "model": "Aokua/csgopred MapModel · MIT",
       "caution": "Map Elo exploratory and not calibrated. Includes only recorded maps. No confirmed veto. Veto is SIMULATED, not official picks/bans.",
       "vetoEstimate": [
         "Mirage",
-        "Nuke",
-        "Ancient"
+        "Ancient",
+        "Anubis"
       ],
-      "seriesProbabilityA": 0.45968474655440655
+      "seriesProbabilityA": 0.4938218320029062
     },
     "bo3-134971": {
       "status": "insufficient-maps",
@@ -1206,42 +1206,42 @@
     },
     "bo3-134973": {
       "status": "map-analysis",
-      "teamAMaps": 17,
-      "teamBMaps": 23,
+      "teamAMaps": 20,
+      "teamBMaps": 28,
       "maps": [
         {
           "map": "Ancient",
-          "probA": 0.5146851919643045,
-          "mapsA": 3,
-          "mapsB": 2
+          "probA": 0.5220644990869155,
+          "mapsA": 4,
+          "mapsB": 3
         },
         {
           "map": "Anubis",
-          "probA": 0.5204727919429835,
+          "probA": 0.5316461870944971,
           "mapsA": 3,
-          "mapsB": 3
+          "mapsB": 4
         },
         {
           "map": "Dust2",
-          "probA": 0.5556916093518155,
-          "mapsA": 5,
-          "mapsB": 9
+          "probA": 0.5752046047132487,
+          "mapsA": 6,
+          "mapsB": 11
         },
         {
           "map": "Inferno",
-          "probA": 0.5067812533216663,
+          "probA": 0.5169917080646342,
           "mapsA": 2,
-          "mapsB": 3
+          "mapsB": 4
         },
         {
           "map": "Mirage",
-          "probA": 0.50906199792145,
-          "mapsA": 4,
+          "probA": 0.508995147044477,
+          "mapsA": 5,
           "mapsB": 0
         },
         {
           "map": "Nuke",
-          "probA": 0.5271396551364156,
+          "probA": 0.5271482061770281,
           "mapsA": 0,
           "mapsB": 6
         },
@@ -1257,7 +1257,7 @@
         "1199"
       ],
       "format": "Bo3",
-      "availableAt": "2026-11-24T06:05:50.234641+00:00",
+      "availableAt": "2026-11-24T06:08:44.178895+00:00",
       "model": "Aokua/csgopred MapModel · MIT",
       "caution": "Map Elo exploratory and not calibrated. Includes only recorded maps. No confirmed veto. Veto is SIMULATED, not official picks/bans.",
       "vetoEstimate": [
@@ -1265,29 +1265,29 @@
         "Mirage",
         "Ancient"
       ],
-      "seriesProbabilityA": 0.5397045770542457
+      "seriesProbabilityA": 0.5531022731930664
     },
     "bo3-134974": {
       "status": "map-analysis",
-      "teamAMaps": 16,
-      "teamBMaps": 13,
+      "teamAMaps": 29,
+      "teamBMaps": 15,
       "maps": [
         {
           "map": "Ancient",
-          "probA": 0.49776522618179253,
-          "mapsA": 7,
-          "mapsB": 5
+          "probA": 0.4984527202372385,
+          "mapsA": 11,
+          "mapsB": 6
         },
         {
           "map": "Anubis",
-          "probA": 0.5053355627573517,
-          "mapsA": 2,
+          "probA": 0.5078774007153064,
+          "mapsA": 4,
           "mapsB": 0
         },
         {
           "map": "Dust2",
-          "probA": 0.47051030523020454,
-          "mapsA": 1,
+          "probA": 0.45320362983059226,
+          "mapsA": 4,
           "mapsB": 6
         },
         {
@@ -1298,14 +1298,14 @@
         },
         {
           "map": "Mirage",
-          "probA": 0.4864712463582545,
-          "mapsA": 4,
-          "mapsB": 2
+          "probA": 0.46783916522454777,
+          "mapsA": 7,
+          "mapsB": 3
         },
         {
           "map": "Nuke",
-          "probA": 0.508345460213617,
-          "mapsA": 2,
+          "probA": 0.5152353802409189,
+          "mapsA": 3,
           "mapsB": 0
         },
         {
@@ -1320,25 +1320,25 @@
         "21440"
       ],
       "format": "Bo3",
-      "availableAt": "2026-11-24T06:05:50.257103+00:00",
+      "availableAt": "2026-11-24T06:08:44.196136+00:00",
       "model": "Aokua/csgopred MapModel · MIT",
       "caution": "Map Elo exploratory and not calibrated. Includes only recorded maps. No confirmed veto. Veto is SIMULATED, not official picks/bans.",
       "vetoEstimate": [
         "Nuke",
         "Dust2",
-        "Ancient"
+        "Anubis"
       ],
-      "seriesProbabilityA": 0.48830939583445343
+      "seriesProbabilityA": 0.48816943794441053
     },
     "bo3-134975": {
       "status": "map-analysis",
-      "teamAMaps": 15,
+      "teamAMaps": 18,
       "teamBMaps": 12,
       "maps": [
         {
           "map": "Ancient",
-          "probA": 0.5166220781890395,
-          "mapsA": 4,
+          "probA": 0.5075571737918866,
+          "mapsA": 5,
           "mapsB": 7
         },
         {
@@ -1349,25 +1349,25 @@
         },
         {
           "map": "Dust2",
-          "probA": 0.5075545458032377,
+          "probA": 0.5074553251917014,
           "mapsA": 3,
           "mapsB": 3
         },
         {
           "map": "Inferno",
-          "probA": 0.4965461772957822,
-          "mapsA": 0,
+          "probA": 0.4930688305849548,
+          "mapsA": 1,
           "mapsB": 1
         },
         {
           "map": "Mirage",
-          "probA": 0.5350002561585568,
-          "mapsA": 5,
+          "probA": 0.541343117360876,
+          "mapsA": 6,
           "mapsB": 0
         },
         {
           "map": "Nuke",
-          "probA": 0.518577803587921,
+          "probA": 0.5185777920032034,
           "mapsA": 3,
           "mapsB": 1
         },
@@ -1383,38 +1383,38 @@
         "9438"
       ],
       "format": "Bo3",
-      "availableAt": "2026-11-24T06:05:50.280072+00:00",
+      "availableAt": "2026-11-24T06:08:44.213184+00:00",
       "model": "Aokua/csgopred MapModel · MIT",
       "caution": "Map Elo exploratory and not calibrated. Includes only recorded maps. No confirmed veto. Veto is SIMULATED, not official picks/bans.",
       "vetoEstimate": [
         "Mirage",
         "Dust2",
-        "Inferno"
+        "Anubis"
       ],
-      "seriesProbabilityA": 0.5195523160864828
+      "seriesProbabilityA": 0.5243992212762887
     },
     "bo3-134977": {
       "status": "map-analysis",
-      "teamAMaps": 19,
-      "teamBMaps": 15,
+      "teamAMaps": 26,
+      "teamBMaps": 20,
       "maps": [
         {
           "map": "Ancient",
-          "probA": 0.5164534258572808,
+          "probA": 0.509126759115538,
           "mapsA": 1,
-          "mapsB": 5
+          "mapsB": 7
         },
         {
           "map": "Anubis",
-          "probA": 0.5118997786928318,
-          "mapsA": 2,
+          "probA": 0.5231965050683607,
+          "mapsA": 4,
           "mapsB": 1
         },
         {
           "map": "Dust2",
-          "probA": 0.5198589306140492,
-          "mapsA": 6,
-          "mapsB": 3
+          "probA": 0.5265757049541372,
+          "mapsA": 7,
+          "mapsB": 4
         },
         {
           "map": "Inferno",
@@ -1424,15 +1424,15 @@
         },
         {
           "map": "Mirage",
-          "probA": 0.482923477861294,
-          "mapsA": 4,
-          "mapsB": 2
+          "probA": 0.47107043543308424,
+          "mapsA": 7,
+          "mapsB": 3
         },
         {
           "map": "Nuke",
-          "probA": 0.4919146190150221,
-          "mapsA": 6,
-          "mapsB": 4
+          "probA": 0.48463387431859944,
+          "mapsA": 7,
+          "mapsB": 5
         },
         {
           "map": "Train",
@@ -1446,19 +1446,19 @@
         "23072"
       ],
       "format": "Bo3",
-      "availableAt": "2026-11-24T06:05:50.301584+00:00",
+      "availableAt": "2026-11-24T06:08:44.230543+00:00",
       "model": "Aokua/csgopred MapModel · MIT",
       "caution": "Map Elo exploratory and not calibrated. Includes only recorded maps. No confirmed veto. Veto is SIMULATED, not official picks/bans.",
       "vetoEstimate": [
         "Nuke",
         "Inferno",
-        "Anubis"
+        "Ancient"
       ],
-      "seriesProbabilityA": 0.501907198853927
+      "seriesProbabilityA": 0.49688031671706867
     },
     "bo3-134978": {
       "status": "insufficient-maps",
-      "teamAMaps": 40,
+      "teamAMaps": 48,
       "teamBMaps": 8,
       "required": 10
     },
@@ -1470,43 +1470,43 @@
     },
     "bo3-134882": {
       "status": "map-analysis",
-      "teamAMaps": 52,
-      "teamBMaps": 34,
+      "teamAMaps": 61,
+      "teamBMaps": 36,
       "maps": [
         {
           "map": "Ancient",
-          "probA": 0.47695846741780185,
-          "mapsA": 12,
-          "mapsB": 12
+          "probA": 0.4707829658694247,
+          "mapsA": 17,
+          "mapsB": 13
         },
         {
           "map": "Anubis",
-          "probA": 0.5079229931181778,
+          "probA": 0.507881170437346,
           "mapsA": 0,
           "mapsB": 2
         },
         {
           "map": "Dust2",
-          "probA": 0.5490570216897142,
-          "mapsA": 18,
+          "probA": 0.5479817487716165,
+          "mapsA": 20,
           "mapsB": 7
         },
         {
           "map": "Inferno",
-          "probA": 0.4690168033917679,
+          "probA": 0.4679449942070691,
           "mapsA": 6,
           "mapsB": 0
         },
         {
           "map": "Mirage",
-          "probA": 0.4779344186022766,
+          "probA": 0.46500582199004104,
           "mapsA": 4,
-          "mapsB": 8
+          "mapsB": 9
         },
         {
           "map": "Nuke",
-          "probA": 0.48962678285885763,
-          "mapsA": 12,
+          "probA": 0.4892822017661035,
+          "mapsA": 14,
           "mapsB": 5
         },
         {
@@ -1521,56 +1521,56 @@
         "16743"
       ],
       "format": "Bo3",
-      "availableAt": "2026-11-24T06:05:50.366209+00:00",
+      "availableAt": "2026-11-24T06:08:44.283672+00:00",
       "model": "Aokua/csgopred MapModel · MIT",
       "caution": "Map Elo exploratory and not calibrated. Includes only recorded maps. No confirmed veto. Veto is SIMULATED, not official picks/bans.",
       "vetoEstimate": [
         "Dust2",
         "Ancient",
-        "Mirage"
+        "Anubis"
       ],
-      "seriesProbabilityA": 0.5019250702407658
+      "seriesProbabilityA": 0.5133450395188395
     },
     "bo3-134786": {
       "status": "map-analysis",
       "teamAMaps": 22,
-      "teamBMaps": 13,
+      "teamBMaps": 25,
       "maps": [
         {
           "map": "Ancient",
-          "probA": 0.5581810097968822,
+          "probA": 0.5474525249533237,
           "mapsA": 6,
-          "mapsB": 5
+          "mapsB": 9
         },
         {
           "map": "Anubis",
-          "probA": 0.520930839394131,
+          "probA": 0.5211255037849223,
           "mapsA": 3,
-          "mapsB": 2
+          "mapsB": 3
         },
         {
           "map": "Dust2",
-          "probA": 0.49724621726158214,
+          "probA": 0.5031379311739004,
           "mapsA": 8,
-          "mapsB": 4
+          "mapsB": 6
         },
         {
           "map": "Inferno",
-          "probA": 0.5,
+          "probA": 0.4864128657200575,
           "mapsA": 0,
-          "mapsB": 0
+          "mapsB": 3
         },
         {
           "map": "Mirage",
-          "probA": 0.4910116261695802,
+          "probA": 0.49107389859147055,
           "mapsA": 1,
-          "mapsB": 2
+          "mapsB": 3
         },
         {
           "map": "Nuke",
-          "probA": 0.49668045509451525,
+          "probA": 0.5001131869946649,
           "mapsA": 4,
-          "mapsB": 0
+          "mapsB": 1
         },
         {
           "map": "Train",
@@ -1584,15 +1584,15 @@
         "6277"
       ],
       "format": "Bo3",
-      "availableAt": "2026-11-24T06:05:50.389998+00:00",
+      "availableAt": "2026-11-24T06:08:44.301120+00:00",
       "model": "Aokua/csgopred MapModel · MIT",
       "caution": "Map Elo exploratory and not calibrated. Includes only recorded maps. No confirmed veto. Veto is SIMULATED, not official picks/bans.",
       "vetoEstimate": [
-        "Anubis",
-        "Dust2",
-        "Inferno"
+        "Ancient",
+        "Inferno",
+        "Dust2"
       ],
-      "seriesProbabilityA": 0.5090885283278566
+      "seriesProbabilityA": 0.5185057072471578
     },
     "bo3-134787": {
       "status": "insufficient-maps",
@@ -1602,55 +1602,55 @@
     },
     "bo3-134861": {
       "status": "insufficient-maps",
-      "teamAMaps": 98,
+      "teamAMaps": 103,
       "teamBMaps": 5,
       "required": 10
     },
     "bo3-134890": {
       "status": "insufficient-maps",
       "teamAMaps": 0,
-      "teamBMaps": 34,
+      "teamBMaps": 42,
       "required": 10
     },
     "bo3-135030": {
       "status": "map-analysis",
-      "teamAMaps": 76,
-      "teamBMaps": 10,
+      "teamAMaps": 93,
+      "teamBMaps": 16,
       "maps": [
         {
           "map": "Ancient",
-          "probA": 0.5469536888287584,
-          "mapsA": 16,
+          "probA": 0.5545023601743044,
+          "mapsA": 20,
           "mapsB": 1
         },
         {
           "map": "Anubis",
-          "probA": 0.4635214966708554,
-          "mapsA": 8,
+          "probA": 0.4658636487958526,
+          "mapsA": 9,
           "mapsB": 0
         },
         {
           "map": "Dust2",
-          "probA": 0.5984382842132149,
-          "mapsA": 11,
-          "mapsB": 4
+          "probA": 0.6122236243643555,
+          "mapsA": 14,
+          "mapsB": 6
         },
         {
           "map": "Inferno",
-          "probA": 0.4918062709118959,
+          "probA": 0.4841860074880978,
           "mapsA": 0,
-          "mapsB": 2
+          "mapsB": 3
         },
         {
           "map": "Mirage",
-          "probA": 0.49746439793886327,
-          "mapsA": 22,
-          "mapsB": 1
+          "probA": 0.49131802276492154,
+          "mapsA": 26,
+          "mapsB": 4
         },
         {
           "map": "Nuke",
-          "probA": 0.5931270030808989,
-          "mapsA": 19,
+          "probA": 0.59727197259773,
+          "mapsA": 24,
           "mapsB": 2
         },
         {
@@ -1665,62 +1665,62 @@
         "25272"
       ],
       "format": "Bo3",
-      "availableAt": "2026-11-24T06:05:50.477162+00:00",
+      "availableAt": "2026-11-24T06:08:44.370230+00:00",
       "model": "Aokua/csgopred MapModel · MIT",
       "caution": "Map Elo exploratory and not calibrated. Includes only recorded maps. No confirmed veto. Veto is SIMULATED, not official picks/bans.",
       "vetoEstimate": [
-        "Nuke",
+        "Dust2",
         "Inferno",
-        "Dust2"
+        "Mirage"
       ],
-      "seriesProbabilityA": 0.5918360072321294
+      "seriesProbabilityA": 0.5438330114369542
     },
     "bo3-134862": {
       "status": "insufficient-maps",
-      "teamAMaps": 57,
+      "teamAMaps": 61,
       "teamBMaps": 7,
       "required": 10
     },
     "bo3-134891": {
       "status": "map-analysis",
-      "teamAMaps": 58,
-      "teamBMaps": 19,
+      "teamAMaps": 72,
+      "teamBMaps": 28,
       "maps": [
         {
           "map": "Ancient",
-          "probA": 0.4899507969123094,
+          "probA": 0.49535303382470824,
           "mapsA": 1,
-          "mapsB": 5
+          "mapsB": 6
         },
         {
           "map": "Anubis",
-          "probA": 0.5421771526610322,
-          "mapsA": 12,
-          "mapsB": 3
+          "probA": 0.5916495691835103,
+          "mapsA": 14,
+          "mapsB": 6
         },
         {
           "map": "Dust2",
-          "probA": 0.5486177492336332,
-          "mapsA": 16,
+          "probA": 0.5627255896048468,
+          "mapsA": 21,
           "mapsB": 0
         },
         {
           "map": "Inferno",
-          "probA": 0.5648791358510948,
-          "mapsA": 10,
-          "mapsB": 3
+          "probA": 0.5800388229911684,
+          "mapsA": 11,
+          "mapsB": 5
         },
         {
           "map": "Mirage",
-          "probA": 0.4871543346750497,
-          "mapsA": 11,
-          "mapsB": 6
+          "probA": 0.5361660620173638,
+          "mapsA": 15,
+          "mapsB": 8
         },
         {
           "map": "Nuke",
-          "probA": 0.4709763883672229,
-          "mapsA": 8,
-          "mapsB": 2
+          "probA": 0.4565137873700411,
+          "mapsA": 10,
+          "mapsB": 3
         },
         {
           "map": "Train",
@@ -1734,55 +1734,55 @@
         "22418"
       ],
       "format": "Bo3",
-      "availableAt": "2026-11-24T06:05:50.522326+00:00",
+      "availableAt": "2026-11-24T06:08:44.405067+00:00",
       "model": "Aokua/csgopred MapModel · MIT",
       "caution": "Map Elo exploratory and not calibrated. Includes only recorded maps. No confirmed veto. Veto is SIMULATED, not official picks/bans.",
       "vetoEstimate": [
-        "Dust2",
+        "Anubis",
         "Ancient",
-        "Anubis"
+        "Dust2"
       ],
-      "seriesProbabilityA": 0.5404140623557097
+      "seriesProbabilityA": 0.5749175250163476
     },
     "bo3-135031": {
       "status": "map-analysis",
-      "teamAMaps": 22,
-      "teamBMaps": 79,
+      "teamAMaps": 45,
+      "teamBMaps": 97,
       "maps": [
         {
           "map": "Ancient",
-          "probA": 0.5141171286157898,
-          "mapsA": 2,
-          "mapsB": 17
+          "probA": 0.5158638322875482,
+          "mapsA": 5,
+          "mapsB": 20
         },
         {
           "map": "Anubis",
-          "probA": 0.47188516417489906,
-          "mapsA": 4,
-          "mapsB": 14
+          "probA": 0.5093987129252567,
+          "mapsA": 8,
+          "mapsB": 18
         },
         {
           "map": "Dust2",
-          "probA": 0.5607741906490957,
-          "mapsA": 4,
-          "mapsB": 16
+          "probA": 0.5875338081057745,
+          "mapsA": 12,
+          "mapsB": 22
         },
         {
           "map": "Inferno",
-          "probA": 0.49429241492008025,
-          "mapsA": 3,
+          "probA": 0.5071806569821457,
+          "mapsA": 8,
           "mapsB": 0
         },
         {
           "map": "Mirage",
-          "probA": 0.4492078139036736,
-          "mapsA": 7,
-          "mapsB": 18
+          "probA": 0.4201869259822638,
+          "mapsA": 9,
+          "mapsB": 23
         },
         {
           "map": "Nuke",
-          "probA": 0.5417651613874617,
-          "mapsA": 2,
+          "probA": 0.539995191627726,
+          "mapsA": 3,
           "mapsB": 14
         },
         {
@@ -1797,54 +1797,54 @@
         "24506"
       ],
       "format": "Bo3",
-      "availableAt": "2026-11-24T06:05:50.545510+00:00",
+      "availableAt": "2026-11-24T06:08:44.422383+00:00",
       "model": "Aokua/csgopred MapModel · MIT",
       "caution": "Map Elo exploratory and not calibrated. Includes only recorded maps. No confirmed veto. Veto is SIMULATED, not official picks/bans.",
       "vetoEstimate": [
-        "Dust2",
         "Anubis",
+        "Inferno",
         "Ancient"
       ],
-      "seriesProbabilityA": 0.5234364843639987
+      "seriesProbabilityA": 0.5162194598312277
     },
     "bo3-135035": {
       "status": "map-analysis",
-      "teamAMaps": 14,
+      "teamAMaps": 15,
       "teamBMaps": 16,
       "maps": [
         {
           "map": "Ancient",
-          "probA": 0.4914335491814555,
+          "probA": 0.4910379525772649,
           "mapsA": 0,
           "mapsB": 2
         },
         {
           "map": "Anubis",
-          "probA": 0.5266854505287711,
-          "mapsA": 4,
+          "probA": 0.537783652080328,
+          "mapsA": 5,
           "mapsB": 4
         },
         {
           "map": "Dust2",
-          "probA": 0.49492761340237046,
+          "probA": 0.49450683011992347,
           "mapsA": 1,
           "mapsB": 2
         },
         {
           "map": "Inferno",
-          "probA": 0.49367853828662905,
+          "probA": 0.4930551065312143,
           "mapsA": 1,
           "mapsB": 4
         },
         {
           "map": "Mirage",
-          "probA": 0.460240595798473,
+          "probA": 0.4591818234712933,
           "mapsA": 5,
           "mapsB": 0
         },
         {
           "map": "Nuke",
-          "probA": 0.48263940082287937,
+          "probA": 0.48334227339252733,
           "mapsA": 3,
           "mapsB": 4
         },
@@ -1860,7 +1860,7 @@
         "18843"
       ],
       "format": "Bo3",
-      "availableAt": "2026-11-24T06:05:50.568231+00:00",
+      "availableAt": "2026-11-24T06:08:44.441621+00:00",
       "model": "Aokua/csgopred MapModel · MIT",
       "caution": "Map Elo exploratory and not calibrated. Includes only recorded maps. No confirmed veto. Veto is SIMULATED, not official picks/bans.",
       "vetoEstimate": [
@@ -1868,53 +1868,53 @@
         "Ancient",
         "Inferno"
       ],
-      "seriesProbabilityA": 0.49002039979996537
+      "seriesProbabilityA": 0.4893006284090924
     },
     "bo3-134981": {
       "status": "insufficient-maps",
-      "teamAMaps": 38,
+      "teamAMaps": 59,
       "teamBMaps": 3,
       "required": 10
     },
     "bo3-135036": {
       "status": "map-analysis",
-      "teamAMaps": 41,
+      "teamAMaps": 65,
       "teamBMaps": 52,
       "maps": [
         {
           "map": "Ancient",
-          "probA": 0.5457599208415723,
-          "mapsA": 10,
+          "probA": 0.5297362922131497,
+          "mapsA": 16,
           "mapsB": 12
         },
         {
           "map": "Anubis",
-          "probA": 0.5176759990283002,
-          "mapsA": 0,
+          "probA": 0.51002430176391,
+          "mapsA": 2,
           "mapsB": 6
         },
         {
           "map": "Dust2",
-          "probA": 0.4961974654578333,
-          "mapsA": 7,
+          "probA": 0.4800309053268129,
+          "mapsA": 9,
           "mapsB": 9
         },
         {
           "map": "Inferno",
-          "probA": 0.45862164218839646,
-          "mapsA": 5,
+          "probA": 0.4060257117349738,
+          "mapsA": 10,
           "mapsB": 3
         },
         {
           "map": "Mirage",
-          "probA": 0.4076125460258597,
-          "mapsA": 14,
+          "probA": 0.4081001707912843,
+          "mapsA": 19,
           "mapsB": 20
         },
         {
           "map": "Nuke",
-          "probA": 0.4615009160372476,
-          "mapsA": 5,
+          "probA": 0.4706958772471807,
+          "mapsA": 9,
           "mapsB": 2
         },
         {
@@ -1929,26 +1929,26 @@
         "25400"
       ],
       "format": "Bo3",
-      "availableAt": "2026-11-24T06:05:50.616320+00:00",
+      "availableAt": "2026-11-24T06:08:44.476516+00:00",
       "model": "Aokua/csgopred MapModel · MIT",
       "caution": "Map Elo exploratory and not calibrated. Includes only recorded maps. No confirmed veto. Veto is SIMULATED, not official picks/bans.",
       "vetoEstimate": [
-        "Anubis",
+        "Train",
         "Mirage",
-        "Dust2"
+        "Anubis"
       ],
-      "seriesProbabilityA": 0.46073058586982163
+      "seriesProbabilityA": 0.4590622362775971
     },
     "bo3-134883": {
       "status": "map-analysis",
-      "teamAMaps": 46,
-      "teamBMaps": 24,
+      "teamAMaps": 56,
+      "teamBMaps": 33,
       "maps": [
         {
           "map": "Ancient",
-          "probA": 0.51925253422215,
-          "mapsA": 11,
-          "mapsB": 5
+          "probA": 0.522336881203756,
+          "mapsA": 13,
+          "mapsB": 8
         },
         {
           "map": "Anubis",
@@ -1958,26 +1958,26 @@
         },
         {
           "map": "Dust2",
-          "probA": 0.5009177705816725,
-          "mapsA": 5,
-          "mapsB": 10
+          "probA": 0.4959082553677647,
+          "mapsA": 7,
+          "mapsB": 12
         },
         {
           "map": "Inferno",
-          "probA": 0.5248168701444931,
-          "mapsA": 12,
-          "mapsB": 3
+          "probA": 0.5322973522680492,
+          "mapsA": 15,
+          "mapsB": 6
         },
         {
           "map": "Mirage",
-          "probA": 0.44503584472656427,
-          "mapsA": 10,
-          "mapsB": 2
+          "probA": 0.4324853659668135,
+          "mapsA": 11,
+          "mapsB": 3
         },
         {
           "map": "Nuke",
-          "probA": 0.45856116890360354,
-          "mapsA": 8,
+          "probA": 0.4434736251358066,
+          "mapsA": 10,
           "mapsB": 4
         },
         {
@@ -1992,7 +1992,7 @@
         "24574"
       ],
       "format": "Bo3",
-      "availableAt": "2026-11-24T06:05:50.637576+00:00",
+      "availableAt": "2026-11-24T06:08:44.493853+00:00",
       "model": "Aokua/csgopred MapModel · MIT",
       "caution": "Map Elo exploratory and not calibrated. Includes only recorded maps. No confirmed veto. Veto is SIMULATED, not official picks/bans.",
       "vetoEstimate": [
@@ -2000,46 +2000,46 @@
         "Dust2",
         "Anubis"
       ],
-      "seriesProbabilityA": 0.5128673203630828
+      "seriesProbabilityA": 0.514102803817907
     },
     "bo3-134884": {
       "status": "map-analysis",
-      "teamAMaps": 47,
-      "teamBMaps": 23,
+      "teamAMaps": 54,
+      "teamBMaps": 28,
       "maps": [
         {
           "map": "Ancient",
-          "probA": 0.4245587342331739,
-          "mapsA": 10,
-          "mapsB": 9
+          "probA": 0.43432999882762435,
+          "mapsA": 13,
+          "mapsB": 10
         },
         {
           "map": "Anubis",
-          "probA": 0.48631357282765897,
+          "probA": 0.4863173734459918,
           "mapsA": 3,
           "mapsB": 0
         },
         {
           "map": "Dust2",
-          "probA": 0.5870668923285599,
-          "mapsA": 17,
-          "mapsB": 5
+          "probA": 0.6231466139666195,
+          "mapsA": 20,
+          "mapsB": 7
         },
         {
           "map": "Inferno",
-          "probA": 0.46667075395326785,
-          "mapsA": 2,
-          "mapsB": 4
+          "probA": 0.44893453281074225,
+          "mapsA": 3,
+          "mapsB": 5
         },
         {
           "map": "Mirage",
-          "probA": 0.4910111209608605,
+          "probA": 0.5021944738055425,
           "mapsA": 7,
-          "mapsB": 4
+          "mapsB": 5
         },
         {
           "map": "Nuke",
-          "probA": 0.505654871395892,
+          "probA": 0.5052110609271597,
           "mapsA": 8,
           "mapsB": 1
         },
@@ -2055,32 +2055,32 @@
         "25310"
       ],
       "format": "Bo3",
-      "availableAt": "2026-11-24T06:05:50.660839+00:00",
+      "availableAt": "2026-11-24T06:08:44.511396+00:00",
       "model": "Aokua/csgopred MapModel · MIT",
       "caution": "Map Elo exploratory and not calibrated. Includes only recorded maps. No confirmed veto. Veto is SIMULATED, not official picks/bans.",
       "vetoEstimate": [
         "Nuke",
-        "Inferno",
+        "Ancient",
         "Anubis"
       ],
-      "seriesProbabilityA": 0.4793144400553785
+      "seriesProbabilityA": 0.46291985192679974
     },
     "bo3-134740": {
       "status": "insufficient-maps",
       "teamAMaps": 6,
-      "teamBMaps": 2,
+      "teamBMaps": 3,
       "required": 10
     },
     "bo3-134741": {
       "status": "insufficient-maps",
-      "teamAMaps": 33,
+      "teamAMaps": 38,
       "teamBMaps": 2,
       "required": 10
     },
     "bo3-134742": {
       "status": "insufficient-maps",
       "teamAMaps": 7,
-      "teamBMaps": 25,
+      "teamBMaps": 35,
       "required": 10
     },
     "bo3-134743": {
@@ -2091,50 +2091,50 @@
     },
     "bo3-134866": {
       "status": "insufficient-maps",
-      "teamAMaps": 15,
+      "teamAMaps": 27,
       "teamBMaps": 2,
       "required": 10
     },
     "bo3-134885": {
       "status": "map-analysis",
-      "teamAMaps": 41,
-      "teamBMaps": 70,
+      "teamAMaps": 78,
+      "teamBMaps": 72,
       "maps": [
         {
           "map": "Ancient",
-          "probA": 0.36529240061921386,
-          "mapsA": 7,
+          "probA": 0.32457747315473967,
+          "mapsA": 10,
           "mapsB": 15
         },
         {
           "map": "Anubis",
-          "probA": 0.4527596550118491,
-          "mapsA": 14,
+          "probA": 0.4617355335804073,
+          "mapsA": 16,
           "mapsB": 19
         },
         {
           "map": "Dust2",
-          "probA": 0.5029443930265166,
-          "mapsA": 7,
+          "probA": 0.4866348584941773,
+          "mapsA": 19,
           "mapsB": 0
         },
         {
           "map": "Inferno",
-          "probA": 0.4442798319927987,
-          "mapsA": 0,
+          "probA": 0.4384616681379876,
+          "mapsA": 1,
           "mapsB": 10
         },
         {
           "map": "Mirage",
-          "probA": 0.5369717874228606,
-          "mapsA": 9,
-          "mapsB": 14
+          "probA": 0.618591135437492,
+          "mapsA": 21,
+          "mapsB": 15
         },
         {
           "map": "Nuke",
-          "probA": 0.5118112564621077,
-          "mapsA": 4,
-          "mapsB": 12
+          "probA": 0.44560537460633987,
+          "mapsA": 11,
+          "mapsB": 13
         },
         {
           "map": "Train",
@@ -2148,15 +2148,15 @@
         "10493"
       ],
       "format": "Bo3",
-      "availableAt": "2026-11-24T06:05:50.789158+00:00",
+      "availableAt": "2026-11-24T06:08:44.617798+00:00",
       "model": "Aokua/csgopred MapModel · MIT",
       "caution": "Map Elo exploratory and not calibrated. Includes only recorded maps. No confirmed veto. Veto is SIMULATED, not official picks/bans.",
       "vetoEstimate": [
+        "Mirage",
         "Anubis",
-        "Inferno",
         "Dust2"
       ],
-      "seriesProbabilityA": 0.44997643931762066
+      "seriesProbabilityA": 0.5333594663689114
     },
     "bo3-134867": {
       "status": "insufficient-maps",
@@ -2166,7 +2166,7 @@
     },
     "bo3-134886": {
       "status": "insufficient-maps",
-      "teamAMaps": 65,
+      "teamAMaps": 91,
       "teamBMaps": 1,
       "required": 10
     }
