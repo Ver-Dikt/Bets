@@ -96,22 +96,11 @@ details p{color:#92a9bf;font-size:12px;line-height:1.6}details h3{font-size:13px
 </header>
 <main>
 <section class="hero"><div><h1>Матчи и аналитика</h1><p>Расписание, вероятности и проверка прогнозов по CS2 и Dota 2.</p></div></section>
-<div class="health">
- <div class="health-box"><span class="k">Предстоящие</span><b id="upcoming-count">—</b><div class="s">Из источников</div></div>
- <div class="health-box"><span class="k">Live-снимок</span><b id="live-count">—</b><div class="s" id="live-age">Не потоковый Live</div></div>
- <div class="health-box"><span class="k">История</span><b id="history-count">—</b><div class="s">Проверенных результатов</div></div>
-</div>
 <nav class="tabs section-nav" aria-label="Разделы">
  <button class="tab active" data-view="today">Матчи</button>
- <button class="tab" data-view="brief">Твой список · 24 ноября</button>
- <button class="tab" data-view="live">Live</button>
  <button class="tab" data-view="daily">Итоги дня</button>
- <button class="tab" data-view="memory">Опыт</button>
- <button class="tab" data-view="learning">Калибровка</button>
- <button class="tab" data-view="evolution">Версии моделей</button>
- <button class="tab" data-view="data">Данные и архив</button>
 </nav>
-<section id="workspace-report" class="panel" hidden><h2 id="workspace-title"></h2><div id="workspace-content"></div></section>
+<section id="workspace-report" class="panel" hidden><h2 id="workspace-title">Итоги дня</h2><div id="workspace-content"></div></section>
 <div class="content" id="workspace-matches">
  <section class="left">
   <div class="panel"><div class="panel-heading"><h2>Расписание матчей</h2><span class="pill" id="fixture-update">Проверка источников</span></div>
@@ -119,27 +108,17 @@ details p{color:#92a9bf;font-size:12px;line-height:1.6}details h3{font-size:13px
    <div class="filter-grid" id="prematch-filters">
      <label>Период<select id="period"><option value="today">Сегодня</option><option value="tomorrow">Завтра</option><option value="all">Все предстоящие</option></select></label>
      <label>Турнир<select id="tournament"><option value="all">Все турниры</option></select></label>
-     <label>Данные<select id="quality"><option value="all">Все матчи</option><option value="selective">Больше данных</option><option value="pari">Есть запись PARI</option></select></label>
    </div>
-   <div class="source-row"><span id="cs2-source">CS2: проверка…</span><span id="dota-source">Dota: проверка…</span><span id="pari-source">PARI: проверка…</span></div>
+   <div class="source-row"><span id="cs2-source">CS2: проверка…</span><span id="dota-source">Dota: проверка…</span></div>
    <div id="source-warning"></div>
    <div id="fixture-list" aria-live="polite"><div class="empty">Получаю реальные матчи из последнего опубликованного снимка…</div></div>
    <button id="show-more" class="more" hidden>Показать ещё</button>
   </div>
-  <details><summary>История завершённых матчей <span id="history-summary" class="muted"></span></summary><p>Завершённые матчи используются для обучения и проверки. Сами по себе они не являются прогнозами.</p><div class="tabs" style="margin-top:12px"><button class="tab active" data-history="cs2">CS2</button><button class="tab" data-history="dota">Dota 2</button></div><div id="archive-list"></div></details>
-  <details><summary>Проверка моделей / бэктест</summary><div id="model-quality">Загрузка отчёта…</div></details>
  </section>
  <section class="right">
   <div class="panel" id="analysis-panel"><div class="panel-heading"><h2>Анализ матча</h2><span class="pill">Модель + факты</span></div>
    <div id="match-detail"><div class="details-empty"><div class="big">◎</div><strong>Выбери предстоящий матч</strong><span>Здесь появятся вероятность, рейтинг команд, форма, H2H и обоснование каждого фактора.</span></div></div>
   </div>
-  <details open><summary>Как Bets принимает решение</summary>
-   <h3>1. Получение данных и обновление</h3><p>GitHub Actions получает расписание примерно каждые 30 минут, результаты матчей раз в сутки и карты CS2 примерно каждые 6 часов. По окончании успешного сбора выпускается новый снимок сайта. Время фактической публикации может задерживаться. Кнопка ↻ загружает последний опубликованный снимок, но не запрашивает прямой Live.</p>
-   <h3>2. Оценка силы</h3><p>Elo (65%) оценивает накопленную силу команды, форма (25%) — последние 12 результатов с поправкой на малую выборку, H2H (10%) — до 10 личных встреч. Коэффициенты букмекера не участвуют в обучении.</p>
-   <h3>3. Контроль</h3><p>Нужны минимум 10 завершённых результатов на каждую команду. Модель не использует результаты позже времени начала матча; исторические показатели проверяются последовательно. Веса пока эвристические и не доказаны как оптимальные.</p>
-   <h3>Карты и ограничения</h3><p>Отдельная модель MapModel анализирует реальные результаты карт CS2, если команда сыграла достаточно карт. Она может смоделировать veto для известного Bo-формата, но это не официальные пики и баны и может участвовать в исследовательской оценке. Составы, замены, статистика игроков и драфты показываются только при наличии пригодных данных источника.</p>
-  </details>
-  <div class="panel"><div class="panel-heading"><h2>Бумажный журнал</h2><span class="pill">Только на устройстве</span></div><div id="paper-summary" class="muted">Нет сохранённых прогнозов</div><div id="paper-list"></div><button id="paper-export" class="more">Экспортировать JSON</button></div>
  </section>
 </div>
 <div class="footer">Источники: <a href="https://bo3.gg" target="_blank" rel="noopener noreferrer">bo3.gg</a>, <a href="https://www.opendota.com" target="_blank" rel="noopener noreferrer">OpenDota</a>, <a href="https://dota.haglund.dev" target="_blank" rel="noopener noreferrer">Dota schedule</a>. Это аналитический эксперимент, не подтверждённая прибыльная стратегия. Расписание показано по Москве (UTC+3).</div>
