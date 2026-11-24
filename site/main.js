@@ -63,8 +63,20 @@ function renderFixtures(){
   const name=el('div','fixture-name',f.a+'  —  '+f.b);
   const foot=el('div','fixture-foot');
   const label=f.tournament||'Турнир не указан';
-  foot.append(el('span','',label.length>48?label.slice(0,45)+'…':label),el('span','',f.format||'Анализ'));
+  foot.append(el('span','',label.length>48?label.slice(0,45)+'…':label),el('span','',f.format||'Разбор'));
   button.append(meta,name,foot);
+  if(f.status==='upcoming'&&matches.length){
+    try{
+      const assessment=analyzeFixture(f,matches);
+      if(assessment.status==='ok'){
+        const preview=el('div','fixture-foot');
+        preview.style.borderTop='1px solid #304658';preview.style.paddingTop='9px';
+        preview.append(el('span','','Модель: '+assessment.picked),el('span','win',pct(Math.max(assessment.result.pa,assessment.result.pb))));
+        button.append(preview);
+      }else button.append(el('div','meta','Прогноз недоступен · мало подтверждённой истории'));
+    }catch{button.append(el('div','meta','Требуется проверка идентификаторов команд'))}
+  }
+  if(f.status==='live'&&Array.isArray(f.score))button.append(el('div','meta','Счёт на момент снимка: '+f.score.join(' : ')));
   button.addEventListener('click',()=>{selected=f;renderFixtures();renderAnalysis();if(window.matchMedia('(max-width:820px)').matches)$('analysis-panel').scrollIntoView({behavior:'smooth',block:'start'})});
   root.append(button);
  }
