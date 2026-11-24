@@ -1,465 +1,78 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-24T12:59:28.662Z",
+  "generatedAt": "2026-11-24T15:46:08.524Z",
   "fixtures": [
-    {
-      "id": "bo3-134896",
-      "game": "cs2",
-      "a": "Inner Circle Academy",
-      "b": "Passion Academy",
-      "date": "2026-11-24T11:30:00.000Z",
-      "status": "live",
-      "tournament": "United21 Season 59",
-      "format": "Bo3",
-      "teamSlugs": [
-        "inner-circle-academy",
-        "passion-academy"
-      ],
-      "score": [
-        1,
-        0
-      ],
-      "providerIds": [
-        "22737",
-        "22861"
-      ],
-      "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z",
-      "rosters": [
-        {
-          "observedAt": "2026-11-24T06:01:47.904Z",
-          "players": [
-            {
-              "id": 35750,
-              "name": "3ippoch",
-              "metric": 5.863189223633132
-            },
-            {
-              "id": 38774,
-              "name": "Flierax",
-              "metric": 6.663413066892795
-            },
-            {
-              "id": 39328,
-              "name": "NaYz",
-              "metric": 6.0329177759174
-            },
-            {
-              "id": 50600,
-              "name": "L1seYoung",
-              "metric": 6.316032324845827
-            },
-            {
-              "id": 82993,
-              "name": "Tamefear",
-              "metric": 6.026526735272663
-            }
-          ],
-          "source": "bo3.gg team profile"
-        },
-        null
-      ]
-    },
-    {
-      "id": "bo3-134857",
-      "game": "cs2",
-      "a": "DONSTU",
-      "b": "Fortress",
-      "date": "2026-11-24T11:40:00.000Z",
-      "status": "live",
-      "tournament": "European Pro League Series 11 Play-In",
-      "format": "Bo3",
-      "teamSlugs": [
-        "donstu-esports",
-        "fortress"
-      ],
-      "score": [
-        1,
-        0
-      ],
-      "providerIds": [
-        "18843",
-        "22418"
-      ],
-      "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z",
-      "rosters": [
-        {
-          "observedAt": "2026-11-24T06:01:48.026Z",
-          "players": [
-            {
-              "id": 34326,
-              "name": "NeoLife",
-              "metric": 6.2341260464547705
-            },
-            {
-              "id": 35898,
-              "name": "redzed",
-              "metric": 5.722426119235095
-            },
-            {
-              "id": 37280,
-              "name": "Due1yant",
-              "metric": 5.970089978524968
-            },
-            {
-              "id": 75197,
-              "name": "gleb86rus",
-              "metric": 5.870952518988634
-            },
-            {
-              "id": 78016,
-              "name": "phorate",
-              "metric": 5.668389744583493
-            }
-          ],
-          "source": "bo3.gg team profile"
-        },
-        {
-          "observedAt": "2026-11-24T06:01:47.982Z",
-          "players": [
-            {
-              "id": 81784,
-              "name": "BqreBedre",
-              "metric": 5.215451818762501
-            },
-            {
-              "id": 81798,
-              "name": "As K",
-              "metric": 5.093548689234846
-            },
-            {
-              "id": 81799,
-              "name": "Brand",
-              "metric": 5.501549142194063
-            },
-            {
-              "id": 81800,
-              "name": "K1ngShield",
-              "metric": 5.431167212793384
-            },
-            {
-              "id": 81801,
-              "name": "GrEnNiE",
-              "metric": 5.224250090455567
-            }
-          ],
-          "source": "bo3.gg team profile"
-        }
-      ]
-    },
-    {
-      "id": "bo3-134583",
-      "game": "cs2",
-      "a": "Sökerorg",
-      "b": "Lunacy",
-      "date": "2026-11-24T12:00:00.000Z",
-      "status": "live",
-      "tournament": "CCT Europe 2026 Series 15 Play-In",
-      "format": "Bo3",
-      "teamSlugs": [
-        "sokerorg",
-        "lunacy-team"
-      ],
-      "score": [
-        0,
-        0
-      ],
-      "providerIds": [
-        "25400",
-        "25636"
-      ],
-      "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z",
-      "rosters": [
-        {
-          "observedAt": "2026-11-24T06:01:48.992Z",
-          "players": [
-            {
-              "id": 29783,
-              "name": "dan1",
-              "metric": 5.8402742272571775
-            },
-            {
-              "id": 31400,
-              "name": "flaw",
-              "metric": 5.656925234093272
-            },
-            {
-              "id": 31447,
-              "name": "dottie",
-              "metric": 6.466555323496525
-            },
-            {
-              "id": 50332,
-              "name": "toshas",
-              "metric": 5.5521079869840975
-            },
-            {
-              "id": 69308,
-              "name": "BRK",
-              "metric": 6.16978402071998
-            }
-          ],
-          "source": "bo3.gg team profile"
-        },
-        null
-      ]
-    },
-    {
-      "id": "agenda-dota-1807993",
-      "game": "dota",
-      "a": "angry birds",
-      "b": "Team Synapse",
-      "date": "2026-11-24T13:00:00.000Z",
-      "status": "upcoming",
-      "tournament": "European Pro League",
-      "format": "Bo3",
-      "score": null,
-      "providerIds": [
-        "10322861",
-        "10212329"
-      ],
-      "source": "Esport Agenda",
-      "sourceUrl": "https://www.esportagenda.com/match/1807993",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
-    },
-    {
-      "id": "agenda-dota-1816477",
-      "game": "dota",
-      "a": "Team Yandex",
-      "b": "1w Team",
-      "date": "2026-11-24T14:00:00.000Z",
-      "status": "upcoming",
-      "tournament": "BLAST Slam",
-      "format": "Bo3",
-      "score": null,
-      "providerIds": null,
-      "source": "Esport Agenda",
-      "sourceUrl": "https://www.esportagenda.com/match/1816477",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
-    },
-    {
-      "id": "agenda-dota-1816478",
-      "game": "dota",
-      "a": "GamerLegion",
-      "b": "PARIVISION",
-      "date": "2026-11-24T14:00:00.000Z",
-      "status": "upcoming",
-      "tournament": "BLAST Slam",
-      "format": "Bo3",
-      "score": null,
-      "providerIds": [
-        "9964962",
-        "9824702"
-      ],
-      "source": "Esport Agenda",
-      "sourceUrl": "https://www.esportagenda.com/match/1816478",
-      "fetchedAt": "2026-11-24T12:58:48.631Z",
-      "rosters": [
-        {
-          "observedAt": "2026-11-24T06:05:20.010Z",
-          "players": [
-            {
-              "id": 154974246,
-              "name": "RCY",
-              "played": 283,
-              "metric": 0.5053003533568905
-            },
-            {
-              "id": 160119017,
-              "name": "Fayde",
-              "played": 283,
-              "metric": 0.5053003533568905
-            },
-            {
-              "id": 90423751,
-              "name": "Bignum",
-              "played": 283,
-              "metric": 0.5053003533568905
-            },
-            {
-              "id": 191362875,
-              "name": "Speeed",
-              "played": 283,
-              "metric": 0.5053003533568905
-            },
-            {
-              "id": 177203952,
-              "name": "Yuma",
-              "played": 58,
-              "metric": 0.5689655172413793
-            }
-          ],
-          "source": "OpenDota team profile"
-        },
-        {
-          "observedAt": "2026-11-24T06:05:20.005Z",
-          "players": [
-            {
-              "id": 106573901,
-              "name": "No[o]ne-",
-              "played": 134,
-              "metric": 0.664179104477612
-            },
-            {
-              "id": 73401082,
-              "name": "Dukalis",
-              "played": 134,
-              "metric": 0.664179104477612
-            },
-            {
-              "id": 164199202,
-              "name": "9Class",
-              "played": 134,
-              "metric": 0.664179104477612
-            },
-            {
-              "id": 1044002267,
-              "name": "Satanic",
-              "played": 133,
-              "metric": 0.6691729323308271
-            },
-            {
-              "id": 195108598,
-              "name": "Noticed",
-              "played": 89,
-              "metric": 0.7303370786516854
-            }
-          ],
-          "source": "OpenDota team profile"
-        }
-      ]
-    },
     {
       "id": "bo3-134895",
       "game": "cs2",
       "a": "INFINITE Talent",
       "b": "TheChampionGG",
-      "date": "2026-11-24T14:00:00.000Z",
-      "status": "upcoming",
+      "date": "2026-11-24T14:10:00.000Z",
+      "status": "live",
       "tournament": "United21 Season 59",
       "format": "Bo3",
       "teamSlugs": [
         "infinite-talent",
         "thechampiongg"
       ],
-      "score": null,
+      "score": [
+        0,
+        1
+      ],
       "providerIds": [
         "18574",
         "25374"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z",
-      "confirmation": [
-        "Esport Agenda"
-      ]
-    },
-    {
-      "id": "bo3-134584",
-      "game": "cs2",
-      "a": "Drama",
-      "b": "Phantom Academy",
-      "date": "2026-11-24T15:00:00.000Z",
-      "status": "upcoming",
-      "tournament": "CCT Europe 2026 Series 15 Play-In",
-      "format": "Bo3",
-      "teamSlugs": [
-        "drama-esports",
-        "phantom-academy"
-      ],
-      "score": null,
-      "providerIds": [
-        "22812",
-        "22009"
-      ],
-      "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z",
-      "confirmation": [
-        "Esport Agenda"
-      ],
-      "rosters": [
-        {
-          "observedAt": "2026-11-24T12:59:14.756Z",
-          "players": [
-            {
-              "id": 25053,
-              "name": "DEPRESHN",
-              "metric": 6.474749243598837
-            },
-            {
-              "id": 29281,
-              "name": "Frip",
-              "metric": 6.273839155316234
-            },
-            {
-              "id": 30863,
-              "name": "andr1x",
-              "metric": 5.753784792882844
-            },
-            {
-              "id": 30982,
-              "name": "choiv7",
-              "metric": 5.43739107659786
-            },
-            {
-              "id": 31950,
-              "name": "Chill",
-              "metric": 5.7716933291916765
-            }
-          ],
-          "source": "bo3.gg team profile"
-        },
-        null
-      ]
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "bo3-134639",
       "game": "cs2",
       "a": "Misa",
       "b": "ASTRON",
-      "date": "2026-11-24T15:00:00.000Z",
-      "status": "upcoming",
+      "date": "2026-11-24T15:10:00.000Z",
+      "status": "live",
       "tournament": "Fiesta Series 4",
       "format": "Bo3",
       "teamSlugs": [
         "misa-esports-cs",
         "astron"
       ],
-      "score": null,
+      "score": [
+        0,
+        0
+      ],
       "providerIds": [
         "20952",
         "25747"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z",
-      "confirmation": [
-        "Esport Agenda"
-      ]
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "bo3-134979",
       "game": "cs2",
       "a": "Young TigeRES",
       "b": "ROUNDS",
-      "date": "2026-11-24T15:00:00.000Z",
-      "status": "upcoming",
+      "date": "2026-11-24T15:10:00.000Z",
+      "status": "live",
       "tournament": "ESEA Season 59: Advanced Division - Europe",
       "format": "Bo3",
       "teamSlugs": [
         "young-tigeres",
         "roundsgg"
       ],
-      "score": null,
+      "score": [
+        0,
+        0
+      ],
       "providerIds": [
         "21990",
         "5440"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z",
-      "confirmation": [
-        "Esport Agenda"
-      ],
+      "fetchedAt": "2026-11-24T15:46:05.033Z",
       "rosters": [
         null,
         {
@@ -496,43 +109,244 @@
       ]
     },
     {
+      "id": "opendota-live-9103896435",
+      "game": "dota",
+      "a": "PARIVISION",
+      "b": "GamerLegion",
+      "date": "2026-11-24T15:15:01.000Z",
+      "status": "live",
+      "tournament": null,
+      "format": null,
+      "providerIds": [
+        "9824702",
+        "9964962"
+      ],
+      "source": "OpenDota Live",
+      "fetchedAt": "2026-11-24T15:45:00.000Z",
+      "liveState": {
+        "seriesId": "1172272",
+        "second": 1410,
+        "goldLead": 3983,
+        "kills": [
+          21,
+          16
+        ],
+        "delay": 900,
+        "heroes": [
+          [
+            44,
+            49,
+            86,
+            29,
+            68
+          ],
+          [
+            16,
+            79,
+            78,
+            119,
+            145
+          ]
+        ]
+      },
+      "rosters": [
+        {
+          "observedAt": "2026-11-24T06:05:20.005Z",
+          "players": [
+            {
+              "id": 106573901,
+              "name": "No[o]ne-",
+              "played": 134,
+              "metric": 0.664179104477612
+            },
+            {
+              "id": 73401082,
+              "name": "Dukalis",
+              "played": 134,
+              "metric": 0.664179104477612
+            },
+            {
+              "id": 164199202,
+              "name": "9Class",
+              "played": 134,
+              "metric": 0.664179104477612
+            },
+            {
+              "id": 1044002267,
+              "name": "Satanic",
+              "played": 133,
+              "metric": 0.6691729323308271
+            },
+            {
+              "id": 195108598,
+              "name": "Noticed",
+              "played": 89,
+              "metric": 0.7303370786516854
+            }
+          ],
+          "source": "OpenDota team profile"
+        },
+        {
+          "observedAt": "2026-11-24T06:05:20.010Z",
+          "players": [
+            {
+              "id": 154974246,
+              "name": "RCY",
+              "played": 283,
+              "metric": 0.5053003533568905
+            },
+            {
+              "id": 160119017,
+              "name": "Fayde",
+              "played": 283,
+              "metric": 0.5053003533568905
+            },
+            {
+              "id": 90423751,
+              "name": "Bignum",
+              "played": 283,
+              "metric": 0.5053003533568905
+            },
+            {
+              "id": 191362875,
+              "name": "Speeed",
+              "played": 283,
+              "metric": 0.5053003533568905
+            },
+            {
+              "id": 177203952,
+              "name": "Yuma",
+              "played": 58,
+              "metric": 0.5689655172413793
+            }
+          ],
+          "source": "OpenDota team profile"
+        }
+      ]
+    },
+    {
+      "id": "bo3-134584",
+      "game": "cs2",
+      "a": "Drama",
+      "b": "Phantom Academy",
+      "date": "2026-11-24T15:20:00.000Z",
+      "status": "live",
+      "tournament": "CCT Europe 2026 Series 15 Play-In",
+      "format": "Bo3",
+      "teamSlugs": [
+        "drama-esports",
+        "phantom-academy"
+      ],
+      "score": [
+        0,
+        0
+      ],
+      "providerIds": [
+        "22812",
+        "22009"
+      ],
+      "source": "bo3.gg (unofficial)",
+      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "rosters": [
+        {
+          "observedAt": "2026-11-24T12:59:14.756Z",
+          "players": [
+            {
+              "id": 25053,
+              "name": "DEPRESHN",
+              "metric": 6.474749243598837
+            },
+            {
+              "id": 29281,
+              "name": "Frip",
+              "metric": 6.273839155316234
+            },
+            {
+              "id": 30863,
+              "name": "andr1x",
+              "metric": 5.753784792882844
+            },
+            {
+              "id": 30982,
+              "name": "choiv7",
+              "metric": 5.43739107659786
+            },
+            {
+              "id": 31950,
+              "name": "Chill",
+              "metric": 5.7716933291916765
+            }
+          ],
+          "source": "bo3.gg team profile"
+        },
+        null
+      ]
+    },
+    {
+      "id": "opendota-live-9103887230",
+      "game": "dota",
+      "a": "Team Yandex",
+      "b": "1win",
+      "date": "2026-11-24T15:21:31.000Z",
+      "status": "live",
+      "tournament": null,
+      "format": null,
+      "providerIds": [
+        "9823272",
+        "10182357"
+      ],
+      "source": "OpenDota Live",
+      "fetchedAt": "2026-11-24T15:45:00.000Z",
+      "liveState": {
+        "seriesId": "1172273",
+        "second": 1306,
+        "goldLead": -1135,
+        "kills": [
+          13,
+          18
+        ],
+        "delay": 900,
+        "heroes": [
+          [
+            145,
+            7,
+            16,
+            37,
+            21
+          ],
+          [
+            121,
+            53,
+            126,
+            131,
+            38
+          ]
+        ]
+      }
+    },
+    {
       "id": "bo3-132989",
       "game": "cs2",
       "a": "boyband",
       "b": "BOJONG",
       "date": "2026-11-24T15:30:00.000Z",
-      "status": "upcoming",
+      "status": "live",
       "tournament": "Elisa Open Suomi Season 14",
       "format": "Bo3",
       "teamSlugs": [
         "boyband",
         "bojong"
       ],
-      "score": null,
+      "score": [
+        0,
+        0
+      ],
       "providerIds": [
         "22899",
         "22898"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z",
-      "confirmation": [
-        "Esport Agenda"
-      ]
-    },
-    {
-      "id": "agenda-dota-1807994",
-      "game": "dota",
-      "a": "PuckChamp",
-      "b": "Zero Tenacity",
-      "date": "2026-11-24T16:00:00.000Z",
-      "status": "upcoming",
-      "tournament": "European Pro League",
-      "format": "Bo3",
-      "score": null,
-      "providerIds": null,
-      "source": "Esport Agenda",
-      "sourceUrl": "https://www.esportagenda.com/match/1807994",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "bo3-134966",
@@ -553,7 +367,7 @@
         "22190"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z",
+      "fetchedAt": "2026-11-24T15:46:05.033Z",
       "confirmation": [
         "Esport Agenda"
       ],
@@ -623,6 +437,21 @@
       ]
     },
     {
+      "id": "agenda-dota-1807994",
+      "game": "dota",
+      "a": "PuckChamp",
+      "b": "Zero Tenacity",
+      "date": "2026-11-24T16:15:00.000Z",
+      "status": "upcoming",
+      "tournament": "European Pro League",
+      "format": "Bo3",
+      "score": null,
+      "providerIds": null,
+      "source": "Esport Agenda",
+      "sourceUrl": "https://www.esportagenda.com/match/1807994",
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
+    },
+    {
       "id": "agenda-cs2-1832008",
       "game": "cs2",
       "a": "99firepower 1utility",
@@ -635,7 +464,7 @@
       "providerIds": null,
       "source": "Esport Agenda",
       "sourceUrl": "https://www.esportagenda.com/match/1832008",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "agenda-dota-1816479",
@@ -653,7 +482,7 @@
       ],
       "source": "Esport Agenda",
       "sourceUrl": "https://www.esportagenda.com/match/1816479",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "agenda-dota-1816480",
@@ -671,7 +500,46 @@
       ],
       "source": "Esport Agenda",
       "sourceUrl": "https://www.esportagenda.com/match/1816480",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "rosters": [
+        null,
+        {
+          "observedAt": "2026-11-24T15:46:06.958Z",
+          "players": [
+            {
+              "id": 152962063,
+              "name": "m1CKe",
+              "played": 1765,
+              "metric": 0.5762039660056657
+            },
+            {
+              "id": 77490514,
+              "name": "Boxi",
+              "played": 1736,
+              "metric": 0.5731566820276498
+            },
+            {
+              "id": 16497807,
+              "name": "tOfu",
+              "played": 364,
+              "metric": 0.5741758241758241
+            },
+            {
+              "id": 898455820,
+              "name": "Malr1ne",
+              "played": 33,
+              "metric": 0.5151515151515151
+            },
+            {
+              "id": 60943014,
+              "name": "Jabbz",
+              "played": 7,
+              "metric": null
+            }
+          ],
+          "source": "OpenDota team profile"
+        }
+      ]
     },
     {
       "id": "bo3-134967",
@@ -692,7 +560,7 @@
         "21439"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z",
+      "fetchedAt": "2026-11-24T15:46:05.033Z",
       "confirmation": [
         "Esport Agenda"
       ]
@@ -716,7 +584,7 @@
         "20702"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z",
+      "fetchedAt": "2026-11-24T15:46:05.033Z",
       "rosters": [
         null,
         {
@@ -765,7 +633,7 @@
       "providerIds": null,
       "source": "Esport Agenda",
       "sourceUrl": "https://www.esportagenda.com/match/1832013",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "bo3-134968",
@@ -786,11 +654,41 @@
         "22418"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z",
+      "fetchedAt": "2026-11-24T15:46:05.033Z",
       "rosters": [
-        null,
         {
-          "observedAt": "2026-11-24T06:01:47.982Z",
+          "observedAt": "2026-11-24T15:46:07.227Z",
+          "players": [
+            {
+              "id": 29486,
+              "name": "Cizzx",
+              "metric": 5.746003133730288
+            },
+            {
+              "id": 36520,
+              "name": "zer0UKY",
+              "metric": 5.974260834019868
+            },
+            {
+              "id": 37971,
+              "name": "Quality",
+              "metric": 6.505381324267698
+            },
+            {
+              "id": 76578,
+              "name": "zemix",
+              "metric": 6.072153414790082
+            },
+            {
+              "id": 78922,
+              "name": "xEternaLxx",
+              "metric": 6.16300020142889
+            }
+          ],
+          "source": "bo3.gg team profile"
+        },
+        {
+          "observedAt": "2026-11-24T15:46:07.729Z",
           "players": [
             {
               "id": 81784,
@@ -841,9 +739,73 @@
         "2868"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z",
+      "fetchedAt": "2026-11-24T15:46:05.033Z",
       "confirmation": [
         "Esport Agenda"
+      ],
+      "rosters": [
+        {
+          "observedAt": "2026-11-24T15:46:07.673Z",
+          "players": [
+            {
+              "id": 23969,
+              "name": "uli",
+              "metric": 5.924990546317921
+            },
+            {
+              "id": 32104,
+              "name": "ottob",
+              "metric": 6.440546210689557
+            },
+            {
+              "id": 32130,
+              "name": "p3kko",
+              "metric": 5.625727514665367
+            },
+            {
+              "id": 34437,
+              "name": "Alxc",
+              "metric": 6.13259122506121
+            },
+            {
+              "id": 34855,
+              "name": "8Juho8",
+              "metric": 6.0930650362038286
+            }
+          ],
+          "source": "bo3.gg team profile"
+        },
+        {
+          "observedAt": "2026-11-24T15:46:07.655Z",
+          "players": [
+            {
+              "id": 34438,
+              "name": "Rbm",
+              "metric": 5.814021056032537
+            },
+            {
+              "id": 34854,
+              "name": "epik",
+              "metric": 5.597044154699572
+            },
+            {
+              "id": 34909,
+              "name": "osku",
+              "metric": 5.8302183991669825
+            },
+            {
+              "id": 47802,
+              "name": "matz",
+              "metric": 5.966331756442593
+            },
+            {
+              "id": 50742,
+              "name": "Keksimage",
+              "metric": 6.190953516755444
+            }
+          ],
+          "source": "bo3.gg team profile"
+        }
       ]
     },
     {
@@ -865,9 +827,73 @@
         "24506"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z",
+      "fetchedAt": "2026-11-24T15:46:05.033Z",
       "confirmation": [
         "Esport Agenda"
+      ],
+      "rosters": [
+        {
+          "observedAt": "2026-11-24T15:46:07.792Z",
+          "players": [
+            {
+              "id": 34547,
+              "name": "opdust",
+              "metric": 5.888724229088192
+            },
+            {
+              "id": 50712,
+              "name": "Ay0k",
+              "metric": 5.725315919044403
+            },
+            {
+              "id": 53343,
+              "name": "deeN",
+              "metric": 6.238025687454888
+            },
+            {
+              "id": 76408,
+              "name": "eSx",
+              "metric": 5.931695742136094
+            },
+            {
+              "id": 76754,
+              "name": "Nikodeon",
+              "metric": 6.503944836529887
+            }
+          ],
+          "source": "bo3.gg team profile"
+        },
+        {
+          "observedAt": "2026-11-24T15:46:07.992Z",
+          "players": [
+            {
+              "id": 74541,
+              "name": "Naginat",
+              "metric": 6.090680304871399
+            },
+            {
+              "id": 75441,
+              "name": "kirxttu",
+              "metric": 5.899698680551848
+            },
+            {
+              "id": 75560,
+              "name": "Santuriano",
+              "metric": 5.979074929569509
+            },
+            {
+              "id": 81408,
+              "name": "xeNji",
+              "metric": 6.468666673704776
+            },
+            {
+              "id": 84355,
+              "name": "wh1temink",
+              "metric": 6.078417881202076
+            }
+          ],
+          "source": "bo3.gg team profile"
+        }
       ]
     },
     {
@@ -889,9 +915,43 @@
         "20697"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z",
+      "fetchedAt": "2026-11-24T15:46:05.033Z",
       "confirmation": [
         "Esport Agenda"
+      ],
+      "rosters": [
+        {
+          "observedAt": "2026-11-24T15:46:08.030Z",
+          "players": [
+            {
+              "id": 25679,
+              "name": "maty",
+              "metric": 6.23292430064566
+            },
+            {
+              "id": 29069,
+              "name": "yakuza",
+              "metric": 5.759803573903674
+            },
+            {
+              "id": 29070,
+              "name": "tooi",
+              "metric": 4.9392635209808535
+            },
+            {
+              "id": 38283,
+              "name": "StreakN",
+              "metric": 5.570473709171206
+            },
+            {
+              "id": 76524,
+              "name": "Sh1karee",
+              "metric": 5.989326256760653
+            }
+          ],
+          "source": "bo3.gg team profile"
+        },
+        null
       ]
     },
     {
@@ -913,7 +973,7 @@
         "24535"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z",
+      "fetchedAt": "2026-11-24T15:46:05.033Z",
       "confirmation": [
         "Esport Agenda"
       ]
@@ -931,7 +991,7 @@
       "providerIds": null,
       "source": "Esport Agenda",
       "sourceUrl": "https://www.esportagenda.com/match/1832004",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "agenda-cs2-1832010",
@@ -946,7 +1006,7 @@
       "providerIds": null,
       "source": "Esport Agenda",
       "sourceUrl": "https://www.esportagenda.com/match/1832010",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "agenda-cs2-1832011",
@@ -961,7 +1021,7 @@
       "providerIds": null,
       "source": "Esport Agenda",
       "sourceUrl": "https://www.esportagenda.com/match/1832011",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "agenda-dota-1807995",
@@ -976,7 +1036,7 @@
       "providerIds": null,
       "source": "Esport Agenda",
       "sourceUrl": "https://www.esportagenda.com/match/1807995",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "bo3-134784",
@@ -997,7 +1057,7 @@
         "25839"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z",
+      "fetchedAt": "2026-11-24T15:46:05.033Z",
       "confirmation": [
         "Esport Agenda"
       ]
@@ -1021,9 +1081,43 @@
         "9930"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z",
+      "fetchedAt": "2026-11-24T15:46:05.033Z",
       "confirmation": [
         "Esport Agenda"
+      ],
+      "rosters": [
+        null,
+        {
+          "observedAt": "2026-11-24T15:46:08.519Z",
+          "players": [
+            {
+              "id": 31663,
+              "name": "spirit",
+              "metric": 6.09453755334263
+            },
+            {
+              "id": 31664,
+              "name": "Shady",
+              "metric": null
+            },
+            {
+              "id": 34799,
+              "name": "rexxie",
+              "metric": null
+            },
+            {
+              "id": 35900,
+              "name": "XdENiSZERA",
+              "metric": 5.947565960256547
+            },
+            {
+              "id": 52730,
+              "name": "rikon",
+              "metric": 5.81498769928094
+            }
+          ],
+          "source": "bo3.gg team profile"
+        }
       ]
     },
     {
@@ -1045,7 +1139,7 @@
         "25342"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z",
+      "fetchedAt": "2026-11-24T15:46:05.033Z",
       "confirmation": [
         "Esport Agenda"
       ]
@@ -1069,7 +1163,7 @@
         "9728"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z",
+      "fetchedAt": "2026-11-24T15:46:05.033Z",
       "confirmation": [
         "Esport Agenda"
       ]
@@ -1093,7 +1187,7 @@
         "22009"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z",
+      "fetchedAt": "2026-11-24T15:46:05.033Z",
       "confirmation": [
         "Esport Agenda"
       ]
@@ -1117,7 +1211,7 @@
         "24666"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z",
+      "fetchedAt": "2026-11-24T15:46:05.033Z",
       "confirmation": [
         "Esport Agenda"
       ]
@@ -1141,7 +1235,7 @@
         "1199"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "bo3-134974",
@@ -1162,7 +1256,7 @@
         "21440"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "bo3-134975",
@@ -1183,7 +1277,7 @@
         "9438"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z",
+      "fetchedAt": "2026-11-24T15:46:05.033Z",
       "confirmation": [
         "Esport Agenda"
       ]
@@ -1207,7 +1301,7 @@
         "23072"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z",
+      "fetchedAt": "2026-11-24T15:46:05.033Z",
       "confirmation": [
         "Esport Agenda"
       ]
@@ -1231,7 +1325,7 @@
         "21698"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "bo3-134980",
@@ -1252,7 +1346,7 @@
         "25424"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z",
+      "fetchedAt": "2026-11-24T15:46:05.033Z",
       "confirmation": [
         "Esport Agenda"
       ]
@@ -1276,7 +1370,7 @@
         "16743"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z",
+      "fetchedAt": "2026-11-24T15:46:05.033Z",
       "confirmation": [
         "Esport Agenda"
       ]
@@ -1300,7 +1394,7 @@
         "6277"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z",
+      "fetchedAt": "2026-11-24T15:46:05.033Z",
       "confirmation": [
         "Esport Agenda"
       ]
@@ -1324,7 +1418,10 @@
         "25842"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "confirmation": [
+        "Esport Agenda"
+      ]
     },
     {
       "id": "bo3-134740",
@@ -1345,7 +1442,7 @@
         "25112"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "bo3-134741",
@@ -1366,7 +1463,7 @@
         "24914"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "bo3-134743",
@@ -1387,7 +1484,133 @@
         "25834"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
+    },
+    {
+      "id": "bo3-134382",
+      "game": "cs2",
+      "a": "HEROIC",
+      "b": "M80",
+      "date": "2026-11-25T06:00:00.000Z",
+      "status": "upcoming",
+      "tournament": "PGL Major Singapore 2026 Stage 1",
+      "format": "Bo1",
+      "teamSlugs": [
+        "heroic",
+        "m80-cs-go"
+      ],
+      "score": null,
+      "providerIds": [
+        "759",
+        "7430"
+      ],
+      "source": "bo3.gg (unofficial)",
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
+    },
+    {
+      "id": "bo3-134383",
+      "game": "cs2",
+      "a": "Eternal Fire",
+      "b": "100 Thieves",
+      "date": "2026-11-25T06:00:00.000Z",
+      "status": "upcoming",
+      "tournament": "PGL Major Singapore 2026 Stage 1",
+      "format": "Bo1",
+      "teamSlugs": [
+        "eternal-fire",
+        "100-thieves"
+      ],
+      "score": null,
+      "providerIds": [
+        "1527",
+        "464"
+      ],
+      "source": "bo3.gg (unofficial)",
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
+    },
+    {
+      "id": "bo3-134384",
+      "game": "cs2",
+      "a": "PARIVISION",
+      "b": "FaZe",
+      "date": "2026-11-25T07:00:00.000Z",
+      "status": "upcoming",
+      "tournament": "PGL Major Singapore 2026 Stage 1",
+      "format": "Bo1",
+      "teamSlugs": [
+        "parivision",
+        "faze"
+      ],
+      "score": null,
+      "providerIds": [
+        "8171",
+        "791"
+      ],
+      "source": "bo3.gg (unofficial)",
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
+    },
+    {
+      "id": "bo3-134385",
+      "game": "cs2",
+      "a": "Wildcard",
+      "b": "Lynn Vision",
+      "date": "2026-11-25T07:00:00.000Z",
+      "status": "upcoming",
+      "tournament": "PGL Major Singapore 2026 Stage 1",
+      "format": "Bo1",
+      "teamSlugs": [
+        "wildcard-gaming",
+        "lynn-vision"
+      ],
+      "score": null,
+      "providerIds": [
+        "6062",
+        "476"
+      ],
+      "source": "bo3.gg (unofficial)",
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
+    },
+    {
+      "id": "bo3-134386",
+      "game": "cs2",
+      "a": "9z",
+      "b": "DENDELE",
+      "date": "2026-11-25T08:00:00.000Z",
+      "status": "upcoming",
+      "tournament": "PGL Major Singapore 2026 Stage 1",
+      "format": "Bo3",
+      "teamSlugs": [
+        "9z",
+        "dendele-cs"
+      ],
+      "score": null,
+      "providerIds": [
+        "324",
+        "24956"
+      ],
+      "source": "bo3.gg (unofficial)",
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
+    },
+    {
+      "id": "bo3-134387",
+      "game": "cs2",
+      "a": "Imperial",
+      "b": "FlyQuest",
+      "date": "2026-11-25T08:00:00.000Z",
+      "status": "upcoming",
+      "tournament": "PGL Major Singapore 2026 Stage 1",
+      "format": "Bo3",
+      "teamSlugs": [
+        "imperial",
+        "flyquest"
+      ],
+      "score": null,
+      "providerIds": [
+        "1430",
+        "10398"
+      ],
+      "source": "bo3.gg (unofficial)",
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "bo3-134861",
@@ -1408,7 +1631,7 @@
         "25394"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z",
+      "fetchedAt": "2026-11-24T15:46:05.033Z",
       "rosters": [
         {
           "observedAt": "2026-11-24T06:01:44.026Z",
@@ -1463,7 +1686,7 @@
         "23942"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "bo3-135030",
@@ -1472,7 +1695,7 @@
       "b": "Quintessence",
       "date": "2026-11-25T09:00:00.000Z",
       "status": "upcoming",
-      "tournament": "CCT Europe 2026 Series 16 Closed Qualifier",
+      "tournament": "CCT Europe 2026 Series 16 Play-In",
       "format": "Bo3",
       "teamSlugs": [
         "spirit-academy",
@@ -1484,7 +1707,49 @@
         "25272"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
+    },
+    {
+      "id": "bo3-134388",
+      "game": "cs2",
+      "a": "Ninjas in Pyjamas",
+      "b": "Liquid",
+      "date": "2026-11-25T10:30:00.000Z",
+      "status": "upcoming",
+      "tournament": "PGL Major Singapore 2026 Stage 1",
+      "format": "Bo3",
+      "teamSlugs": [
+        "nip",
+        "liquid"
+      ],
+      "score": null,
+      "providerIds": [
+        "785",
+        "790"
+      ],
+      "source": "bo3.gg (unofficial)",
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
+    },
+    {
+      "id": "bo3-134389",
+      "game": "cs2",
+      "a": "BC.Game",
+      "b": "Chinggis Warriors",
+      "date": "2026-11-25T10:30:00.000Z",
+      "status": "upcoming",
+      "tournament": "PGL Major Singapore 2026 Stage 1",
+      "format": "Bo3",
+      "teamSlugs": [
+        "bc-game",
+        "chinggis-warriors"
+      ],
+      "score": null,
+      "providerIds": [
+        "10844",
+        "9974"
+      ],
+      "source": "bo3.gg (unofficial)",
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "bo3-134862",
@@ -1505,7 +1770,7 @@
         "25763"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "bo3-134891",
@@ -1526,11 +1791,41 @@
         "22418"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z",
+      "fetchedAt": "2026-11-24T15:46:05.033Z",
       "rosters": [
-        null,
         {
-          "observedAt": "2026-11-24T06:01:47.982Z",
+          "observedAt": "2026-11-24T15:46:07.227Z",
+          "players": [
+            {
+              "id": 29486,
+              "name": "Cizzx",
+              "metric": 5.746003133730288
+            },
+            {
+              "id": 36520,
+              "name": "zer0UKY",
+              "metric": 5.974260834019868
+            },
+            {
+              "id": 37971,
+              "name": "Quality",
+              "metric": 6.505381324267698
+            },
+            {
+              "id": 76578,
+              "name": "zemix",
+              "metric": 6.072153414790082
+            },
+            {
+              "id": 78922,
+              "name": "xEternaLxx",
+              "metric": 6.16300020142889
+            }
+          ],
+          "source": "bo3.gg team profile"
+        },
+        {
+          "observedAt": "2026-11-24T15:46:07.729Z",
           "players": [
             {
               "id": 81784,
@@ -1569,7 +1864,7 @@
       "b": "Noir Verse",
       "date": "2026-11-25T12:00:00.000Z",
       "status": "upcoming",
-      "tournament": "CCT Europe 2026 Series 16 Closed Qualifier",
+      "tournament": "CCT Europe 2026 Series 16 Play-In",
       "format": "Bo3",
       "teamSlugs": [
         "saw-youngsters",
@@ -1581,7 +1876,41 @@
         "24506"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "rosters": [
+        null,
+        {
+          "observedAt": "2026-11-24T15:46:07.992Z",
+          "players": [
+            {
+              "id": 74541,
+              "name": "Naginat",
+              "metric": 6.090680304871399
+            },
+            {
+              "id": 75441,
+              "name": "kirxttu",
+              "metric": 5.899698680551848
+            },
+            {
+              "id": 75560,
+              "name": "Santuriano",
+              "metric": 5.979074929569509
+            },
+            {
+              "id": 81408,
+              "name": "xeNji",
+              "metric": 6.468666673704776
+            },
+            {
+              "id": 84355,
+              "name": "wh1temink",
+              "metric": 6.078417881202076
+            }
+          ],
+          "source": "bo3.gg team profile"
+        }
+      ]
     },
     {
       "id": "bo3-135035",
@@ -1590,7 +1919,7 @@
       "b": "DONSTU",
       "date": "2026-11-25T15:00:00.000Z",
       "status": "upcoming",
-      "tournament": "CCT Europe 2026 Series 16 Closed Qualifier",
+      "tournament": "CCT Europe 2026 Series 16 Play-In",
       "format": "Bo3",
       "teamSlugs": [
         "nordic-partners-gaming",
@@ -1602,7 +1931,7 @@
         "18843"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z",
+      "fetchedAt": "2026-11-24T15:46:05.033Z",
       "rosters": [
         null,
         {
@@ -1657,7 +1986,7 @@
         "25649"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "bo3-135036",
@@ -1666,7 +1995,7 @@
       "b": "Sökerorg",
       "date": "2026-11-25T18:00:00.000Z",
       "status": "upcoming",
-      "tournament": "CCT Europe 2026 Series 16 Closed Qualifier",
+      "tournament": "CCT Europe 2026 Series 16 Play-In",
       "format": "Bo3",
       "teamSlugs": [
         "drama-esports",
@@ -1678,7 +2007,7 @@
         "25400"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z",
+      "fetchedAt": "2026-11-24T15:46:05.033Z",
       "rosters": [
         {
           "observedAt": "2026-11-24T12:59:14.756Z",
@@ -1763,7 +2092,7 @@
         "24574"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "bo3-134884",
@@ -1784,7 +2113,7 @@
         "25310"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "bo3-134742",
@@ -1805,7 +2134,7 @@
         "1475"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "bo3-134866",
@@ -1826,7 +2155,7 @@
         "25749"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "bo3-134885",
@@ -1847,7 +2176,7 @@
         "10493"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "bo3-134867",
@@ -1868,7 +2197,7 @@
         "5059"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "bo3-134886",
@@ -1889,7 +2218,7 @@
         "25664"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "bo3-134853",
@@ -1910,7 +2239,7 @@
         "25129"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z",
+      "fetchedAt": "2026-11-24T15:46:05.033Z",
       "rosters": [
         {
           "observedAt": "2026-11-24T06:01:48.992Z",
@@ -1965,7 +2294,7 @@
         "24977"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "bo3-135040",
@@ -1974,7 +2303,7 @@
       "b": "MASONIC",
       "date": "2026-11-27T09:00:00.000Z",
       "status": "upcoming",
-      "tournament": "CCT Europe 2026 Series 16 Closed Qualifier",
+      "tournament": "CCT Europe 2026 Series 16 Play-In",
       "format": "Bo3",
       "teamSlugs": [
         "mouz-nxt",
@@ -1986,7 +2315,41 @@
         "1059"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "rosters": [
+        {
+          "observedAt": "2026-11-24T15:46:07.792Z",
+          "players": [
+            {
+              "id": 34547,
+              "name": "opdust",
+              "metric": 5.888724229088192
+            },
+            {
+              "id": 50712,
+              "name": "Ay0k",
+              "metric": 5.725315919044403
+            },
+            {
+              "id": 53343,
+              "name": "deeN",
+              "metric": 6.238025687454888
+            },
+            {
+              "id": 76408,
+              "name": "eSx",
+              "metric": 5.931695742136094
+            },
+            {
+              "id": 76754,
+              "name": "Nikodeon",
+              "metric": 6.503944836529887
+            }
+          ],
+          "source": "bo3.gg team profile"
+        },
+        null
+      ]
     },
     {
       "id": "bo3-134854",
@@ -2007,7 +2370,7 @@
         "21674"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "bo3-134903",
@@ -2028,7 +2391,62 @@
         "3629"
       ],
       "source": "bo3.gg (unofficial)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
+    },
+    {
+      "id": "bo3-135041",
+      "game": "cs2",
+      "a": "Azuolas",
+      "b": "Honvéd",
+      "date": "2026-11-27T12:00:00.000Z",
+      "status": "upcoming",
+      "tournament": "CCT Europe 2026 Series 16 Play-In",
+      "format": "Bo3",
+      "teamSlugs": [
+        "azuolas",
+        "honved"
+      ],
+      "score": null,
+      "providerIds": [
+        "25247",
+        "1279"
+      ],
+      "source": "bo3.gg (unofficial)",
+      "fetchedAt": "2026-11-24T15:46:05.033Z",
+      "rosters": [
+        {
+          "observedAt": "2026-11-24T15:46:08.030Z",
+          "players": [
+            {
+              "id": 25679,
+              "name": "maty",
+              "metric": 6.23292430064566
+            },
+            {
+              "id": 29069,
+              "name": "yakuza",
+              "metric": 5.759803573903674
+            },
+            {
+              "id": 29070,
+              "name": "tooi",
+              "metric": 4.9392635209808535
+            },
+            {
+              "id": 38283,
+              "name": "StreakN",
+              "metric": 5.570473709171206
+            },
+            {
+              "id": 76524,
+              "name": "Sh1karee",
+              "metric": 5.989326256760653
+            }
+          ],
+          "source": "bo3.gg team profile"
+        },
+        null
+      ]
     },
     {
       "id": "dota-schedule-ZxdfK8IxN1:0001",
@@ -2042,7 +2460,7 @@
       "score": null,
       "providerIds": null,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "dota-schedule-ZxdfK8IxN1:0002",
@@ -2056,7 +2474,7 @@
       "score": null,
       "providerIds": null,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "dota-schedule-ZxdfK8IxN1:0003",
@@ -2070,7 +2488,7 @@
       "score": null,
       "providerIds": null,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "dota-schedule-ZxdfK8IxN1:0004",
@@ -2084,7 +2502,7 @@
       "score": null,
       "providerIds": null,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "dota-schedule-ZxdfK8IxN1:0005",
@@ -2098,7 +2516,7 @@
       "score": null,
       "providerIds": null,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "dota-schedule-ZxdfK8IxN1:0006",
@@ -2112,7 +2530,7 @@
       "score": null,
       "providerIds": null,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "dota-schedule-ZxdfK8IxN2:0001",
@@ -2126,7 +2544,7 @@
       "score": null,
       "providerIds": null,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "dota-schedule-ZxdfK8IxN2:0002",
@@ -2140,7 +2558,7 @@
       "score": null,
       "providerIds": null,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "dota-schedule-ZxdfK8IxN2:0003",
@@ -2154,7 +2572,7 @@
       "score": null,
       "providerIds": null,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "dota-schedule-ZxdfK8IxN2:0004",
@@ -2168,7 +2586,7 @@
       "score": null,
       "providerIds": null,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "dota-schedule-ZxdfK8IxN2:0005",
@@ -2182,7 +2600,7 @@
       "score": null,
       "providerIds": null,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "dota-schedule-ZxdfK8IxN2:0006",
@@ -2196,7 +2614,7 @@
       "score": null,
       "providerIds": null,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "dota-schedule-ZxdfK8IxN3:0001",
@@ -2210,7 +2628,7 @@
       "score": null,
       "providerIds": null,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "dota-schedule-ZxdfK8IxN3:0002",
@@ -2224,7 +2642,7 @@
       "score": null,
       "providerIds": null,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "dota-schedule-ZxdfK8IxN3:0003",
@@ -2238,7 +2656,7 @@
       "score": null,
       "providerIds": null,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     },
     {
       "id": "dota-schedule-ZxdfK8IxN3:0004",
@@ -2252,61 +2670,61 @@
       "score": null,
       "providerIds": null,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "fetchedAt": "2026-11-24T12:58:48.631Z"
+      "fetchedAt": "2026-11-24T15:46:05.033Z"
     }
   ],
   "sources": {
     "cs2": {
       "ok": true,
       "source": "bo3.gg (unofficial)",
-      "checkedAt": "2026-11-24T12:58:48.631Z",
-      "fixtures": 55
+      "checkedAt": "2026-11-24T15:46:05.033Z",
+      "fixtures": 61
     },
     "dota": {
       "ok": true,
       "source": "dota.haglund.dev (Liquipedia schedule)",
-      "checkedAt": "2026-11-24T12:58:48.631Z",
+      "checkedAt": "2026-11-24T15:46:05.033Z",
       "fixtures": 16
     },
     "opendota-live": {
-      "ok": false,
+      "ok": true,
       "source": "OpenDota Live",
-      "checkedAt": "2026-11-24T12:58:48.631Z",
-      "error": "Источник недоступен"
+      "checkedAt": "2026-11-24T15:46:05.033Z",
+      "fixtures": 2
     },
     "agenda-cs2": {
       "ok": true,
       "source": "Esport Agenda · cs2",
-      "checkedAt": "2026-11-24T12:58:48.631Z",
-      "fixtures": 27
+      "checkedAt": "2026-11-24T15:46:05.033Z",
+      "fixtures": 23
     },
     "agenda-dota": {
       "ok": true,
       "source": "Esport Agenda · dota",
-      "checkedAt": "2026-11-24T12:58:48.631Z",
-      "fixtures": 7
+      "checkedAt": "2026-11-24T15:46:05.033Z",
+      "fixtures": 4
     },
     "pari": {
       "ok": false,
       "source": "PARI",
-      "checkedAt": "2026-11-24T12:58:48.631Z",
+      "checkedAt": "2026-11-24T15:46:05.033Z",
       "error": "Автоматическая линия PARI пока не настроена"
     },
     "cs2-results": {
       "ok": true,
-      "checkedAt": "2026-11-24T12:59:40.666Z",
+      "checkedAt": "2026-11-24T15:46:10.239Z",
       "source": "bo3.gg"
     },
     "dota-results": {
-      "ok": false,
-      "checkedAt": "2026-11-24T12:59:40.666Z",
+      "ok": true,
+      "checkedAt": "2026-11-24T15:46:10.239Z",
       "source": "OpenDota"
     }
   },
   "pariCoverage": {
     "matched": 0,
     "onlyPari": 0,
-    "onlySchedule": 83,
+    "onlySchedule": 88,
     "ambiguous": 0
   },
   "label": "Source-labeled fixture and bookmaker snapshots."
