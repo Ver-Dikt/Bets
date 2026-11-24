@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-24T05:21:11.290087+00:00",
+  "generatedAt": "2026-11-24T05:21:50.249059+00:00",
   "source": "verified bo3.gg map scores via MIT Aokua/csgopred map model",
-  "historicalMaps": 274,
+  "historicalMaps": 1099,
   "insights": {
     "bo3-133422": {
       "status": "insufficient-maps",
-      "teamAMaps": 0,
+      "teamAMaps": 6,
       "teamBMaps": 0,
       "required": 10
     }
