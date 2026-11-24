@@ -15,7 +15,7 @@ test('personal Bets server serves private archive, validation report, health and
   for(let i=0;i<80;i++){if(child.exitCode!==null)throw Error('server exited '+child.exitCode);try{const r=await fetch(base+'/api/health');if(r.ok){ready=true;break}}catch{}await sleep(100)}
   assert.equal(ready,true);
   const health=await(await fetch(base+'/api/health')).json();assert.equal(health.mode,'paper');
-  const main=await fetch(base+'/');assert.equal(main.status,200);assert.match(await main.text(),/<title>Bets/);
+  const main=await fetch(base+'/');assert.equal(main.status,200);assert.match(await main.text(),/<title>Bets/i);
   const engine=await fetch(base+'/engine.mjs');assert.equal(engine.status,200);assert.match(engine.headers.get('content-type'),/javascript/);
   const status=await(await fetch(base+'/api/archive/status')).json();assert.equal(status.total,22);assert.equal(status.cs2,22);
   const archive=await(await fetch(base+'/api/archive?game=cs2&limit=3')).json();assert.equal(archive.total,22);assert.equal(archive.matches.length,3);
