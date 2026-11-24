@@ -100,7 +100,7 @@ details p{color:#92a9bf;font-size:12px;line-height:1.6}details h3{font-size:13px
 <div class="content">
  <section class="left">
   <div class="panel"><div class="panel-heading"><h2>Расписание матчей</h2><span class="pill" id="fixture-update">Проверка источников</span></div>
-   <div class="tabs" aria-label="Фильтр дисциплины"><button class="tab active" data-game="all">Все</button><button class="tab" data-game="cs2">CS2</button><button class="tab" data-game="dota">Dota 2</button></div>
+   <div class="tabs" aria-label="Фильтр дисциплины"><button class="tab active" data-game="all">Все</button><button class="tab" data-game="cs2">CS2</button><button class="tab" data-game="dota">Dota 2</button><button class="tab" id="refresh" title="Проверить последний опубликованный снимок">↻</button></div>
    <div class="source-row"><span id="cs2-source">CS2: проверка…</span><span id="dota-source">Dota: проверка…</span></div>
    <div id="source-warning"></div>
    <div id="fixture-list" aria-live="polite"><div class="empty">Получаю реальные матчи из последнего опубликованного снимка…</div></div>
@@ -114,10 +114,10 @@ details p{color:#92a9bf;font-size:12px;line-height:1.6}details h3{font-size:13px
    <div id="match-detail"><div class="details-empty"><div class="big">◎</div><strong>Выбери предстоящий матч</strong><span>Здесь появятся вероятность, рейтинг команд, форма, H2H и обоснование каждого фактора.</span></div></div>
   </div>
   <details open><summary>Как Bets принимает решение</summary>
-   <h3>1. Получение данных</h3><p>GitHub Actions периодически получает завершённые матчи CS2 от bo3.gg и Dota 2 от OpenDota, проверяет даты, команды, победителя и источник. Отдельный процесс получает расписание. После обновления публикуется новый снимок сайта.</p>
+   <h3>1. Получение данных и обновление</h3><p>GitHub Actions получает расписание примерно каждые 30 минут, результаты матчей раз в сутки и карты CS2 примерно каждые 6 часов. По окончании успешного сбора выпускается новый снимок сайта. Время фактической публикации может задерживаться. Кнопка ↻ загружает последний опубликованный снимок, но не запрашивает прямой Live.</p>
    <h3>2. Оценка силы</h3><p>Elo (65%) оценивает накопленную силу команды, форма (25%) — последние 12 результатов с поправкой на малую выборку, H2H (10%) — до 10 личных встреч. Коэффициенты букмекера не участвуют в обучении.</p>
    <h3>3. Контроль</h3><p>Нужны минимум 10 завершённых результатов на каждую команду. Модель не использует результаты позже времени начала матча; исторические показатели проверяются последовательно. Веса пока эвристические и не доказаны как оптимальные.</p>
-   <h3>Что ещё НЕ учитывается</h3><p>Составы, замены, травмы, индивидуальная статистика, пики и баны карт, драфт, свежие патчи и подтверждённые букмекерские линии пока не интегрированы. Если точных данных недостаточно, Bets не должен выдавать уверенный прогноз.</p>
+   <h3>Карты и ограничения</h3><p>Отдельная модель MapModel анализирует реальные результаты карт CS2, если команда сыграла достаточно карт. Она может смоделировать veto для известного Bo-формата, но это не официальные пики и баны и пока не часть основного ансамбля. Составы, замены, индивидуальная статистика, Dota-драфты, свежие патчи и подтверждённые рыночные котировки пока отсутствуют.</p>
   </details>
   <div class="panel"><div class="panel-heading"><h2>Бумажный журнал</h2><span class="pill">Только на устройстве</span></div><div id="paper-summary" class="muted">Нет сохранённых прогнозов</div><div id="paper-list"></div><button id="paper-export" class="more">Экспортировать JSON</button></div>
  </section>
