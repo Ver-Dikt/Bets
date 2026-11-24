@@ -286,6 +286,7 @@ async function load(){
 document.querySelectorAll('[data-game]').forEach(b=>b.addEventListener('click',()=>{filters.game=b.dataset.game;expanded=false;renderFixtures()}));
 document.querySelectorAll('[data-history]').forEach(b=>b.addEventListener('click',()=>{filters.archive=b.dataset.history;renderArchive()}));
 $('show-more').onclick=()=>{expanded=!expanded;renderFixtures()};
+$('refresh').onclick=load;
 $('paper-export').onclick=()=>{const blob=new Blob([JSON.stringify(paper,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=el('a');a.href=url;a.download='bets-paper.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000)};
 load();
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(()=>{}));
