@@ -1,17 +1,126 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#08111e"><meta name="description" content="Bets: аналитика CS2 и Dota 2 на реальных завершённых матчах"><link rel="manifest" href="./manifest.webmanifest"><link rel="icon" href="./icon.svg" type="image/svg+xml"><title>Bets | CS2 & Dota 2</title><style>
-:root{font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;color:#eff6ff;background:#09111d;color-scheme:dark}
-*{box-sizing:border-box}body{margin:0}button,input,select{font:inherit}header{background:linear-gradient(110deg,#14283b,#0d1625);padding:21px max(16px,calc((100% - 1040px)/2));border-bottom:1px solid #263e51}
-h1{font-size:26px;margin:0;letter-spacing:4px;font-weight:900}header p{margin:3px 0 0;color:#9fbbc7}.shell{max-width:1040px;margin:auto;padding:20px 16px 70px}
-.state{border-left:3px solid #39b99b;background:#172b35;border-radius:8px;padding:12px 14px;font-size:13px;margin-bottom:16px}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}.stat{border:1px solid #273c52;border-radius:12px;padding:15px;background:#142237}.stat span{display:block;color:#90a8bd;font-size:12px}.stat strong{font-size:23px;font-variant-numeric:tabular-nums}
-.layout{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px}.panel{background:#142237;border:1px solid #273c52;border-radius:14px;padding:18px;margin-bottom:16px}h2{font-size:18px;margin:0 0 12px}
-.controls{display:flex;gap:8px;flex-wrap:wrap}.controls button{width:auto}button{background:#21364d;color:#e2f4ff;border:1px solid #3d536c;border-radius:9px;padding:10px 13px;cursor:pointer}button.selected,button.primary{background:#177d70;border-color:#2ba58c}button:disabled{opacity:.4}
-input,select{background:#0c1928;border:1px solid #3d536c;border-radius:9px;color:#e6f1fd;padding:11px;width:100%;min-width:0}
-label{display:block;color:#9cb1c7;font-size:12px;margin:12px 0 5px}.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.match{padding:12px 2px;border-bottom:1px solid #293c53}.match:last-child{border-bottom:none}.match-title{font-weight:700}.meta{color:#8ea8bc;font-size:12px}.win{color:#61d1b0}
-small,.muted{color:#91a8bd}p{margin:10px 0;line-height:1.55}.warn{color:#f8c58d}.box{padding:12px;border-radius:9px;background:#0e1b2d;border:1px solid #2c4560}.empty{padding:22px;text-align:center;color:#9aafc4;border:1px dashed #34516a;border-radius:9px}#out strong{font-size:20px}
-@media(max-width:730px){.layout{grid-template-columns:1fr}.stat{padding:11px}.stat strong{font-size:20px}header{padding:18px 16px}.shell{padding:14px 12px 50px}.panel{padding:14px}}
-</style></head><body><header><h1>BETS</h1><p>CS2 + Dota 2 · Research / Paper predictions</p></header><div class="shell"><div class="state" id="state" role="status">Загружаю проверенный архив GitHub…</div><div class="stats"><div class="stat"><span>Матчей в архиве</span><strong id="total">—</strong></div><div class="stat"><span>CS2</span><strong id="cs-count">—</strong></div><div class="stat"><span>Dota 2</span><strong id="dota-count">—</strong></div></div>
-<div class="layout"><div><section class="panel"><h2>Завершённые матчи</h2><div class="controls"><button id="cs" class="selected" aria-pressed="true">CS2</button><button id="dota" aria-pressed="false">Dota 2</button><button id="refresh">Обновить снимок</button></div><p class="muted" id="matchinfo">Исторические результаты. Не Live.</p><div id="matches"></div></section><section class="panel"><h2>Ретроспективный бэктест</h2><div id="quality" class="muted">Ожидание отчёта…</div></section></div>
-<div><section class="panel"><h2>Модельный прогноз</h2><p class="muted">Выбери команды из архивной истории и будущую дату. Это некалиброванная оценка; реальная достоверность не доказана.</p><label for="a">Команда A</label><select id="a"></select><label for="b">Команда B</label><select id="b"></select><label for="kickoff">Дата будущего матча</label><input type="datetime-local" id="kickoff"><div class="pair"><div><label for="oa">Коэффициент A</label><input type="number" min="1.01" step="0.01" placeholder="Необязательно" id="oa"></div><div><label for="ob">Коэффициент B</label><input type="number" min="1.01" step="0.01" placeholder="Необязательно" id="ob"></div></div><button class="primary" id="predict">Рассчитать</button><div id="out" class="box" style="margin-top:14px">Выбери команды</div><button id="save" disabled>Сохранить бумажный прогноз</button></section><section class="panel"><h2>Мой журнал</h2><p class="muted">Хранится только в этом браузере, без облачной синхронизации и денежных операций.</p><p id="journal">Пока пусто</p><button id="export">Экспорт JSON</button></section></div></div>
-<p class="muted">Данные: OpenDota (Dota 2, карты) и неофициальный bo3.gg (CS2, серии). Букмекерские линии не подгружаются. Публикация интерфейса не означает, что имеется постоянный сервер или Live API.</p></div><script type="module" src="./main.js"></script></body></html>
+<!doctype html>
+<html lang="ru"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#09121f">
+<meta name="description" content="BETS Intelligence — матчи CS2 и Dota 2, исследовательская статистика, объясняемые прогнозы и контроль качества данных.">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="manifest" href="./manifest.webmanifest">
+<title>BETS · Esports Intelligence</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,system-ui,sans-serif;color:#edf5ff;background:#0a121e;color-scheme:dark;line-height:1.48;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}body{margin:0;min-height:100vh}button,input,select{font:inherit}button{cursor:pointer}a{color:#75dcca}
+.shell{max-width:1280px;padding:0 20px;margin:auto}
+.top{height:74px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #213244}
+.brand{display:flex;align-items:center;gap:12px}.logo{font-size:24px;letter-spacing:.14em;font-weight:860}.brand-sub{font-size:11px;color:#90aabe;letter-spacing:.11em;text-transform:uppercase}
+.live-dot{height:7px;width:7px;display:inline-block;vertical-align:middle;background:#68c4ab;border-radius:50%;margin-right:8px}
+.top-right{display:flex;align-items:center;gap:10px}.top-right small{color:#8b9fb6}.chip{font-size:11px;color:#a7e0d1;border:1px solid #315a58;background:#102b2b;padding:6px 10px;border-radius:20px;white-space:nowrap}
+main{padding-top:22px;padding-bottom:65px}
+.eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#65c5b0;font-weight:700;margin-bottom:8px}
+h1{font-size:clamp(25px,5vw,36px);letter-spacing:-.035em;line-height:1.18;margin:0;font-weight:780}
+h2{font-size:18px;margin:0;letter-spacing:-.02em}
+h3{font-size:15px;margin:0;font-weight:680}.muted,.sub{color:#97aabe}small{font-size:12px}.thin{font-weight:400}
+.hero{padding:14px 0 24px;display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+.hero p{font-size:14px;color:#92a8c0;margin:9px 0 0;max-width:540px}
+.status{display:flex;align-items:center;gap:8px;font-size:12px;color:#9fc0c6;border:1px solid #294057;background:#142536;padding:9px 13px;border-radius:12px}
+.health{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin-bottom:22px}
+.health-box{background:#101e2e;border:1px solid #253b4f;border-radius:13px;padding:14px 16px;min-width:0}
+.health-box b{font-size:20px;font-variant-numeric:tabular-nums;display:block;margin:3px 0 0}
+.health-box .k{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:#8ba3b8}
+.health-box .s{font-size:11px;color:#8095ad;margin-top:2px}
+.content{display:grid;grid-template-columns:minmax(0,.96fr) minmax(0,1.04fr);align-items:start;gap:18px}
+.panel{border:1px solid #283c51;background:#142235;border-radius:16px;padding:18px;margin-bottom:16px;min-width:0}
+.panel-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+.pill{border:1px solid #385066;background:#1b3046;color:#b8cddd;border-radius:24px;padding:5px 10px;font-size:11px;white-space:nowrap}
+.tabs{display:flex;gap:7px;margin:0 0 17px}
+.tab{color:#adbece;padding:9px 15px;background:#0f1b2b;border:1px solid #31445a;border-radius:10px;font-size:13px}
+.tab.active{background:#176756;color:#e1fff4;border-color:#2f977c}
+.source-row{font-size:12px;color:#8ca7bd;display:flex;justify-content:space-between;gap:8px;margin:3px 0 9px}
+.source-warning{font-size:12px;border-left:2px solid #dfb17e;border-radius:4px;background:#30291f;color:#e9c59b;padding:10px 12px;margin-bottom:14px}
+.fixture{width:100%;text-align:left;border:1px solid #2b4057;border-radius:12px;background:#122034;color:inherit;display:block;padding:14px;margin:0 0 10px;transition:background .15s,border-color .15s}
+.fixture:hover,.fixture.selected{border-color:#45a38c;background:#1a3341}
+.fixture-top{display:flex;justify-content:space-between;gap:10px;font-size:11px;color:#98b0c4;align-items:center;margin-bottom:11px}
+.fixture-name{font-size:16px;font-weight:735;letter-spacing:-.015em;line-height:1.35}
+.fixture-foot{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:11px;font-size:12px;color:#b2c8d5}
+.tag{color:#89dfc0;font-size:11px;background:#193f3b;padding:4px 8px;border-radius:6px;white-space:nowrap}
+.tag.live{background:#482a28;color:#f3aaa0}.tag.weak{background:#343126;color:#efcd8f}
+.count{font-size:12px;color:#819bb1}
+button.more{background:#1b3145;color:#c9e5ec;border:1px solid #3a5766;border-radius:9px;padding:11px 14px;width:100%;margin:4px 0}
+.empty{border:1px dashed #395069;border-radius:13px;color:#8ea9bf;padding:22px;font-size:13px;text-align:center}
+.details-empty{display:flex;min-height:280px;justify-content:center;align-items:center;flex-direction:column;text-align:center;color:#91a6bb;gap:8px}
+.details-empty .big{font-size:40px;color:#4f776f}
+.match-hero{border-bottom:1px solid #304357;padding-bottom:15px;margin-bottom:15px}
+.match-meta{display:flex;gap:7px;flex-wrap:wrap;align-items:center;color:#99b2c6;font-size:11px;margin:0 0 12px}
+.versus{display:grid;grid-template-columns:minmax(0,1fr) 34px minmax(0,1fr);align-items:center;gap:8px;text-align:center}
+.team{font-size:17px;font-weight:780;overflow-wrap:anywhere;line-height:1.3}.vs{color:#647e94;font-weight:700}
+.time{font-size:12px;color:#87a2b6;margin-top:12px;text-align:center}
+.prob{display:flex;gap:3px;border-radius:9px;overflow:hidden;height:13px;background:#2e4354;margin:15px 0 4px}
+.prob-a{background:linear-gradient(90deg,#1b8b76,#62bba3)}.prob-b{background:#597089}
+.prob-labels{display:flex;justify-content:space-between;gap:8px;font-variant-numeric:tabular-nums;font-size:20px;font-weight:750}
+.prob-labels small{display:block;color:#98b2c3;font-size:10px;font-weight:400}
+.selection{border:1px solid #365f59;background:#12362f;border-radius:12px;padding:13px;margin:16px 0}
+.selection b{font-size:16px;display:block}.selection p{margin:5px 0 0;color:#a7c9bf;font-size:12px}
+.analysis-head{font-size:12px;text-transform:uppercase;letter-spacing:.11em;font-weight:730;color:#a6bed0;margin:20px 0 10px}
+.factor{border:1px solid #2c4055;background:#102033;border-radius:11px;padding:13px;margin-bottom:9px}
+.factor-title{display:flex;align-items:baseline;justify-content:space-between;gap:10px;font-weight:700;font-size:14px}
+.factor .contribution{color:#81d7bb;white-space:nowrap}
+.factor-description{font-size:12px;color:#91a8be;margin:6px 0 0}
+.factor-progress{width:100%;height:5px;background:#293e54;border-radius:8px;overflow:hidden;margin-top:10px}
+.factor-progress div{height:100%;background:#4aa68f}
+.comp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.comp-box{border:1px solid #2d4158;background:#101e30;border-radius:10px;padding:11px}
+.comp-box strong{display:block;font-size:19px;font-variant-numeric:tabular-nums}
+.comp-box small{color:#8faac0}
+.odds{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+label{font-size:12px;color:#adc1cf;display:block;margin:9px 0 5px}
+input{background:#0d1b2d;border:1px solid #41546a;color:#e9f4ff;padding:11px;border-radius:10px;width:100%;min-width:0}
+.action{background:#187a66;color:#eafff9;border:1px solid #2b9a82;border-radius:10px;padding:11px 14px;width:100%;font-weight:670;margin-top:12px}
+.action:disabled{opacity:.45;cursor:not-allowed}
+.help{border-left:2px solid #3b9381;background:#162b35;padding:12px;color:#b4cdd5;border-radius:6px;font-size:12px;margin-top:12px}
+details{border:1px solid #293f55;background:#122033;border-radius:13px;padding:14px 16px;margin:14px 0}
+summary{cursor:pointer;font-size:14px;font-weight:700}
+details p{color:#92a9bf;font-size:12px;line-height:1.6}details h3{font-size:13px;margin-top:14px}
+.footer{font-size:11px;color:#738da4;padding:10px 0;line-height:1.8}
+.footer a{color:#a2c9ce}.right .panel{position:relative}
+@media(max-width:820px){.content{grid-template-columns:1fr}.hero{align-items:start}.panel{padding:16px}}
+@media(max-width:480px){.shell{padding:0 12px}.top{height:64px}.logo{font-size:21px}.brand-sub{font-size:9px}.top-right small{display:none}.hero{padding:20px 2px 18px}.hero p{font-size:13px}.health{gap:7px}.health-box{padding:10px;border-radius:10px}.health-box b{font-size:17px}.health-box .k{font-size:10px}.health-box .s{font-size:10px}.panel{padding:14px;border-radius:13px}.fixture{padding:12px}.fixture-name{font-size:15px}.tabs .tab{padding:9px 13px}.team{font-size:15px}}
+</style></head>
+<body><div class="shell">
+<header class="top">
+ <div class="brand"><div class="logo">BETS<span style="color:#58c1a7">.</span></div><div class="brand-sub">Esports<br>Intelligence</div></div>
+ <div class="top-right"><small>CS2 / DOTA 2</small><span class="chip">RESEARCH MODE</span></div>
+</header>
+<main>
+<section class="hero"><div><div class="eyebrow">Match intelligence / 01</div><h1>Матчи. Аналитика.<br><span style="color:#78ccbc">Обоснованные решения.</span></h1><p>Реальное расписание, история команд и объяснение модели. Без придуманных Live-результатов и коэффициентов.</p></div></section>
+<div class="health">
+ <div class="health-box"><span class="k">Предстоящие</span><b id="upcoming-count">—</b><div class="s">Из источников</div></div>
+ <div class="health-box"><span class="k">Live-снимок</span><b id="live-count">—</b><div class="s" id="live-age">Не потоковый Live</div></div>
+ <div class="health-box"><span class="k">История</span><b id="history-count">—</b><div class="s">Проверенных результатов</div></div>
+</div>
+<div class="content">
+ <section class="left">
+  <div class="panel"><div class="panel-heading"><h2>Расписание матчей</h2><span class="pill" id="fixture-update">Проверка источников</span></div>
+   <div class="tabs" aria-label="Фильтр дисциплины"><button class="tab active" data-game="all">Все</button><button class="tab" data-game="cs2">CS2</button><button class="tab" data-game="dota">Dota 2</button></div>
+   <div class="source-row"><span id="cs2-source">CS2: проверка…</span><span id="dota-source">Dota: проверка…</span></div>
+   <div id="source-warning"></div>
+   <div id="fixture-list" aria-live="polite"><div class="empty">Получаю реальные матчи из последнего опубликованного снимка…</div></div>
+   <button id="show-more" class="more" hidden>Показать ещё</button>
+  </div>
+  <details><summary>История завершённых матчей <span id="history-summary" class="muted"></span></summary><p>Завершённые матчи используются для обучения и проверки. Сами по себе они не являются прогнозами.</p><div class="tabs" style="margin-top:12px"><button class="tab active" data-history="cs2">CS2</button><button class="tab" data-history="dota">Dota 2</button></div><div id="archive-list"></div></details>
+  <details><summary>Проверка моделей / бэктест</summary><div id="model-quality">Загрузка отчёта…</div></details>
+ </section>
+ <section class="right">
+  <div class="panel" id="analysis-panel"><div class="panel-heading"><h2>Анализ матча</h2><span class="pill">Модель + факты</span></div>
+   <div id="match-detail"><div class="details-empty"><div class="big">◎</div><strong>Выбери предстоящий матч</strong><span>Здесь появятся вероятность, рейтинг команд, форма, H2H и обоснование каждого фактора.</span></div></div>
+  </div>
+  <details open><summary>Как Bets принимает решение</summary>
+   <h3>1. Получение данных</h3><p>GitHub Actions периодически получает завершённые матчи CS2 от bo3.gg и Dota 2 от OpenDota, проверяет даты, команды, победителя и источник. Отдельный процесс получает расписание. После обновления публикуется новый снимок сайта.</p>
+   <h3>2. Оценка силы</h3><p>Elo (65%) оценивает накопленную силу команды, форма (25%) — последние 12 результатов с поправкой на малую выборку, H2H (10%) — до 10 личных встреч. Коэффициенты букмекера не участвуют в обучении.</p>
+   <h3>3. Контроль</h3><p>Нужны минимум 10 завершённых результатов на каждую команду. Модель не использует результаты позже времени начала матча; исторические показатели проверяются последовательно. Веса пока эвристические и не доказаны как оптимальные.</p>
+   <h3>Что ещё НЕ учитывается</h3><p>Составы, замены, травмы, индивидуальная статистика, пики и баны карт, драфт, свежие патчи и подтверждённые букмекерские линии пока не интегрированы. Если точных данных недостаточно, Bets не должен выдавать уверенный прогноз.</p>
+  </details>
+  <div class="panel"><div class="panel-heading"><h2>Бумажный журнал</h2><span class="pill">Только на устройстве</span></div><div id="paper-summary" class="muted">Нет сохранённых прогнозов</div><div id="paper-list"></div><button id="paper-export" class="more">Экспортировать JSON</button></div>
+ </section>
+</div>
+<div class="footer">Источники: <a href="https://bo3.gg" target="_blank" rel="noopener noreferrer">bo3.gg</a>, <a href="https://www.opendota.com" target="_blank" rel="noopener noreferrer">OpenDota</a>, <a href="https://dota.haglund.dev" target="_blank" rel="noopener noreferrer">Dota schedule</a>. Это аналитический эксперимент, не подтверждённая прибыльная стратегия. Времена отображаются по часовому поясу устройства.</div>
+</main></div><script type="module" src="./main.js"></script></body></html>
