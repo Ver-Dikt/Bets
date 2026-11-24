@@ -1,4 +1,5 @@
 import {reconcilePaper} from './settlement.mjs';
+import {forecastTotal} from './live.mjs';
 
 const dayFormat=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Moscow',year:'numeric',month:'2-digit',day:'2-digit'});
 export const moscowDay=value=>Number.isFinite(Date.parse(value))?dayFormat.format(new Date(value)):null;
@@ -9,7 +10,7 @@ const recordedMus={
 };
 
 export function dailyRows({day,fixtures,journal,matches,brief,mus={},now}){
- const events=new Map(), forecasts=new Map(), settlements=new Map();
+ const events=new Map(), forecasts=new Map(), settlements=new Map(), scores=new Map();
  const prices=new Map((brief?.fixtures??[]).filter(row=>row.publicPrice).map(row=>[row.id,row]));
  const put=(id,row)=>{if(id)events.set(id,{...events.get(id),...row,id});};
  for(const row of brief?.fixtures??[])put(row.id,row);
@@ -22,6 +23,7 @@ export function dailyRows({day,fixtures,journal,matches,brief,mus={},now}){
    put(p.fixtureId,{a:p.a,b:p.b,date:p.kickoff,game:p.game});
   }
   if(event.type==='settlement'&&(event.result===0||event.result===1))settlements.set(event.forecastId,event);
+  if(event.type==='series-score')scores.set(event.forecastId,event);
  }
  for(const row of fixtures)put(row.id,row);
  const pending=[...forecasts.values()].filter(p=>!settlements.has(p.id)&&p.probabilityBasis!=='map'&&moscowDay(p.kickoff)===day);
@@ -40,7 +42,10 @@ export function dailyRows({day,fixtures,journal,matches,brief,mus={},now}){
    :event.pari?.odds?{a:event.a,b:event.b,odds:event.pari.odds,observedAt:event.pari.observedAt}
    :forecast?.odds?{a:forecast.a,b:forecast.b,odds:forecast.odds,observedAt:forecast.createdAt}:null;
   const musPick=Object.hasOwn(mus,event.id)?mus[event.id]:recordedMus[event.id];
-  rows.push({event,forecast,price,winner,actual,musPick,
+  const total=forecast&&(forecast.total??forecastTotal(forecast));
+  const score=scores.get(forecast?.id);
+  rows.push({event,forecast,price,winner,actual,musPick,total,
+   totalSaved:Boolean(forecast?.total),totalActual:total&&score?.format===forecast.format?score.maps>total.line:null,
    upcoming:Date.parse(forecast?.kickoff??event.date)>now,
    source:settlement?.source??archive?.resolvedFrom, localMus:Object.hasOwn(mus,event.id)});
  }

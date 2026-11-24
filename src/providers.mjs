@@ -26,8 +26,14 @@ export function normalizeBo3(payload){
    if(!a||!b||a===b||!(winnerId===t1||winnerId===t2)||!Number.isFinite(when)||m.id==null)continue;
    const tournament=tournaments[String(m.tournament)]?.name??null;
    const ended=Date.parse(m.end_date);
+   const format=Number.isSafeInteger(m.bo_type)&&[1,3,5,7].includes(m.bo_type)?'Bo'+m.bo_type:
+    typeof m.bo_type==='string'?m.bo_type:null;
+   const score=[m.team1_score,m.team2_score];
+   const target=(Number(format?.slice(2))+1)/2;
+   const index=winnerId===t1?0:1;
+   const wins=score.every(n=>Number.isSafeInteger(n)&&n>=0)&&score[index]===target&&score[1-index]<target?score:null;
    result.push({finishedAt:Number.isFinite(ended)&&ended>when?new Date(ended).toISOString():null,id:'cs-'+m.id,discipline:'cs2',date:new Date(when).toISOString(),a,b,winner:winnerId===t1?a:b,
-    source:'bo3.gg (unofficial)',kind:'series',format:typeof m.bo_type==='string'?m.bo_type:null,
+    source:'bo3.gg (unofficial)',kind:'series',format,...(wins?{wins}:{}),
     tournament:typeof tournament==='string'?tournament:null,
     providerTeamIds:[t1,t2]});
   }

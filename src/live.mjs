@@ -40,3 +40,9 @@ export function decidingMapTotal(probability,format,basis){
   const over=format==='Bo3'?2*split:6*split**2;
   return {line:format==='Bo3'?2.5:4.5,over,under:1-over};
 }
+
+export function forecastTotal(record){
+  if(record.probabilityBasis==='map')return null;
+  return decidingMapTotal(record.game==='dota'?record.mapProbability:record.probabilityA,
+    record.format,record.game==='dota'?'map':'series');
+}

@@ -259,9 +259,15 @@ function renderDaily(root){
   compBox('Точность',t.won+t.lost?pct(t.won/(t.won+t.lost)):'—',t.won+t.lost+' сверено'));
  root.append(grid);
  if(!rows.length)root.append(paragraph('muted','На эту дату ещё нет записанных прогнозов.'));
- for(const {forecast,winner,upcoming} of rows){
+ for(const {forecast,winner,upcoming,total,totalSaved,totalActual} of rows){
   const result=winner?(winner===forecast.pick?'Попадание':'Промах')+' · победитель '+winner:upcoming?'Предстоит':'Ждём результата';
-  root.append(compBox(shortTime(forecast.kickoff)+' · '+forecast.a+' — '+forecast.b,forecast.pick+' · '+pct(forecast.probability),result));
+  const row=compBox(shortTime(forecast.kickoff)+' · '+forecast.a+' — '+forecast.b,forecast.pick+' · '+pct(forecast.probability),result);
+  if(total){
+   const line=String(total.line).replace('.',','), actual=typeof totalActual==='boolean'?' · итог '+(totalActual?'ТБ ':'ТМ ')+line:' · ждём счёт серии';
+   row.append(paragraph('muted','ТБ '+line+' '+pct(total.over)+' / ТМ '+line+' '+pct(total.under)+actual+
+    (totalSaved?'':' · пересчёт по записи')));
+  }
+  root.append(row);
  }
 }
 function renderWorkspace(){

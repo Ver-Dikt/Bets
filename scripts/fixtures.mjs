@@ -125,7 +125,8 @@ for(const [index,entry] of recent.entries()){
  else console.warn(key,entry.reason?.message);
 }
 const history=mergeArchive(archive,latest).archive.matches;
-const updated=updateJournal(before,fixtures,history,results,new Date().toISOString(),mapInsights.insights,report.games);
+const finished=[...results,...latest.filter(row=>row.discipline==='cs2').map(row=>({...row,status:'finished'}))];
+const updated=updateJournal(before,fixtures,history,finished,new Date().toISOString(),mapInsights.insights,report.games);
 if(updated.events.length!==before.events.length){
  await mkdir(dirname(journalPath),{recursive:true});
  await writeFile(journalPath,JSON.stringify(updated)+'\n');

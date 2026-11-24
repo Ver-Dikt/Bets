@@ -2,7 +2,7 @@ import {readFile} from 'node:fs/promises';
 import {analyzeFixture} from '../src/analysis.mjs';
 import {reconcilePaper} from '../src/settlement.mjs';
 import {matchDotaResults} from '../src/dota-series.mjs';
-import {seriesChance,seriesUpdate} from '../src/live.mjs';
+import {seriesChance,seriesUpdate,forecastTotal} from '../src/live.mjs';
 
 export function updateJournal(before, fixtures, history, series, recordedAt, maps={},report={}) {
   const time=Date.parse(recordedAt);
@@ -32,12 +32,15 @@ export function updateJournal(before, fixtures, history, series, recordedAt, map
       map:forecast.mapContribution,roster:forecast.rosterContribution},reasons:forecast.reasons,calibrationDelta:forecast.calibrationDelta,
       odds:fixture.pari?.mode==='feed'&&Date.parse(fixture.pari.freshUntil)>time?fixture.pari.odds:null};
     if(sameInputs&&previous.model===record.model&&Math.abs(previous.probabilityA-pa)<.01)continue;
+    const total=forecastTotal(record);
+    if(total)record.total=total;
     forecasts.set(fixture.id,record);
     events.push({type:'forecast',record});
   }
   const eligible=[...forecasts.values()].filter(record=>!settled.has(record.fixtureId)&&record.probabilityBasis!=='map');
   const finished=series.filter(row=>row.status==='finished');
-  const completed=[...history,...finished,...matchDotaResults(eligible.filter(record=>!finished.some(row=>row.id===record.fixtureId)),history)];
+  const all=[...forecasts.values()].filter(record=>record.probabilityBasis!=='map');
+  const completed=[...history,...finished,...matchDotaResults(all.filter(record=>!finished.some(row=>row.id===record.fixtureId)),history)];
   const result=reconcilePaper(eligible,completed,recordedAt);
   for(const record of result.records){
     if(record.actual===null)continue;
@@ -45,6 +48,18 @@ export function updateJournal(before, fixtures, history, series, recordedAt, map
       verifiedMatchId:record.verifiedMatchId,source:record.resolvedFrom,
       error:record.actual===0?{kind:'upset',brier:record.probability**2,knownFactors:record.reasons.map(reason=>reason.name),
         hypothesis:'Проверить покрытие истории и согласованность факторов. Причина расхождения не установлена.'}:null});
+  }
+  const scores=new Set(events.filter(item=>item.type==='series-score').map(item=>item.forecastId));
+  const byId=new Map(completed.map(row=>[row.id,row]));
+  const scoreCandidates=all.filter(p=>!scores.has(p.id)&&['Bo3','Bo5'].includes(p.format));
+  for(const p of reconcilePaper(scoreCandidates,completed,recordedAt).records){
+    if(p.actual===null)continue;
+    const match=byId.get(p.verifiedMatchId), wins=match?.wins??match?.score;
+    const target=p.format==='Bo3'?2:3;
+    if(match?.format!==p.format||!Array.isArray(wins)||wins.length!==2||
+      !wins.every(n=>Number.isInteger(n)&&n>=0)||Math.max(...wins)!==target||Math.min(...wins)>=target)continue;
+    events.push({type:'series-score',fixtureId:p.fixtureId,forecastId:p.id,format:p.format,maps:wins[0]+wins[1],
+      checkedAt:recordedAt,source:match.source});
   }
   for(const fixture of fixtures){
     if(fixture.status!=='live'||!fixture.score||!received(fixture))continue;
