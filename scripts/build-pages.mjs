@@ -13,7 +13,7 @@ const safe=archive.matches.filter(m=>m&&typeof m.id==='string'&&['cs2','dota'].i
 })).sort((a,b)=>Date.parse(a.date)-Date.parse(b.date));
 if(safe.length<1)throw Error('No finished games; refusing empty site publication');
 await mkdir(dist,{recursive:true});
-for(const filename of ['index.html','main.js','analysis.mjs','manifest.webmanifest','sw.js']){
+for(const filename of ['index.html','main.js','analysis.mjs','settlement.mjs','manifest.webmanifest','sw.js']){
  await copyFile(resolve(root,'site',filename),resolve(dist,filename));
 }
 for(const filename of ['engine.mjs','identity.mjs','icon.svg']){
