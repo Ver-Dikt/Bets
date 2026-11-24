@@ -207,6 +207,22 @@ function drawPari(root,f){
  root.append(prices,paragraph('muted',(mode==='capture'?'Снимок с экрана':fresh?'Снимок линии':'Архивная цена')+' · '+shortTime(observedAt)));
  return fresh;
 }
+function priceCards(teams,odds,probabilities){
+ const grid=el('div','comp-grid price-grid');
+ for(const [i,team] of teams.entries()){
+  const price=odds[i], probability=probabilities[i], comparison=priceComparison(probability,price);
+  if(!(price>1))continue;
+  const card=compBox(team,price.toFixed(2));
+  card.append(paragraph('muted','Порог безубыточности · '+pct(1/price)));
+  if(comparison){
+   const delta=comparison.delta*100;
+   card.append(paragraph('muted','Шанс BETS · '+pct(probability)),
+    paragraph(delta>0?'price-positive':'muted',(delta>0?'+':'')+delta.toFixed(1)+' п.п. к порогу'));
+  }else card.append(paragraph('muted','Нет сопоставимой оценки на победу в матче'));
+  grid.append(card);
+ }
+ return grid;
+}
 function drawOdds(root,analysis,f,fresh){
  const mapOnly=f.game==='dota'&&!analysis.probabilityBasis?.startsWith('series');
  if(mapOnly){root.append(paragraph('muted','Оценка модели относится к одной карте. Сравнение с ценой победы в серии недоступно.'));return}
@@ -223,13 +239,10 @@ function drawOdds(root,analysis,f,fresh){
  compute.addEventListener('click',()=>{
   const a=oa.value.trim(),b=ob.value.trim();
   if(!a&&!b){info.textContent='Укажи хотя бы один коэффициент';return}
-  try{
-   const pa=analysis.result.pa,pb=analysis.result.pb;
-   const pick=pa>=pb?f.a:f.b,probability=Math.max(pa,pb),price=pa>=pb?Number(a):Number(b);
-   if(!(price>1)){info.textContent='Для выбранного моделью исхода ('+pick+') нужна действительная котировка > 1';return}
-   const ev=(probability*price-1)*100;
-   info.textContent='Выбор модели: '+pick+'. Введённая цена: '+price.toFixed(2)+'. EV: '+ev.toFixed(1)+'%. Это математическая оценка на основе некалиброванной вероятности, не сигнал к реальной ставке.';
-  }catch(e){info.textContent=e.message}
+  const odds=[Number(a),Number(b)];
+  if([a,b].some((value,i)=>value&&!(odds[i]>1))){info.textContent='Введи коэффициент больше 1.';return}
+  info.replaceChildren(priceCards([f.a,f.b],odds,[analysis.result.pa,analysis.result.pb]),
+   paragraph('muted','Плюс означает, что оценка BETS выше порога по введённой цене. Сверь рынок и цену в PARI.'));
  });
  root.append(compute,info);
  const save=el('button','more','Зафиксировать исследовательский прогноз');
@@ -399,17 +412,19 @@ function renderDaily(root){
  }
  root.append(tabs);
  const shown=group==='all'?rows:group==='mus'?musRows:pari;
+ if(group==='pari')root.append(paragraph('muted','Коэффициенты PARI показаны крупно под каждой парой. Сохранённый снимок подходит для разбора. Свежий коэффициент на предстоящий матч можно проверить в карточке «Матчи».'));
  if(!shown.length)root.append(paragraph('muted','В этой подборке на выбранную дату пока нет записей.'));
  for(const {event,forecast,price,winner,upcoming,source,musPick,localMus} of shown){
   const result=winner?(winner===forecast?.pick?'Попадание':forecast?'Ошибка':'Завершён')+' · победитель '+winner:upcoming?'Предстоит':'Ожидаем подтверждённый итог';
   const row=compBox(shortTime(event.date)+' · '+event.a+' — '+event.b,forecast?forecast.pick+' · '+pct(forecast.probability):'Прогноз BETS отсутствует',
    result+(source?' · '+source:''));
   if(price){
-   const index=forecast?.pick===price.a?0:forecast?.pick===price.b?1:-1;
-   const compare=priceComparison(forecast?.probability,price.odds[index]);
-   row.append(paragraph('muted','PARI · '+price.a+' '+price.odds[0]+' / '+price.b+' '+price.odds[1]+' · '+price.kind+
-    (compare&&forecast.probabilityBasis!=='map'?' · порог для выбора BETS '+pct(compare.breakEven)+
-      (compare.delta>0?' · оценка модели выше порога':' · оценка модели не выше порога'):'')));
+   const teams=[price.a,price.b];
+   const probabilities=teams.map(team=>forecast&&forecast.probabilityBasis!=='map'&&[forecast.a,forecast.b].includes(team)
+    ?team===forecast.pick?forecast.probability:1-forecast.probability:undefined);
+   const stamp=Number.isFinite(Date.parse(price.observedAt))?shortTime(price.observedAt):price.observedAt;
+   row.append(paragraph('muted','PARI · '+(price.fresh&&upcoming?'свежий снимок':'сохранённый снимок')+(stamp?' · '+stamp:'')),
+    priceCards(teams,price.odds,probabilities));
   }
   if(musPick)row.append(paragraph('muted','MUS · '+musPick+(winner?(winner===musPick?' · попадание':' · ошибка'):'')+
     (localMus?' · запись на устройстве':' · передано пользователем')));

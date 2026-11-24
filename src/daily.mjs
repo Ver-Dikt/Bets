@@ -34,9 +34,11 @@ export function dailyRows({day,fixtures,journal,matches,brief,mus={},now}){
   const actual=settlement?.result??archive?.actual;
   const winner=actual===1?forecast.pick:actual===0?(forecast.pick===forecast.a?forecast.b:forecast.a):null;
   const reference=prices.get(event.id);
-  const price=reference?{a:reference.a,b:reference.b,odds:reference.publicPrice.odds,kind:'сохранённая котировка'}
-   :event.pari?.odds?{a:event.a,b:event.b,odds:event.pari.odds,kind:'котировка из расписания'}
-   :forecast?.odds?{a:forecast.a,b:forecast.b,odds:forecast.odds,kind:'котировка в журнале'}:null;
+  const price=event.pari?.odds&&event.pari.mode==='feed'&&Date.parse(event.pari.freshUntil)>now
+   ?{a:event.a,b:event.b,odds:event.pari.odds,observedAt:event.pari.observedAt,fresh:true}
+   :reference?{a:reference.a,b:reference.b,odds:reference.publicPrice.odds,observedAt:reference.publicPrice.observedAt}
+   :event.pari?.odds?{a:event.a,b:event.b,odds:event.pari.odds,observedAt:event.pari.observedAt}
+   :forecast?.odds?{a:forecast.a,b:forecast.b,odds:forecast.odds,observedAt:forecast.createdAt}:null;
   const musPick=Object.hasOwn(mus,event.id)?mus[event.id]:recordedMus[event.id];
   rows.push({event,forecast,price,winner,actual,musPick,
    upcoming:Date.parse(forecast?.kickoff??event.date)>now,
