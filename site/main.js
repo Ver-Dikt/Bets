@@ -1,5 +1,6 @@
 import {analyzeFixture} from './analysis.mjs';
 import {score} from './engine.mjs';
+import {reconcilePaper} from './settlement.mjs';
 const $=id=>document.getElementById(id);
 const el=(tag,cls='',text=null)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==null)n.textContent=String(text);return n};
 const dateFmt=new Intl.DateTimeFormat('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
@@ -247,13 +248,20 @@ function renderQuality(){
  }
  root.append(paragraph('warn','Бэктест не равен истории реально опубликованных прогнозов. Доходность без подтверждённых предматчевых цен не рассчитывается.'));
 }
+function reconcileJournal(){
+ const outcome=reconcilePaper(paper,matches);
+ if(outcome.resolvedNew){
+  paper=outcome.records;
+  localStorage.setItem(PAPER_KEY,JSON.stringify(paper));
+ }
+}
 function renderJournal(){
  const root=$('paper-list');root.replaceChildren();const s=score(paper);
  $('paper-summary').textContent=paper.length?('Всего '+paper.length+' · подтверждённых исходов '+s.resolved+(s.brier==null?'':' · Brier '+s.brier.toFixed(3))):'Нет сохранённых прогнозов';
  for(const p of paper.slice(-3).reverse()){
   const div=el('div','factor');div.append(el('strong','',p.a+' — '+p.b),
    paragraph('muted','Выбор: '+p.pick+' · '+pct(p.probability)+' · '+shortTime(p.kickoff)),
-   paragraph('muted',p.actual===null?'Исход ещё не сверялся':'Результат отмечен вручную'));root.append(div);
+   paragraph('muted',p.actual===null?'Ожидание завершения и подтверждённого ID матча':p.actual===1?'✅ Выбор выиграл · '+(p.resolvedFrom||'подтверждённый источник'):'❌ Выбор проиграл · '+(p.resolvedFrom||'подтверждённый источник')));root.append(div);
  }
 }
 async function load(){
@@ -267,6 +275,7 @@ async function load(){
  }else{fixtureStatus=null;fixtures=[]}
  if(reportResult.status==='fulfilled'&&reportResult.value?.games)report=reportResult.value;
  if(mapResult.status==='fulfilled'&&mapResult.value?.schemaVersion===1)mapInsights=mapResult.value;
+ reconcileJournal();renderJournal();
  renderSources();renderMetrics();renderFixtures();renderArchive();renderQuality();
  const available=activeFixtures();
  if(!selected&&available.length)selected=available[0];
