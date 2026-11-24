@@ -1,4 +1,4 @@
-name: Bets Private Match Archive
+name: Bets Historical Match Archive
 on:
   workflow_dispatch:
     inputs:
@@ -34,7 +34,6 @@ concurrency:
   cancel-in-progress: false
 jobs:
   collect:
-    if: github.event.repository.private == true
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
@@ -43,7 +42,7 @@ jobs:
         with:
           node-version: "22"
       - run: npm test
-      - name: Ingest public finished match history into PRIVATE repo only
+      - name: Ingest finished match history into repository archive
         id: collect
         shell: bash
         env:
@@ -92,7 +91,7 @@ jobs:
           else
             echo "No archive to report yet"
           fi
-      - name: Save private data only if something changed
+      - name: Save verified history when changed
         if: always()
         shell: bash
         run: |
