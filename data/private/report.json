@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-11-24T05:27:27.926Z",
+  "generatedAt": "2026-11-24T05:50:51.482Z",
   "archiveUpdatedAt": "2026-11-24T05:27:27.806Z",
   "totalMatches": 6575,
   "games": {
@@ -10,44 +10,273 @@
       "latest": "2026-11-24T04:00:00.000Z",
       "format": "series",
       "model": "ensemble-v1-uncalibrated",
-      "tested": 2472,
-      "coverage": 0.46222887060583395,
+      "tested": 2355,
+      "coverage": 0.44035153328347043,
       "quality": {
         "ensemble": {
-          "count": 2472,
-          "resolved": 2472,
-          "wins": 1375,
-          "brier": 0.24018795438113,
-          "logloss": 0.6730654375230591,
+          "count": 2355,
+          "resolved": 2355,
+          "wins": 1307,
+          "brier": 0.24161664312014938,
+          "logloss": 0.6759829900983474,
           "roi": null,
           "priced": 0
         },
         "elo": {
-          "count": 2472,
-          "resolved": 2472,
-          "wins": 1375,
-          "brier": 0.24017183481782567,
-          "logloss": 0.6730138340995713,
+          "count": 2355,
+          "resolved": 2355,
+          "wins": 1307,
+          "brier": 0.24152899117204182,
+          "logloss": 0.6758075807540668,
           "roi": null,
           "priced": 0
         },
         "form": {
-          "count": 2472,
-          "resolved": 2472,
-          "wins": 1375,
-          "brier": 0.24267119413383895,
-          "logloss": 0.678109725656618,
+          "count": 2355,
+          "resolved": 2355,
+          "wins": 1307,
+          "brier": 0.24505555128443818,
+          "logloss": 0.6831420259546096,
           "roi": null,
           "priced": 0
         },
         "h2h": {
-          "count": 2472,
-          "resolved": 2472,
-          "wins": 1375,
-          "brier": 0.24867277375372,
-          "logloss": 0.6904813176708581,
+          "count": 2355,
+          "resolved": 2355,
+          "wins": 1307,
+          "brier": 0.2485644222639032,
+          "logloss": 0.6902575085921504,
           "roi": null,
           "priced": 0
+        }
+      },
+      "calibration": {
+        "status": "evaluated",
+        "temperature": 0.7,
+        "version": "temperature-v1",
+        "validationStart": "2026-10-22T19:00:00.000Z",
+        "testStart": "2026-11-06T06:30:00.000Z",
+        "validationN": 471,
+        "testN": 589,
+        "baseline": {
+          "ensemble": {
+            "n": 589,
+            "brier": 0.24360559915012941,
+            "logloss": 0.6802319803171576,
+            "accuracy": 0.5602716468590832,
+            "reliability": [
+              {
+                "count": 5,
+                "mean": 0.2857147529288639,
+                "observed": 0.4
+              },
+              {
+                "count": 73,
+                "mean": 0.3631792667597931,
+                "observed": 0.4246575342465753
+              },
+              {
+                "count": 197,
+                "mean": 0.4538804528491618,
+                "observed": 0.4873096446700508
+              },
+              {
+                "count": 225,
+                "mean": 0.5442080358171103,
+                "observed": 0.5555555555555556
+              },
+              {
+                "count": 81,
+                "mean": 0.634773056031482,
+                "observed": 0.654320987654321
+              },
+              {
+                "count": 8,
+                "mean": 0.7312240954516925,
+                "observed": 0.75
+              }
+            ]
+          },
+          "elo": {
+            "n": 589,
+            "brier": 0.24245885758290545,
+            "logloss": 0.6779596917615204,
+            "accuracy": 0.5755517826825127,
+            "reliability": [
+              {
+                "count": 14,
+                "mean": 0.28027934472532967,
+                "observed": 0.42857142857142855
+              },
+              {
+                "count": 79,
+                "mean": 0.35945393831730993,
+                "observed": 0.4430379746835443
+              },
+              {
+                "count": 191,
+                "mean": 0.45418322897723656,
+                "observed": 0.4607329842931937
+              },
+              {
+                "count": 193,
+                "mean": 0.5464353198740184,
+                "observed": 0.5544041450777202
+              },
+              {
+                "count": 91,
+                "mean": 0.6370084949517029,
+                "observed": 0.6813186813186813
+              },
+              {
+                "count": 20,
+                "mean": 0.7250738544066256,
+                "observed": 0.7
+              },
+              {
+                "count": 1,
+                "mean": 0.8308601169889084,
+                "observed": 1
+              }
+            ]
+          },
+          "form": {
+            "n": 589,
+            "brier": 0.25148534278548546,
+            "logloss": 0.6969648596044693,
+            "accuracy": 0.5271646859083192,
+            "reliability": [
+              {
+                "count": 1,
+                "mean": 0.16666666666666663,
+                "observed": 0
+              },
+              {
+                "count": 22,
+                "mean": 0.27367424242424243,
+                "observed": 0.5454545454545454
+              },
+              {
+                "count": 78,
+                "mean": 0.3603687468577172,
+                "observed": 0.41025641025641024
+              },
+              {
+                "count": 144,
+                "mean": 0.44432529956427047,
+                "observed": 0.5416666666666666
+              },
+              {
+                "count": 251,
+                "mean": 0.5392803784860559,
+                "observed": 0.5378486055776892
+              },
+              {
+                "count": 72,
+                "mean": 0.6384846473311545,
+                "observed": 0.6111111111111112
+              },
+              {
+                "count": 20,
+                "mean": 0.7245251225490197,
+                "observed": 0.55
+              },
+              {
+                "count": 1,
+                "mean": 0.8333333333333334,
+                "observed": 1
+              }
+            ]
+          },
+          "h2h": {
+            "n": 589,
+            "brier": 0.24916964356396862,
+            "logloss": 0.6914976592383436,
+            "accuracy": 0.5169779286926995,
+            "reliability": [
+              {
+                "count": 1,
+                "mean": 0.36363636363636365,
+                "observed": 1
+              },
+              {
+                "count": 70,
+                "mean": 0.4406565656565651,
+                "observed": 0.5142857142857142
+              },
+              {
+                "count": 496,
+                "mean": 0.5098057184750726,
+                "observed": 0.5342741935483871
+              },
+              {
+                "count": 22,
+                "mean": 0.6077134986225894,
+                "observed": 0.5
+              }
+            ]
+          },
+          "neutral": {
+            "n": 589,
+            "brier": 0.25,
+            "logloss": 0.6931471805599468,
+            "accuracy": 0.5,
+            "reliability": [
+              {
+                "count": 589,
+                "mean": 0.5,
+                "observed": 0.5314091680814941
+              }
+            ]
+          }
+        },
+        "calibrated": {
+          "n": 589,
+          "brier": 0.24547503950648128,
+          "logloss": 0.6845831764736019,
+          "accuracy": 0.5602716468590832,
+          "reliability": [
+            {
+              "count": 1,
+              "mean": 0.18063376354818636,
+              "observed": 0
+            },
+            {
+              "count": 35,
+              "mean": 0.2683692123473789,
+              "observed": 0.45714285714285713
+            },
+            {
+              "count": 81,
+              "mean": 0.35753414101296244,
+              "observed": 0.43209876543209874
+            },
+            {
+              "count": 158,
+              "mean": 0.44787518207094784,
+              "observed": 0.4936708860759494
+            },
+            {
+              "count": 171,
+              "mean": 0.5446311505042799,
+              "observed": 0.5321637426900585
+            },
+            {
+              "count": 112,
+              "mean": 0.6453787521309637,
+              "observed": 0.6160714285714286
+            },
+            {
+              "count": 26,
+              "mean": 0.7394853417101436,
+              "observed": 0.7692307692307693
+            },
+            {
+              "count": 5,
+              "mean": 0.818785932238189,
+              "observed": 0.8
+            }
+          ]
         }
       },
       "sampleAdequacy": "RESEARCH_SAMPLE_500_PLUS",
@@ -59,44 +288,248 @@
       "latest": "2026-11-23T18:07:01.000Z",
       "format": "map",
       "model": "ensemble-v1-uncalibrated",
-      "tested": 474,
-      "coverage": 0.3863080684596577,
+      "tested": 372,
+      "coverage": 0.30317848410757947,
       "quality": {
         "ensemble": {
-          "count": 474,
-          "resolved": 474,
-          "wins": 222,
-          "brier": 0.23570040652936247,
-          "logloss": 0.6636370674463774,
+          "count": 372,
+          "resolved": 372,
+          "wins": 168,
+          "brier": 0.23901187663079312,
+          "logloss": 0.6701954112022169,
           "roi": null,
           "priced": 0
         },
         "elo": {
-          "count": 474,
-          "resolved": 474,
-          "wins": 222,
-          "brier": 0.23643298693940273,
-          "logloss": 0.6651371695079765,
+          "count": 372,
+          "resolved": 372,
+          "wins": 168,
+          "brier": 0.23847294540854266,
+          "logloss": 0.669103234555422,
           "roi": null,
           "priced": 0
         },
         "form": {
-          "count": 474,
-          "resolved": 474,
-          "wins": 222,
-          "brier": 0.23644278202579092,
-          "logloss": 0.6647551927039774,
+          "count": 372,
+          "resolved": 372,
+          "wins": 168,
+          "brier": 0.24457165972290024,
+          "logloss": 0.6813519270681365,
           "roi": null,
           "priced": 0
         },
         "h2h": {
-          "count": 474,
-          "resolved": 474,
-          "wins": 222,
-          "brier": 0.24229484139975851,
-          "logloss": 0.6773416183018777,
+          "count": 372,
+          "resolved": 372,
+          "wins": 168,
+          "brier": 0.24378480917058748,
+          "logloss": 0.6804283625923752,
           "roi": null,
           "priced": 0
+        }
+      },
+      "calibration": {
+        "status": "evaluated",
+        "temperature": 1.35,
+        "version": "temperature-v1",
+        "validationStart": "2026-11-10T15:11:41.000Z",
+        "testStart": "2026-11-15T18:53:01.000Z",
+        "validationN": 75,
+        "testN": 93,
+        "baseline": {
+          "ensemble": {
+            "n": 93,
+            "brier": 0.23778081095717515,
+            "logloss": 0.6679539925136172,
+            "accuracy": 0.6021505376344086,
+            "reliability": [
+              {
+                "count": 6,
+                "mean": 0.26611261482853527,
+                "observed": 0.3333333333333333
+              },
+              {
+                "count": 12,
+                "mean": 0.37255081254854655,
+                "observed": 0.4166666666666667
+              },
+              {
+                "count": 38,
+                "mean": 0.4442985360698515,
+                "observed": 0.42105263157894735
+              },
+              {
+                "count": 30,
+                "mean": 0.5395053851056887,
+                "observed": 0.6333333333333333
+              },
+              {
+                "count": 4,
+                "mean": 0.6299316386615295,
+                "observed": 0.5
+              },
+              {
+                "count": 3,
+                "mean": 0.7508843481189812,
+                "observed": 0.6666666666666666
+              }
+            ]
+          },
+          "elo": {
+            "n": 93,
+            "brier": 0.23659536643104184,
+            "logloss": 0.665988313245002,
+            "accuracy": 0.6129032258064516,
+            "reliability": [
+              {
+                "count": 7,
+                "mean": 0.23865994024093581,
+                "observed": 0.2857142857142857
+              },
+              {
+                "count": 14,
+                "mean": 0.3626388897965898,
+                "observed": 0.35714285714285715
+              },
+              {
+                "count": 40,
+                "mean": 0.44977999587462136,
+                "observed": 0.45
+              },
+              {
+                "count": 23,
+                "mean": 0.5443613471183226,
+                "observed": 0.6521739130434783
+              },
+              {
+                "count": 5,
+                "mean": 0.6202613653966864,
+                "observed": 0.6
+              },
+              {
+                "count": 4,
+                "mean": 0.7626667619190279,
+                "observed": 0.75
+              }
+            ]
+          },
+          "form": {
+            "n": 93,
+            "brier": 0.24819203942316437,
+            "logloss": 0.6887604025968739,
+            "accuracy": 0.5967741935483871,
+            "reliability": [
+              {
+                "count": 4,
+                "mean": 0.24999999999999997,
+                "observed": 0
+              },
+              {
+                "count": 14,
+                "mean": 0.3571428571428572,
+                "observed": 0.7857142857142857
+              },
+              {
+                "count": 31,
+                "mean": 0.4390615117014547,
+                "observed": 0.25806451612903225
+              },
+              {
+                "count": 39,
+                "mean": 0.5277777777777778,
+                "observed": 0.6410256410256411
+              },
+              {
+                "count": 2,
+                "mean": 0.6458333333333333,
+                "observed": 0
+              },
+              {
+                "count": 3,
+                "mean": 0.763888888888889,
+                "observed": 0.6666666666666666
+              }
+            ]
+          },
+          "h2h": {
+            "n": 93,
+            "brier": 0.23596840267055136,
+            "logloss": 0.6642884054926118,
+            "accuracy": 0.5806451612903226,
+            "reliability": [
+              {
+                "count": 4,
+                "mean": 0.33733974358974356,
+                "observed": 0.5
+              },
+              {
+                "count": 18,
+                "mean": 0.42914862914862917,
+                "observed": 0.3888888888888889
+              },
+              {
+                "count": 51,
+                "mean": 0.5072574484339191,
+                "observed": 0.45098039215686275
+              },
+              {
+                "count": 20,
+                "mean": 0.6260897435897435,
+                "observed": 0.7
+              }
+            ]
+          },
+          "neutral": {
+            "n": 93,
+            "brier": 0.25,
+            "logloss": 0.6931471805599458,
+            "accuracy": 0.5,
+            "reliability": [
+              {
+                "count": 93,
+                "mean": 0.5,
+                "observed": 0.4946236559139785
+              }
+            ]
+          }
+        },
+        "calibrated": {
+          "n": 93,
+          "brier": 0.23876955428153457,
+          "logloss": 0.6701670693935188,
+          "accuracy": 0.6021505376344086,
+          "reliability": [
+            {
+              "count": 1,
+              "mean": 0.2955368218905963,
+              "observed": 0
+            },
+            {
+              "count": 8,
+              "mean": 0.3472413709046377,
+              "observed": 0.375
+            },
+            {
+              "count": 47,
+              "mean": 0.44959455302842183,
+              "observed": 0.425531914893617
+            },
+            {
+              "count": 33,
+              "mean": 0.5343889857451711,
+              "observed": 0.6060606060606061
+            },
+            {
+              "count": 2,
+              "mean": 0.6531199492739763,
+              "observed": 0.5
+            },
+            {
+              "count": 2,
+              "mean": 0.7049704754587489,
+              "observed": 1
+            }
+          ]
         }
       },
       "sampleAdequacy": "INSUFFICIENT_OUT_OF_SAMPLE",
@@ -105,7 +538,7 @@
   },
   "sourcePolicy": "real finished matches only; provider terms and availability still need monitoring",
   "warnings": [
-    "Comparisons use a fixed heuristic and are not calibrated.",
+    "Temperature is selected on a separate validation interval and measured on the untouched last interval.",
     "Pre-match odds unavailable: ROI not calculated.",
     "Provider data are not independently audited."
   ]

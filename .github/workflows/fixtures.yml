@@ -4,8 +4,12 @@ on:
   schedule:
     - cron: "7,37 * * * *"
   push:
+    branches: [main]
     paths:
       - "src/fixtures.mjs"
+      - "src/pandascore.mjs"
+      - "src/pari.mjs"
+      - "scripts/journal.mjs"
       - "scripts/fixtures.mjs"
       - ".github/workflows/fixtures.yml"
 permissions:
@@ -35,6 +39,9 @@ jobs:
         run: |
           python scripts/fixtures_cs2_sdk.py || echo "::warning::CS2API client source unavailable; fallback will be attempted"
       - name: Fetch CS2 and Dota 2 verified upcoming snapshots
+        env:
+          BETS_PARI_FEED_URL: ${{ secrets.BETS_PARI_FEED_URL }}
+          BETS_PANDASCORE_TOKEN: ${{ secrets.BETS_PANDASCORE_TOKEN }}
         run: node scripts/fixtures.mjs
       - name: Commit public fixtures snapshot
         shell: bash
@@ -42,6 +49,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/public/fixtures.json
+          if [[ -f data/public/journal.json ]]; then git add data/public/journal.json; fi
           if git diff --cached --quiet; then exit 0; fi
           git commit -m "data: update esports fixture snapshots"
           for attempt in 1 2 3; do

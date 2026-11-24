@@ -22,7 +22,7 @@ async def main() -> int:
         "scope": "widget-matches",
         "page[offset]": 0,
         "page[limit]": 100,
-        "sort": "tier_rank,-start_date",
+        "sort": "start_date",
         "filter[matches.status][in]": "upcoming,current",
         "filter[matches.discipline_id][eq]": 1,
         "with": "teams,tournament,games,streams",

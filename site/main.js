@@ -3,12 +3,25 @@ import {score} from './engine.mjs';
 import {reconcilePaper} from './settlement.mjs';
 const $=id=>document.getElementById(id);
 const el=(tag,cls='',text=null)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==null)n.textContent=String(text);return n};
-const dateFmt=new Intl.DateTimeFormat('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+const moscow='Europe/Moscow';
+const dayFmt=new Intl.DateTimeFormat('sv-SE',{timeZone:moscow,year:'numeric',month:'2-digit',day:'2-digit'});
+const dateFmt=new Intl.DateTimeFormat('ru-RU',{timeZone:moscow,day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
 const shortTime=x=>Number.isFinite(Date.parse(x))?dateFmt.format(new Date(x)):'Время неизвестно';
-const dateLong=x=>Number.isFinite(Date.parse(x))?new Intl.DateTimeFormat('ru-RU',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(x)):'Время неизвестно';
+const dateLong=x=>Number.isFinite(Date.parse(x))?new Intl.DateTimeFormat('ru-RU',{timeZone:moscow,day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(x)):'Время неизвестно';
 const pct=x=>typeof x==='number'&&Number.isFinite(x)?(x*100).toFixed(1)+'%':'—';
 const asNum=x=>x==null?'—':Number(x).toFixed(1);
-let matches=[],fixtures=[],report=null,mapInsights=null,filters={game:'all',archive:'cs2'},selected=null,expanded=false,loading=false,fixtureStatus=null;
+let matches=[],fixtures=[],journal=[],report=null,mapInsights=null,filters={game:'all',archive:'cs2',view:'today',period:'today',tournament:'all',quality:'all'},selected=null,expanded=false,loading=false,fixtureStatus=null;
+const assessments=new Map();
+function assessment(fixture) {
+ if(Date.parse(fixture.date)<=Date.now())return {status:'live'};
+ if(!assessments.has(fixture.id)){
+  let value;
+  try{value=analyzeFixture(fixture,matches,'','',Date.now(),mapInsights?.insights?.[fixture.id],report?.games?.[fixture.game]?.calibration)}
+  catch{value={status:'identity-conflict'}}
+  assessments.set(fixture.id,value);
+ }
+ return assessments.get(fixture.id);
+}
 const PAPER_KEY='bets-paper-v2';
 let paper=[];try{const o=JSON.parse(localStorage.getItem(PAPER_KEY)||'[]');if(Array.isArray(o))paper=o}catch{}
 const errorBlock=(title,sub)=>{const root=el('div','empty');root.append(el('strong','',title));if(sub){root.append(el('p','',sub))}return root};
@@ -19,23 +32,27 @@ function sourceText(kind){
  return (kind==='cs2'?'CS2':'Dota 2')+': источник недоступен';
 }
 function liveFresh(f){
- const source=fixtureStatus?.sources?.[f.game];
- if(!source?.ok||!Number.isFinite(Date.parse(source.checkedAt)))return false;
- return Date.now()-Date.parse(source.checkedAt)<40*60000;
+ const observed=Date.parse(f.fetchedAt);
+ return Number.isFinite(observed)&&Date.now()-observed<40*60000;
 }
 function activeFixtures(){
- const now=Date.now();
- return fixtures.filter(f=>f.game===filters.game||filters.game==='all')
-   .filter(f=>f.status==='live'?liveFresh(f):Number.isFinite(Date.parse(f.date))&&Date.parse(f.date)>now-3*60000)
-   .sort((a,b)=>(a.status==='live'?-1:0)-(b.status==='live'?-1:0)||Date.parse(a.date)-Date.parse(b.date));
+ const now=Date.now(), today=dayFmt.format(now), tomorrow=dayFmt.format(now+86400000);
+ return fixtures.filter(f=>filters.game==='all'||f.game===filters.game)
+  .filter(f=>filters.view==='live'?f.status==='live'&&liveFresh(f):f.status==='upcoming'&&Date.parse(f.date)>now)
+  .filter(f=>filters.view==='live'||filters.period==='all'||dayFmt.format(new Date(f.date))===(filters.period==='today'?today:tomorrow))
+  .filter(f=>filters.view==='live'||filters.tournament==='all'||f.tournament===filters.tournament)
+  .filter(f=>filters.view==='live'||filters.quality==='all'||(filters.quality==='pari'?Boolean(f.pari):assessment(f).confidence==='исследовательская'))
+  .sort((a,b)=>Date.parse(a.date)-Date.parse(b.date));
 }
 function badge(text,cls=''){return el('span','tag'+(cls?' '+cls:''),text)}
 function renderSources(){
  $('cs2-source').textContent=sourceText('cs2');
  $('dota-source').textContent=sourceText('dota');
+ const pari=fixtureStatus?.sources?.pari;
+ $('pari-source').textContent=pari?.ok?'PARI · '+pari.fixtures+' событий':pari?.mode==='capture'?'PARI · снимок с экрана':'PARI · линия недоступна';
  const root=$('source-warning');root.replaceChildren();
  if(!fixtureStatus){root.append(el('div','source-warning','Нет опубликованного снимка расписания. Придумывать матчи нельзя.'));return}
- const broken=Object.entries(fixtureStatus.sources||{}).filter(([game,v])=>!v?.ok);
+ const broken=Object.entries(fixtureStatus.sources||{}).filter(([game,v])=>game!=='pari'&&!v?.ok);
  if(broken.length)root.append(el('div','source-warning','Не все источники работают: '+broken.map(([game])=>game.toUpperCase()).join(', ')+'. Матчи этой дисциплины могут отсутствовать. История доступна отдельно.'));
  if(Number.isFinite(Date.parse(fixtureStatus.generatedAt))){
   const mins=(Date.now()-Date.parse(fixtureStatus.generatedAt))/60000;
@@ -52,6 +69,7 @@ function renderFixtures(){
  document.querySelectorAll('[data-game]').forEach(b=>{const active=b.dataset.game===filters.game;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active))});
  const items=activeFixtures(),root=$('fixture-list');root.replaceChildren();
  if(!items.length){
+  if(filters.view==='live'){root.append(errorBlock('Свежих Live-снимков сейчас нет'));$('show-more').hidden=true;return}
   const broken=filters.game==='all'?Object.values(fixtureStatus?.sources||{}).some(s=>!s?.ok):fixtureStatus?.sources?.[filters.game]?.ok===false;
   root.append(errorBlock('Нет подтверждённых матчей для показа',broken?'Источник расписания сообщил об ошибке. Bets не показывает вымышленные игры.':'На момент снимка подходящих предстоящих встреч не найдено.'));$('show-more').hidden=true;return;
  }
@@ -66,15 +84,18 @@ function renderFixtures(){
   const label=f.tournament||'Турнир не указан';
   foot.append(el('span','',label.length>48?label.slice(0,45)+'…':label),el('span','',f.format||'Разбор'));
   button.append(meta,name,foot);
+  if(f.confirmation?.length)button.append(el('div','meta','Сопоставлено с '+f.confirmation.join(', ')));
+  if(f.pari)button.append(el('div','meta','PARI · '+f.pari.odds.map(price=>price.toFixed(2)).join(' / ')+
+    (Date.parse(f.pari.freshUntil)<=Date.now()?' · архивная цена':'')));
   if(f.status==='upcoming'&&matches.length){
     try{
-      const assessment=analyzeFixture(f,matches);
-      if(assessment.status==='ok'){
+      const result=assessment(f);
+      if(result.status==='ok'){
         const preview=el('div','fixture-foot');
         preview.style.borderTop='1px solid #304658';preview.style.paddingTop='9px';
-        preview.append(el('span','','Модель: '+assessment.picked),el('span','win',pct(Math.max(assessment.result.pa,assessment.result.pb))));
+        preview.append(el('span','','Модель: '+result.picked),el('span','win',pct(Math.max(result.result.pa,result.result.pb))));
         button.append(preview);
-      }else button.append(el('div','meta','Прогноз недоступен · мало подтверждённой истории'));
+      }else button.append(el('div','meta',assessmentMessage(result.status)));
     }catch{button.append(el('div','meta','Требуется проверка идентификаторов команд'))}
   }
   if(f.status==='live'&&Array.isArray(f.score))button.append(el('div','meta','Счёт на момент снимка: '+f.score.join(' : ')));
@@ -94,9 +115,13 @@ function addMeta(root,f){
  wrap.append(meta,teams,el('div','time',(f.tournament||'Турнир не указан')+' · '+dateLong(f.date)));
  root.append(wrap);
 }
+function assessmentMessage(status){
+ return {'identity-conflict':'Неоднозначное название команды',insufficient:'Мало подтверждённой истории',
+  live:'Матч уже начался',error:'Ошибка расчёта'}[status]??'Нет данных для расчёта';
+}
 function explainMissing(root,r){
  const missing=el('div','selection');
- missing.append(el('b','','Прогноз не опубликован'),paragraph('','Недостаточно подтверждённой истории, поэтому результат не рассчитывается.'));
+ missing.append(el('b','','Прогноз не опубликован'),paragraph('',assessmentMessage(r.status)));
  root.append(missing);
  if(r?.comparisons){const stats=el('div','comp-grid');
  stats.append(compBox(r.comparisons.a.id+' · матчей',r.comparisons.a.count),compBox(r.comparisons.b.id+' · матчей',r.comparisons.b.count));
@@ -123,7 +148,9 @@ function drawFactors(root,analysis){
           compBox('Elo · '+selected.b,asNum(c.b.rating),'История: '+c.b.count),
           compBox('Последние 10 · '+selected.a,c.a.wins+'W / '+c.a.losses+'L','Из '+c.a.last+' матчей'),
           compBox('Последние 10 · '+selected.b,c.b.wins+'W / '+c.b.losses+'L','Из '+c.b.last+' матчей'),
-          compBox('Личные встречи',c.h2h.count,c.h2h.winsA+' : '+c.h2h.winsB+' в архиве'),
+          compBox('Форма '+selected.a,[5,10,20].map(n=>c.a.form[n].wins+'/'+c.a.form[n].played).join(' · '),'Последние 5 / 10 / 20'),
+          compBox('Форма '+selected.b,[5,10,20].map(n=>c.b.form[n].wins+'/'+c.b.form[n].played).join(' · '),'Последние 5 / 10 / 20'),
+          compBox('Личные встречи',c.h2h.count,c.h2h.winsA+' : '+c.h2h.winsB+(c.h2h.lastPlayed?' · '+shortTime(c.h2h.lastPlayed):'')),
           compBox('История дисциплины',c.dataCount,'До начала встречи'));
  root.append(g);
 }
@@ -136,7 +163,7 @@ function drawReasonSummary(root,r,f){
  }).sort((a,b)=>Math.abs(b.pp)-Math.abs(a.pp));
  const head=el('div','selection');
  head.append(el('small','','ПОЧЕМУ ИМЕННО '+winner.toUpperCase()),
-             el('b','','Разница от 50/50: +'+(Math.max(r.result.pa,r.result.pb)*100-50).toFixed(1)+' п.п.'));
+             el('b','','Общая вероятность выше 50% на '+(Math.max(r.result.pa,r.result.pb)*100-50).toFixed(1)+' п.п.'));
  const description=contributions.map(v=>v.name+': '+(v.pp>=0?'+':'')+v.pp.toFixed(1)+' п.п.').join(' · ');
  head.append(paragraph('',description+'. Плюс означает вклад в пользу выбранной команды, минус — против неё. Это вклад фиксированной модели, а не доказанное преимущество над рынком.'));
  root.append(head);
@@ -145,7 +172,7 @@ function drawMapInsight(root,f){
  if(f.game!=='cs2')return;
  const record=mapInsights?.insights?.[f.id];
  root.append(el('h3','analysis-head','Статистика карт · отдельная модель'));
- if(!record){root.append(paragraph('muted','Для этого матча пока нет подтверждённой карты результатов. Никаких фиктивных veto или процентов.'));return}
+ if(!record){root.append(paragraph('muted','История карт для этого матча недоступна.'));return}
  if(record.status==='insufficient-maps'){
   root.append(paragraph('muted','Сыгранных карт в источнике: '+f.a+' — '+record.teamAMaps+', '+f.b+' — '+record.teamBMaps+'. Для модели нужно минимум '+record.required+' карт каждой команде.'));return;
  }
@@ -160,19 +187,31 @@ function drawMapInsight(root,f){
   box.append(head,paragraph('factor-description','История карты: '+f.a+' '+m.mapsA+' · '+f.b+' '+m.mapsB));
   const bar=el('div','factor-progress'),fill=el('div');fill.style.width=(m.probA*100)+'%';bar.append(fill);box.append(bar);root.append(box);
  }
- if(Number.isFinite(record.seriesProbabilityA))root.append(el('div','help','Сценарная вероятность серии по карте-модели: '+pct(record.seriesProbabilityA)+' на '+f.a+'. Это отдельная гипотеза, она не входит в общий ансамбль до независимой проверки.'));
+ if(Number.isFinite(record.seriesProbabilityA))root.append(el('div','help','Сценарная оценка MapModel для '+f.a+' — '+pct(record.seriesProbabilityA)+'. Модель может использовать эту оценку при совпадении состава данных и формата серии.'));
  root.append(paragraph('warn',record.caution||'Расчёт карт исследовательский.'));
 }
-function drawOdds(root,analysis,f){
- root.append(el('h3','analysis-head','Рыночная линия · ввод вручную'));
- root.append(paragraph('muted','Букмекерские коэффициенты не загружаются автоматически. Впиши котировки на один и тот же исход и рынок, чтобы оценить EV; без них нельзя подтвердить преимущество.'));
+function drawPari(root,f){
+ root.append(el('h3','analysis-head','Линия PARI · победитель матча'));
+ if(!f.pari){root.append(paragraph('muted','Нет подтверждённой записи PARI для этого матча.'));return false}
+ const {odds,mode,observedAt,freshUntil}=f.pari;
+ const fresh=mode==='feed'&&Date.parse(freshUntil)>Date.now();
+ const prices=el('div','comp-grid');
+ prices.append(compBox(f.a,odds[0].toFixed(2)),compBox(f.b,odds[1].toFixed(2)));
+ root.append(prices,paragraph('muted',(mode==='capture'?'Снимок с экрана':fresh?'Снимок линии':'Архивная цена')+' · '+shortTime(observedAt)));
+ return fresh;
+}
+function drawOdds(root,analysis,f,fresh){
+ const mapOnly=f.game==='dota'&&!analysis.probabilityBasis?.startsWith('series');
+ if(mapOnly){root.append(paragraph('muted','Оценка модели относится к одной карте. Сравнение с ценой победы в серии недоступно.'));return}
+ root.append(el('h3','analysis-head','Проверка двухисходной цены'));
  const grid=el('div','odds');
  const holderA=el('div'),holderB=el('div');
  const la=el('label','','Коэффициент на '+f.a),lb=el('label','','Коэффициент на '+f.b);
  const oa=el('input'),ob=el('input');
+ if(fresh){oa.value=f.pari.odds[0];ob.value=f.pari.odds[1]}
  oa.type=ob.type='number';oa.min=ob.min='1.01';oa.step=ob.step='0.01';oa.placeholder=ob.placeholder='Напр. 1.90';
  holderA.append(la,oa);holderB.append(lb,ob);grid.append(holderA,holderB);root.append(grid);
- const info=el('div','help','Ожидание котировок. EV вычисляется только для введённой цены, а не по живому рынку.');
+ const info=el('div','help','Укажи цены на победу каждой команды в этом матче.');
  const compute=el('button','action','Проверить цену');
  compute.addEventListener('click',()=>{
   const a=oa.value.trim(),b=ob.value.trim();
@@ -203,8 +242,22 @@ function renderAnalysis(){
  if(!selected){root.append(errorBlock('Выбери игру из расписания','Подробный разбор сформируется по истории именно этих команд.'));return}
  const f=selected;
  addMeta(root,f);
- let r;try{r=analyzeFixture(f,matches)}catch(e){root.append(errorBlock('Ошибка анализа',e.message));return}
- if(r.status==='live'){root.append(el('div','source-warning','Это периодический снимок, не потоковый Live. Предматчевый прогноз после начала игры не выдаётся.'));root.append(compBox('Источник',f.source));return}
+ const fresh=drawPari(root,f);
+ if(f.status==='live'){
+  const events=journal.filter(event=>event.type==='live'&&event.fixtureId===f.id);
+  root.append(compBox('Снимок · '+f.source,shortTime(f.fetchedAt),f.score?'Счёт по картам '+f.score.join(' : '):'Счёт недоступен'));
+  root.append(el('h3','analysis-head','Изменения вероятности по картам'));
+  for(const event of events.slice(-8))root.append(compBox(shortTime(event.observedAt)+' · '+event.score.join(' : '),pct(event.probabilityA)+' · '+f.a));
+  if(f.liveState){
+   const state=f.liveState;
+   root.append(compBox('Преимущество по золоту · Radiant',state.goldLead??'—',
+     state.kills.every(value=>value!=null)?'Убийства '+state.kills.join(' : '):'Счёт по убийствам недоступен'));
+   if(state.second!=null)root.append(compBox('Время карты',Math.floor(state.second/60)+' мин','Задержка источника '+(state.delay??'—')+' сек'));
+  }
+  if(!events.length)root.append(paragraph('muted','Для пересчёта нужны зафиксированная оценка и подтверждённый счёт этой серии.'));
+  return;
+ }
+ const r=assessment(f);
  if(r.status!=='ok'){explainMissing(root,r);root.append(el('div','help','Источник встречи: '+f.source+'. Последняя фиксация расписания: '+shortTime(f.fetchedAt)+'.'));return}
  const a=r.result.pa,b=r.result.pb;
  const labels=el('div','prob-labels');
@@ -218,8 +271,16 @@ function renderAnalysis(){
  drawFactors(root,r);
  drawReasonSummary(root,r,f);
  drawMapInsight(root,f);
- root.append(el('div','help','Почему этот выбор: модель суммирует три оценки с весами 65% / 25% / 10%. Результат исторический и некалиброванный; рейтинг не знает о заменах игроков, картах и актуальном патче.'));
- drawOdds(root,r,f);
+ if(r.mapContribution)root.append(compBox('Карты CS2',pct(r.mapContribution.probabilityA),'Вес 20% · сценарий veto'));
+ root.append(el('h3','analysis-head','Составы и игроки'));
+ for(const [index,team] of [f.a,f.b].entries()){
+  const roster=f.rosters?.[index];
+  const players=roster?.players.map(player=>player.name+(player.metric==null?'':f.game==='dota'?' '+pct(player.metric):' '+player.metric.toFixed(2)));
+  root.append(compBox(team,players?.join(' · ')??'Состав недоступен',roster?roster.source+' · '+shortTime(roster.observedAt):''));
+ }
+ if(r.rosterContribution)root.append(compBox('Профили игроков',pct(r.rosterContribution.a),'Вес 10% · исследовательский вклад. Стартовые пятёрки и замены требуют проверки.'));
+
+ drawOdds(root,r,f,fresh);
  root.append(paragraph('muted','Данные встречи: '+f.source+'. Время получения: '+shortTime(f.fetchedAt)+'. Расчёт использует только исходы до старта этого матча.'));
 }
 function renderArchive(){
@@ -267,7 +328,7 @@ function renderJournal(){
 async function load(){
  if(loading)return;loading=true;
  const read=async(name)=>{const r=await fetch('./'+name+'?v='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error(name+' HTTP '+r.status);return r.json()};
- const [matchesResult,fixtureResult,reportResult,mapResult]=await Promise.allSettled([read('snapshot.json'),read('fixtures.json'),read('report.json'),read('map-insights.json')]);
+ const [matchesResult,fixtureResult,reportResult,mapResult,journalResult]=await Promise.allSettled([read('snapshot.json'),read('fixtures.json'),read('report.json'),read('map-insights.json'),read('journal.json')]);
  if(matchesResult.status==='fulfilled'&&matchesResult.value?.schemaVersion===1&&Array.isArray(matchesResult.value.matches))
   matches=matchesResult.value.matches.filter(m=>m&&m.id&&m.a&&m.b&&(m.winner===m.a||m.winner===m.b)&&Number.isFinite(Date.parse(m.date))).sort((a,b)=>Date.parse(a.date)-Date.parse(b.date));
  if(fixtureResult.status==='fulfilled'&&fixtureResult.value?.schemaVersion===1&&Array.isArray(fixtureResult.value.fixtures)){
@@ -275,18 +336,110 @@ async function load(){
  }else{fixtureStatus=null;fixtures=[]}
  if(reportResult.status==='fulfilled'&&reportResult.value?.games)report=reportResult.value;
  if(mapResult.status==='fulfilled'&&mapResult.value?.schemaVersion===1)mapInsights=mapResult.value;
+ if(journalResult.status==='fulfilled'&&Array.isArray(journalResult.value?.events))journal=journalResult.value.events;
+ assessments.clear();
  reconcileJournal();renderJournal();
+ syncTournaments();
  renderSources();renderMetrics();renderFixtures();renderArchive();renderQuality();
  const available=activeFixtures();
  if(!selected&&available.length)selected=available[0];
- if(selected&&!fixtures.find(f=>f.id===selected.id))selected=available[0]||null;
+ if(selected&&!available.some(f=>f.id===selected.id))selected=available[0]||null;
  if(selected){const fresh=fixtures.find(f=>f.id===selected.id);if(fresh)selected=fresh}
- renderAnalysis();loading=false;
+ renderAnalysis();renderWorkspace();loading=false;
 }
-document.querySelectorAll('[data-game]').forEach(b=>b.addEventListener('click',()=>{filters.game=b.dataset.game;expanded=false;renderFixtures()}));
 document.querySelectorAll('[data-history]').forEach(b=>b.addEventListener('click',()=>{filters.archive=b.dataset.history;renderArchive()}));
 $('show-more').onclick=()=>{expanded=!expanded;renderFixtures()};
 $('refresh').onclick=load;
 $('paper-export').onclick=()=>{const blob=new Blob([JSON.stringify(paper,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=el('a');a.href=url;a.download='bets-paper.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000)};
+function syncTournaments(){
+ const select=$('tournament');
+ const names=[...new Set(fixtures.filter(f=>filters.game==='all'||f.game===filters.game).map(f=>f.tournament).filter(Boolean))].sort();
+ select.replaceChildren(new Option('Все турниры','all'),...names.map(name=>new Option(name,name)));
+ if(!names.includes(filters.tournament))filters.tournament='all';
+ select.value=filters.tournament;
+}
+const viewNames={daily:'Итоги дня',memory:'Опыт и ошибки',learning:'Калибровка',evolution:'Версии моделей',data:'Данные и архив'};
+function renderWorkspace(){
+ const view=filters.view, panel=$('workspace-report'), root=$('workspace-content');
+ const matchesView=view==='today'||view==='live';
+ $('workspace-matches').hidden=!matchesView;
+ $('prematch-filters').hidden=view==='live';
+ panel.hidden=matchesView;
+ for(const button of document.querySelectorAll('[data-view]')){
+  const active=button.dataset.view===view;
+  button.classList.toggle('active',active);
+  button.setAttribute('aria-pressed',String(active));
+ }
+ if(matchesView)return;
+ $('workspace-title').textContent=viewNames[view];
+ root.replaceChildren();
+ if(view==='daily'||view==='memory'){
+  const check=new Map(journal.filter(item=>item.type==='settlement').map(item=>[item.fixtureId,item]));
+  const records=journal.filter(item=>item.type==='forecast').map(item=>item.record);
+  if(view==='daily'){
+   const chooser=el('input');chooser.type='date';chooser.value=filters.reviewDay??dayFmt.format(Date.now());
+   chooser.setAttribute('aria-label','День журнала');
+   chooser.onchange=()=>{filters.reviewDay=chooser.value;renderWorkspace()};
+   root.append(chooser);
+   const day=chooser.value;
+   const select=records.filter(row=>dayFmt.format(new Date(row.kickoff))===day);
+   const gaps=journal.filter(e=>e.type==='skip'&&dayFmt.format(new Date(e.kickoff))===day);
+   root.append(paragraph('muted','Расчётов '+select.length+' · сверено '+select.filter(row=>check.has(row.fixtureId)).length+' · пропусков '+gaps.length));
+   for(const row of select.slice(-40).reverse()){
+    const result=check.get(row.fixtureId);
+    root.append(compBox(row.a+' — '+row.b,row.pick+' · '+pct(row.probability),
+      shortTime(row.createdAt)+' · '+row.model+' · '+(result?.result===1?'совпал':result?.result===0?'не совпал':'ожидаем результат')));
+   }
+   for(const gap of gaps.slice(0,40))root.append(compBox(gap.source,gap.a+' — '+gap.b,'Пропуск · '+gap.reason));
+   return;
+  }
+  for(const row of [...new Map(records.map(item=>[item.fixtureId,item])).values()].slice().reverse()){
+   const result=check.get(row.fixtureId);
+   if(!result?.error)continue;
+   root.append(compBox(row.a+' — '+row.b,'Выбранная команда проиграла',
+     'Brier '+result.error.brier.toFixed(3)+' · '+result.error.knownFactors.join(', ')));
+  }
+  if(!root.childElementCount)root.append(errorBlock('Пока нет сверенных расхождений'));
+  return;
+ }
+ if(view==='learning'||view==='evolution'){
+  for(const game of ['cs2','dota']){
+   const metrics=report?.games?.[game]?.calibration;
+   root.append(el('h3','analysis-head',game==='cs2'?'CS2 · серии':'Dota 2 · карты'));
+   if(metrics?.status!=='evaluated'){root.append(paragraph('muted','Мало наблюдений для отдельной проверки.'));continue}
+   root.append(paragraph('muted','Валидация '+metrics.validationN+' · независимый тест '+metrics.testN+' · начало теста '+shortTime(metrics.testStart)));
+   if(view==='evolution'){
+    const passed=metrics.calibrated.brier<=metrics.baseline.ensemble.brier&&metrics.calibrated.logloss<=metrics.baseline.ensemble.logloss;
+    root.append(compBox(metrics.version,'Температура '+metrics.temperature,passed?'Допущена по Brier и log loss':'Базовая модель показала лучший результат на тесте'));
+    continue;
+   }
+   for(const [label,stat] of Object.entries({...metrics.baseline,calibrated:metrics.calibrated})){
+    root.append(compBox(label,'Brier '+stat.brier.toFixed(4),'Log loss '+stat.logloss.toFixed(4)+' · accuracy '+pct(stat.accuracy)));
+   }
+   for(const bin of metrics.calibrated.reliability)root.append(compBox('Группа · '+bin.count,
+     pct(bin.mean)+' → '+pct(bin.observed),'Расчётная вероятность → наблюдаемая доля'));
+  }
+  return;
+ }
+ for(const [,source] of Object.entries(fixtureStatus?.sources??{})){
+  root.append(compBox(source.source,source.ok?'Данные получены':source.mode==='capture'?'Снимок':'Недоступно',
+    [shortTime(source.checkedAt),source.fixtures==null?null:source.fixtures+' событий',source.error].filter(Boolean).join(' · ')));
+ }
+ const coverage=fixtureStatus?.pariCoverage;
+ if(fixtureStatus?.sources?.pari?.mode&&coverage)root.append(compBox('Сверка PARI',coverage.matched+' совпали',
+   coverage.onlyPari+' только PARI · '+coverage.onlySchedule+' только в расписании · '+coverage.ambiguous+' неоднозначных'));
+ for(const [game,data] of Object.entries(report?.games??{}))root.append(compBox(game.toUpperCase(),data.rows+' результатов',
+   shortTime(data.earliest)+' — '+shortTime(data.latest)));
+}
+function updateFilters(){
+ expanded=false;
+ const rows=activeFixtures();
+ if(!rows.some(row=>row.id===selected?.id))selected=rows[0]??null;
+ renderFixtures();renderAnalysis();renderWorkspace();
+}
+for(const btn of document.querySelectorAll('[data-view]'))btn.onclick=()=>{filters.view=btn.dataset.view;updateFilters()};
+for(const key of ['period','tournament','quality'])$(key).onchange=()=>{filters[key]=$(key).value;updateFilters()};
+for(const btn of document.querySelectorAll('[data-game]'))btn.onclick=()=>{filters.game=btn.dataset.game;syncTournaments();updateFilters()};
 load();
+setInterval(()=>{if(document.visibilityState==='visible')load()},120000);
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(()=>{}));
