@@ -10,6 +10,8 @@ on:
       - "public/icon.svg"
       - "data/private/matches.json"
       - "data/private/report.json"
+      - "data/public/fixtures.json"
+      - "site/analysis.mjs"
       - "scripts/build-pages.mjs"
       - ".github/workflows/pages.yml"
 permissions:
