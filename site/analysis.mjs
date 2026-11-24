@@ -3,7 +3,10 @@ import {canonicalizeMatches,resolveTeamName} from './identity.mjs';
 const sum=(items)=>items.reduce((a,x)=>a+x,0);
 const pct=(n,d)=>d?100*n/d:null;
 export function analyzeFixture(fixture,archive,oddsA='',oddsB=''){
- const game=fixture.game,cutoff=fixture.date;
+ const game=fixture.game;
+ const start=Date.parse(fixture.date),now=Date.now();
+ if(!Number.isFinite(start))return {status:'error',error:'Invalid fixture date'};
+ const cutoff=new Date(Math.min(start,now)).toISOString();
  const normalized=canonicalizeMatches(archive);
  const matches=history(normalized,game,cutoff);
  const ids=fixture.providerIds??[];
@@ -22,7 +25,7 @@ export function analyzeFixture(fixture,archive,oddsA='',oddsB=''){
  const h2h=matches.filter(m=>(m.a===a&&m.b===b)||(m.a===b&&m.b===a)).slice(-10);
  const comparisons={a:teamA,b:teamB,h2h:{count:h2h.length,winsA:h2h.filter(m=>m.winner===a).length,winsB:h2h.filter(m=>m.winner===b).length},dataCount:matches.length};
  let result,prices=null;
- if(fixture.status==='live')return {status:'live',comparisons,note:'Live отображается как снимок источника. Прогноз после старта не выдаётся.'};
+ if(fixture.status==='live'||start<=now)return {status:'live',comparisons,note:'Live отображается как снимок источника. Прогноз после старта не выдаётся.'};
  try{result=modelComparison(matches,game,a,b,cutoff)}
  catch(e){return {status:'error',comparisons,error:e.message}}
  if(result.status!=='ok')return {status:'insufficient',comparisons,result,
