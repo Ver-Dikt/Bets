@@ -5,6 +5,22 @@ import {scaleProbability} from './calibration.mjs';
 import {rosterFactor} from './roster-factor.mjs';
 import {seriesChance} from './live.mjs';
 const pct=(n,d)=>d?100*n/d:null;
+export function probabilitySteps({reasons, probabilityA, calibrationDelta, map, roster, mapProbability, probabilityBasis}){
+ if(!reasons?.length||!Number.isFinite(probabilityA))return [];
+ const steps=reasons.map(({name,a,weight})=>({name,delta:(a-.5)*weight}));
+ let probability=.5+steps.reduce((sum,step)=>sum+step.delta,0);
+ const add=(name,next)=>{
+  steps.push({name,delta:next-probability});
+  probability=next;
+ };
+ if(Number.isFinite(calibrationDelta))add('Калибровка',probability+calibrationDelta);
+ if(Number.isFinite(map?.probabilityA))add('Карты CS2 и veto',probability+(map.probabilityA-probability)*map.weight);
+ if(Number.isFinite(roster?.a))add('Профили игроков',probability+(roster.a-probability)*roster.weight);
+ const beforeSeries=probabilityBasis==='series-projected'&&Number.isFinite(mapProbability)?mapProbability:probabilityA;
+ if(Math.abs(beforeSeries-probability)>1e-9)add('Поправка без сохранённой детализации',beforeSeries);
+ if(probabilityBasis==='series-projected'&&Number.isFinite(mapProbability))add('Пересчёт с карты на серию',probabilityA);
+ return steps;
+}
 export function analyzeFixture(fixture,archive,oddsA='',oddsB='',now=Date.now(),mapInsight=null,calibration=null){
  const game=fixture.game;
  const start=Date.parse(fixture.date);
@@ -82,6 +98,7 @@ export function analyzeFixture(fixture,archive,oddsA='',oddsB='',now=Date.now(),
  ];
  const confidence=Math.min(teamA.count,teamB.count)<20?'низкая':Math.min(teamA.count,teamB.count)<50?'ограниченная':'исследовательская';
  return {status:'ok',comparisons,result,prices,picked,confidence,reasons,probabilityBasis,
+   calibrationDelta:useCalibration?historical-rawProbability:null,
    rosterContribution:roster?{...roster,weight:.1}:null,mapContribution:hasMap?{probabilityA:mapValue,weight:.2}:null,calibrated:useCalibration,
    note:probabilityBasis==='series-projected'?'Оценка серии из модели карт при допущении независимости карт. Проверка выполнена на уровне отдельных карт.':
      hasMap?'Исследовательская оценка с вкладом карты и симуляции veto. Комбинация требует отдельной проверки.':

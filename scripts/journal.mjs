@@ -29,7 +29,8 @@ export function updateJournal(before, fixtures, history, series, recordedAt, map
       a:fixture.a,b:fixture.b,pick:forecast.picked,probability:Math.max(pa,pb),probabilityA:pa,mapProbability:forecast.result.factorProbability,probabilityBasis:forecast.probabilityBasis,
       rosters,format:fixture.format,tournament:fixture.tournament,kickoff:fixture.date,createdAt:recordedAt,model,actual:null,
       source:fixture.source,evidence:{historyA:forecast.comparisons.a.count,historyB:forecast.comparisons.b.count,
-      map:forecast.mapContribution,roster:forecast.rosterContribution},reasons:forecast.reasons,odds:fixture.pari?.mode==='feed'&&Date.parse(fixture.pari.freshUntil)>time?fixture.pari.odds:null};
+      map:forecast.mapContribution,roster:forecast.rosterContribution},reasons:forecast.reasons,calibrationDelta:forecast.calibrationDelta,
+      odds:fixture.pari?.mode==='feed'&&Date.parse(fixture.pari.freshUntil)>time?fixture.pari.odds:null};
     if(sameInputs&&previous.model===record.model&&Math.abs(previous.probabilityA-pa)<.01)continue;
     forecasts.set(fixture.id,record);
     events.push({type:'forecast',record});

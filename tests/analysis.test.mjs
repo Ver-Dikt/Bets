@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {analyzeFixture} from '../src/analysis.mjs';
+import {analyzeFixture,probabilitySteps} from '../src/analysis.mjs';
 const now=Date.parse('2026-03-15T00:00:00Z');
 const rows=Array.from({length:25},(_,i)=>({id:'cs-'+i,discipline:'cs2',date:new Date(Date.UTC(2026,0,1+i)).toISOString(),
  a:'Alpha',b:'Bravo',winner:i%3?'Alpha':'Bravo',source:'test'}));
@@ -21,4 +21,19 @@ test('future games do not contaminate old match factors',()=>{
  const cutoff=Date.parse('2026-01-22T23:00:00Z');
  const a=analyzeFixture(f,rows,'','',cutoff),b=analyzeFixture(f,[...rows,{...rows[0],id:'future',date:'2027-01-01T00:00:00Z'}],'','',cutoff);
  assert.equal(a.status,b.status);assert.equal(a.comparisons.a.count,b.comparisons.a.count);
+});
+test('the explanation reconciles a saved CS2 forecast with its map correction',()=>{
+ const reasons=[{name:'Elo',a:.43449157379981884,weight:.65},
+  {name:'Форма',a:.375,weight:.25},{name:'Личные встречи',a:.5,weight:.1}];
+ const probabilityA=1-.5513956743225077;
+ const steps=probabilitySteps({reasons,probabilityA,map:{probabilityA:.5383435365079329,weight:.2}});
+ assert.equal(steps.length,4);
+ assert.equal(steps.at(-1).name,'Карты CS2 и veto');
+ assert.ok(Math.abs(.5+steps.reduce((sum,step)=>sum+step.delta,0)-probabilityA)<1e-12);
+});
+test('the explanation retains the series conversion and marks gaps in legacy records',()=>{
+ const reasons=[{name:'Elo',a:.6,weight:1}];
+ const steps=probabilitySteps({reasons,probabilityBasis:'series-projected',mapProbability:.62,probabilityA:.676544});
+ assert.deepEqual(steps.map(step=>step.name),['Elo','Поправка без сохранённой детализации','Пересчёт с карты на серию']);
+ assert.ok(Math.abs(.5+steps.reduce((sum,step)=>sum+step.delta,0)-.676544)<1e-12);
 });

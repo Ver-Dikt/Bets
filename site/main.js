@@ -1,5 +1,5 @@
 import {briefRows,priceComparison} from './brief.mjs';
-import {analyzeFixture} from './analysis.mjs';
+import {analyzeFixture,probabilitySteps} from './analysis.mjs';
 import {score} from './engine.mjs';
 import {reconcilePaper} from './settlement.mjs';
 const $=id=>document.getElementById(id);
@@ -10,6 +10,7 @@ const dateFmt=new Intl.DateTimeFormat('ru-RU',{timeZone:moscow,day:'numeric',mon
 const shortTime=x=>Number.isFinite(Date.parse(x))?dateFmt.format(new Date(x)):'Время неизвестно';
 const dateLong=x=>Number.isFinite(Date.parse(x))?new Intl.DateTimeFormat('ru-RU',{timeZone:moscow,day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(x)):'Время неизвестно';
 const pct=x=>typeof x==='number'&&Number.isFinite(x)?(x*100).toFixed(1)+'%':'—';
+const closeMatch=probability=>probability<.55;
 const asNum=x=>x==null?'—':Number(x).toFixed(1);
 let matches=[],fixtures=[],journal=[],brief=null,report=null,mapInsights=null,filters={game:'all',archive:'cs2',view:location.hash==='#brief'?'brief':'today',period:'today',tournament:'all',quality:'all'},selected=null,expanded=false,loading=false,fixtureStatus=null;
 const assessments=new Map();
@@ -94,7 +95,8 @@ function renderFixtures(){
       if(result.status==='ok'){
         const preview=el('div','fixture-foot');
         preview.style.borderTop='1px solid #304658';preview.style.paddingTop='9px';
-        preview.append(el('span','','Модель: '+result.picked),el('span','win',pct(Math.max(result.result.pa,result.result.pb))));
+        const probability=Math.max(result.result.pa,result.result.pb);
+        preview.append(el('span','',closeMatch(probability)?'Почти равный матч':'Модель: '+result.picked),el('span','win',pct(probability)));
         button.append(preview);
       }else button.append(el('div','meta',assessmentMessage(result.status)));
     }catch{button.append(el('div','meta','Требуется проверка идентификаторов команд'))}
@@ -155,18 +157,19 @@ function drawFactors(root,analysis){
           compBox('История дисциплины',c.dataCount,'До начала встречи'));
  root.append(g);
 }
-function drawReasonSummary(root,r,f){
- const winner=r.picked;
- const direction=winner===f.a?1:-1;
- const contributions=r.reasons.map(item=>{
-  const pp=(item.a-.5)*item.weight*100*direction;
-  return {name:item.name,pp};
- }).sort((a,b)=>Math.abs(b.pp)-Math.abs(a.pp));
+function drawReasonSummary(root,forecast){
+ const {a,b,probabilityA}=forecast;
+ const steps=probabilitySteps(forecast);
+ if(!steps.length)return;
  const head=el('div','selection');
- head.append(el('small','','ПОЧЕМУ ИМЕННО '+winner.toUpperCase()),
-             el('b','','Общая вероятность выше 50% на '+(Math.max(r.result.pa,r.result.pb)*100-50).toFixed(1)+' п.п.'));
- const description=contributions.map(v=>v.name+': '+(v.pp>=0?'+':'')+v.pp.toFixed(1)+' п.п.').join(' · ');
- head.append(paragraph('',description+'. Плюс означает вклад в пользу выбранной команды, минус — против неё. Это вклад фиксированной модели, а не доказанное преимущество над рынком.'));
+ head.append(el('small','','КАК ПОЛУЧИЛАСЬ ВЕРОЯТНОСТЬ'),el('b','',a+' '+pct(probabilityA)+' · '+b+' '+pct(1-probabilityA)),
+  paragraph('','Расчёт для '+a+' начинается с 50%. Поправки показаны в порядке применения.'));
+ const list=el('ul');
+ for(const {name,delta} of steps){
+  const pp=delta*100;
+  list.append(el('li','',name+' · '+(pp>=0?'+':'')+pp.toFixed(2)+' п.п.'));
+ }
+ head.append(list);
  root.append(head);
 }
 function drawMapInsight(root,f){
@@ -267,10 +270,12 @@ function renderAnalysis(){
  const ba=el('div','prob-a'),bb=el('div','prob-b');ba.style.width=(a*100)+'%';bb.style.width=(b*100)+'%';bar.append(ba,bb);
  root.append(labels,bar);
  const verdict=el('div','selection');
- verdict.append(el('small','','МОДЕЛЬНЫЙ ФАВОРИТ'),el('b','',r.picked+' · '+pct(Math.max(a,b))),paragraph('',r.note));
+ const favoriteProbability=Math.max(a,b);
+ verdict.append(el('small','',closeMatch(favoriteProbability)?'ПОЧТИ РАВНЫЙ МАТЧ':'МОДЕЛЬНЫЙ ФАВОРИТ'),
+  el('b','',r.picked+' · '+pct(favoriteProbability)),paragraph('',r.note));
  root.append(verdict);
  drawFactors(root,r);
- drawReasonSummary(root,r,f);
+ drawReasonSummary(root,{...r,a:f.a,b:f.b,probabilityA:a,map:r.mapContribution,roster:r.rosterContribution,mapProbability:r.result.factorProbability});
  drawMapInsight(root,f);
  if(r.mapContribution)root.append(compBox('Карты CS2',pct(r.mapContribution.probabilityA),'Вес 20% · сценарий veto'));
  root.append(el('h3','analysis-head','Составы и игроки'));
@@ -481,10 +486,8 @@ function renderBrief(root){
    }
    details.append(paragraph('muted','Факторы сохранённого прогноза · записано '+shortTime(forecast.createdAt)+' · '+forecast.model));
    if(factorList.childElementCount)details.append(factorList);
-   const extra=[];
-   if(forecast.evidence?.map)extra.push('карты CS2');
-   if(forecast.evidence?.roster)extra.push('профили игроков');
-   if(extra.length)details.append(paragraph('muted','Дополнительные факторы: '+extra.join(', ')+'.'));
+   drawReasonSummary(details,{...forecast,probabilityA:forecast.probabilityA??(forecast.pick===forecast.a?forecast.probability:1-forecast.probability),
+    map:forecast.evidence?.map,roster:forecast.evidence?.roster});
    if(forecast.probabilityBasis==='series-projected')details.append(paragraph('muted','Шанс на серию рассчитан из модели карт. Отдельная калибровка серии пока не подтверждена.'));
    const price=stored.publicPrice;
    if(price&&forecast.probabilityBasis!=='map'){
