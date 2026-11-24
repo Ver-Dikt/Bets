@@ -8,7 +8,9 @@ export function normalizeOpenDota(payload){
   const date=new Date(m.start_time*1000);if(!Number.isFinite(date.valueOf()))continue;
   const a=String(m.radiant_name).trim(),b=String(m.dire_name).trim();
   if(!a||!b||a===b)continue;
-  result.push({id:'dota-'+m.match_id,discipline:'dota',date:date.toISOString(),a,b,winner:m.radiant_win?a:b,source:'OpenDota',kind:'map',providerTeamIds:[m.radiant_team_id,m.dire_team_id].map(id=>Number.isSafeInteger(id)&&id>0?String(id):null)});
+  const finishedAt=Number.isFinite(m.duration)&&m.duration>0
+    ?new Date((m.start_time+m.duration)*1000).toISOString():null;
+  result.push({finishedAt,id:'dota-'+m.match_id,discipline:'dota',date:date.toISOString(),a,b,winner:m.radiant_win?a:b,source:'OpenDota',kind:'map',tournament:typeof m.league_name==='string'?m.league_name:null,seriesId:Number.isSafeInteger(m.series_id)&&m.series_id>0?String(m.series_id):null,seriesType:Number.isSafeInteger(m.series_type)?m.series_type:null,providerTeamIds:[m.radiant_team_id,m.dire_team_id].map(id=>Number.isSafeInteger(id)&&id>0?String(id):null)});
  }
  return result;
 }
@@ -23,7 +25,8 @@ export function normalizeBo3(payload){
    const when=Date.parse(m.start_date);
    if(!a||!b||a===b||!(winnerId===t1||winnerId===t2)||!Number.isFinite(when)||m.id==null)continue;
    const tournament=tournaments[String(m.tournament)]?.name??null;
-   result.push({id:'cs-'+m.id,discipline:'cs2',date:new Date(when).toISOString(),a,b,winner:winnerId===t1?a:b,
+   const ended=Date.parse(m.end_date);
+   result.push({finishedAt:Number.isFinite(ended)&&ended>when?new Date(ended).toISOString():null,id:'cs-'+m.id,discipline:'cs2',date:new Date(when).toISOString(),a,b,winner:winnerId===t1?a:b,
     source:'bo3.gg (unofficial)',kind:'series',format:typeof m.bo_type==='string'?m.bo_type:null,
     tournament:typeof tournament==='string'?tournament:null,
     providerTeamIds:[t1,t2]});

@@ -13,7 +13,10 @@ on:
       - "data/private/report.json"
       - "data/public/fixtures.json"
       - "data/public/map-insights.json"
-      - "site/analysis.mjs"
+      - "src/analysis.mjs"
+      - "src/settlement.mjs"
+      - "src/live.mjs"
+      - "data/public/journal.json"
       - "scripts/build-pages.mjs"
       - ".github/workflows/pages.yml"
 permissions:

@@ -1,0 +1,29 @@
+export function seriesChance(mapChance, format, score) {
+  if (!Number.isFinite(mapChance) || mapChance<=0 || mapChance>=1 ||
+      !/^Bo[1357]$/.test(format) || !Array.isArray(score) || score.length!==2 ||
+      !score.every(value=>Number.isSafeInteger(value)&&value>=0)) return null;
+  const target = (Number(format.slice(2))+1)/2;
+  if (score.some(value=>value>=target)) return null;
+  const memo = new Map();
+  function solve(a,b){
+    if(a===target)return 1;
+    if(b===target)return 0;
+    const key=a+':'+b;
+    if(!memo.has(key))memo.set(key,mapChance*solve(a+1,b)+(1-mapChance)*solve(a,b+1));
+    return memo.get(key);
+  }
+  return solve(...score);
+}
+
+// Convert a same-format pre-match series probability to an independent map
+// estimate. The resulting live scenario conditions on verified map wins.
+export function seriesUpdate(base, format, score){
+  if (!Number.isFinite(base)||base<=0||base>=1||seriesChance(.5,format,score)===null) return null;
+  let low=0,high=1;
+  for(let i=0;i<40;i++){
+    const middle=(low+high)/2;
+    if(seriesChance(middle,format,[0,0])<base)low=middle;
+    else high=middle;
+  }
+  return seriesChance((low+high)/2,format,score);
+}

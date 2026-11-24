@@ -4,6 +4,7 @@ const iso=x=>{
  const t=typeof x==='number'&&x<1e11?x*1000:Date.parse(String(x));
  return Number.isFinite(t)?new Date(t).toISOString():null;
 };
+const seriesFormat=value=>[1,2,3,5,7].includes(Number(value))?'Bo'+Number(value):typeof value==='string'&&/^bo[12357]$/i.test(value)?'Bo'+value.slice(2):null;
 const name=x=>typeof x==='string'?x.trim():typeof x?.name==='string'?x.name.trim():'';
 const lookup=(obj,id)=>obj&&typeof obj==='object'?(obj[String(id)]||obj[Number(id)]||null):null;
 const list=data=>Array.isArray(data)?data:Array.isArray(data?.results)?data.results:Array.isArray(data?.data)?data.data:Array.isArray(data?.data?.results)?data.data.results:Array.isArray(data?.data?.matches)?data.data.matches:Array.isArray(data?.matches)?data.matches:[];
@@ -21,11 +22,12 @@ export function normalizeCSFixtures(payload,{fetchedAt=new Date().toISOString()}
   const date=iso(m.start_date??m.begin_at??m.startsAt??m.start_time);
   if(!a||!b||a===b||!date)continue;
   const tournament=name(m.tournament_name)||name(m.tournament)||name(lookup(leagues,m.tournament_id??m.tournament));
-  const scoreA=Number(m.team1_score),scoreB=Number(m.team2_score);
+  const scoreA=m.team1_score==null?NaN:Number(m.team1_score),scoreB=m.team2_score==null?NaN:Number(m.team2_score);
   out.push({id:'bo3-'+m.id,game:'cs2',a,b,date,status:status==='current'||status==='live'?'live':'upcoming',
-   tournament:tournament||null,format:typeof m.bo_type==='string'?m.bo_type:null,
-   score:status==='current'&&Number.isInteger(scoreA)&&Number.isInteger(scoreB)&&scoreA>=0&&scoreB>=0?[scoreA,scoreB]:null,
-   providerIds:[m.team1_id==null?null:String(m.team1_id),m.team2_id==null?null:String(m.team2_id)],
+   tournament:tournament||null,format:seriesFormat(m.bo_type),
+   teamSlugs:[m.team1?.slug??null,m.team2?.slug??null],
+   score:(status==='current'||status==='live')&&Number.isInteger(scoreA)&&Number.isInteger(scoreB)&&scoreA>=0&&scoreB>=0?[scoreA,scoreB]:null,
+   providerIds:[(m.team1_id??m.team1?.id)==null?null:String(m.team1_id??m.team1.id),(m.team2_id??m.team2?.id)==null?null:String(m.team2_id??m.team2.id)],
    source:'bo3.gg (unofficial)',fetchedAt});
  }
  return out;
@@ -42,7 +44,7 @@ export function normalizeDotaFixtures(payload,{fetchedAt=new Date().toISOString(
   if(!id&&!hash)continue;
   out.push({id:'dota-schedule-'+(id||hash),game:'dota',a,b,date,status:'upcoming',
     tournament:typeof m.leagueName==='string'?m.leagueName:null,
-    format:typeof m.matchType==='string'?m.matchType:null,score:null,providerIds:null,
+    format:seriesFormat(m.matchType),score:null,providerIds:null,
     source:'dota.haglund.dev (Liquipedia schedule)',fetchedAt});
  }
  return out;

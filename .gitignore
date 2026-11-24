@@ -13,3 +13,6 @@ private-data/
 
 # Raw unverified source payloads
 data/tmp/
+
+dist/
+__pycache__/

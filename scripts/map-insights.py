@@ -8,7 +8,7 @@ import json
 import pathlib
 import sys
 from collections import Counter
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT / 'vendor' / 'csgopred'))
@@ -32,8 +32,8 @@ def build_insight(fixture: dict, maps: list[dict]) -> dict:
     if not isinstance(ids, list) or len(ids) != 2 or not all(ids):
         return {'status':'missing-team-identifiers'}
     a, b = 'bo3:'+str(ids[0]), 'bo3:'+str(ids[1])
-    before = safe_time(fixture['date'])
-    history = [m for m in maps if safe_time(m['date']) < before]
+    before = min(safe_time(fixture['date']), datetime.now(timezone.utc))
+    history = [m for m in maps if safe_time(m['date']) + timedelta(days=1) < before]
     model = MapModel()
     counts = Counter()
     for m in sorted(history,key=lambda x:x['date']):
@@ -55,7 +55,7 @@ def build_insight(fixture: dict, maps: list[dict]) -> dict:
             'mapsA':model.games.get((a,mp),0),'mapsB':model.games.get((b,mp),0)})
     fmt=(fixture.get('format') or '').lower()
     result={'status':'map-analysis','teamAMaps':n_a,'teamBMaps':n_b,
-            'maps':map_probs,'model':'Aokua/csgopred MapModel · MIT',
+            'maps':map_probs,'teamIds':ids,'format':fixture.get('format'),'availableAt':before.isoformat(),'model':'Aokua/csgopred MapModel · MIT',
             'caution':'Map Elo exploratory and not calibrated. Includes only recorded maps. No confirmed veto.'}
     if fmt in ('bo1','bo3','bo5'):
         result['vetoEstimate'] = model.veto(a,b,fmt,1500.,1500.)
