@@ -21,6 +21,10 @@ for(let page=0;page<3;page++){
  url.searchParams.set('filter[matches.discipline_id][eq]','1');
  url.searchParams.set('with','teams,games');
  const payload=await fetchJson(String(url),{retries:1});
+ if(page===0){
+  const sample=payload?.results?.[0];
+  console.log('CS2 map provider sample shape:',JSON.stringify({total:payload?.total,results:payload?.results?.length,keys:sample?Object.keys(sample):[],gamesType:typeof sample?.games,gamesCount:sample?.games?.length,firstGame:sample?.games?.[0]??null}).slice(0,2800));
+ }
  const incoming=normalizeCSMaps(payload),combined=mergeCSMaps(archive.matches,incoming);
  archive.matches=combined.matches;received+=incoming.length;added+=combined.added;conflicts+=combined.conflicts;
  console.log('CS2 maps page '+(page+1)+': '+incoming.length+' parsed, '+combined.added+' added');
