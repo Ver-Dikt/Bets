@@ -126,6 +126,20 @@ function drawFactors(root,analysis){
           compBox('История дисциплины',c.dataCount,'До начала встречи'));
  root.append(g);
 }
+function drawReasonSummary(root,r,f){
+ const winner=r.picked;
+ const direction=winner===f.a?1:-1;
+ const contributions=r.reasons.map(item=>{
+  const pp=(item.a-.5)*item.weight*100*direction;
+  return {name:item.name,pp};
+ }).sort((a,b)=>Math.abs(b.pp)-Math.abs(a.pp));
+ const head=el('div','selection');
+ head.append(el('small','','ПОЧЕМУ ИМЕННО '+winner.toUpperCase()),
+             el('b','','Разница от 50/50: +'+(Math.max(r.result.pa,r.result.pb)*100-50).toFixed(1)+' п.п.'));
+ const description=contributions.map(v=>v.name+': '+(v.pp>=0?'+':'')+v.pp.toFixed(1)+' п.п.').join(' · ');
+ head.append(paragraph('',description+'. Плюс означает вклад в пользу выбранной команды, минус — против неё. Это вклад фиксированной модели, а не доказанное преимущество над рынком.'));
+ root.append(head);
+}
 function drawMapInsight(root,f){
  if(f.game!=='cs2')return;
  const record=mapInsights?.insights?.[f.id];
@@ -201,6 +215,7 @@ function renderAnalysis(){
  verdict.append(el('small','','МОДЕЛЬНЫЙ ФАВОРИТ'),el('b','',r.picked+' · '+pct(Math.max(a,b))),paragraph('',r.note));
  root.append(verdict);
  drawFactors(root,r);
+ drawReasonSummary(root,r,f);
  drawMapInsight(root,f);
  root.append(el('div','help','Почему этот выбор: модель суммирует три оценки с весами 65% / 25% / 10%. Результат исторический и некалиброванный; рейтинг не знает о заменах игроков, картах и актуальном патче.'));
  drawOdds(root,r,f);
