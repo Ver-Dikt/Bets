@@ -10,11 +10,13 @@ const archivePath=resolve('data/private/maps.json');
 let archive={schemaVersion:1,updatedAt:null,matches:[]};
 try{archive=JSON.parse(await readFile(archivePath,'utf8'));if(!Array.isArray(archive.matches))throw Error('Invalid existing map archive')}catch(e){if(e.code!=='ENOENT')throw e}
 let received=0,added=0,conflicts=0;
-for(let page=0;page<3;page++){
+const firstOlder=Number.isSafeInteger(archive.backfillOffset)&&archive.backfillOffset>=100?archive.backfillOffset:100;
+const offsets=[0,50,...Array.from({length:10},(_,i)=>firstOlder+i*50)];
+for(let page=0;page<offsets.length;page++){
  if(page)await sleep(1800);
  const url=new URL('https://api.bo3.gg/api/v1/matches');
  url.searchParams.set('scope','show-match-team-last-maps');
- url.searchParams.set('page[offset]',String(page*50));
+ url.searchParams.set('page[offset]',String(offsets[page]));
  url.searchParams.set('page[limit]','50');
  url.searchParams.set('sort','-start_date');
  url.searchParams.set('filter[matches.status][in]','finished');
@@ -27,8 +29,9 @@ for(let page=0;page<3;page++){
  }
  const incoming=normalizeCSMaps(payload),combined=mergeCSMaps(archive.matches,incoming);
  archive.matches=combined.matches;received+=incoming.length;added+=combined.added;conflicts+=combined.conflicts;
- console.log('CS2 maps page '+(page+1)+': '+incoming.length+' parsed, '+combined.added+' added');
- if(payload.results.length<50)break;
+ console.log('CS2 maps offset '+offsets[page]+': '+incoming.length+' parsed, '+combined.added+' added');
+ if(page>=2)archive.backfillOffset=offsets[page]+50;
+ if(payload.results.length<50){if(page>=2)archive.backfillOffset=100;break;}
 }
 if(conflicts)console.warn('CS2 map identity conflicts: '+conflicts+'; existing history left unchanged');
 archive.updatedAt=new Date().toISOString();
