@@ -10,3 +10,6 @@ node_modules/
 # Real match archive and private local working data
 .data/
 private-data/
+
+# Raw unverified source payloads
+data/tmp/
