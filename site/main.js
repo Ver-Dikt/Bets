@@ -1,4 +1,5 @@
-import {dailyRows,tally,reviewPeriod,totalTally,errorReview,compareJournalWinners} from './daily.mjs';
+import {dailyRows,tally,reviewPeriod,totalTally,errorReview,compareJournalWinners,
+ confidenceBreakdown,cs2ConfidenceBenchmark,qualifiesForCs2Shortlist} from './daily.mjs';
 import {analyzeFixture,probabilitySteps} from './analysis.mjs';
 const modelNames={
  dynamicElo:'Dynamic Elo',glicko2:'Glicko-2',trueSkill:'TrueSkill',bradleyTerry:'Bradley–Terry',
@@ -16,7 +17,7 @@ const dateLong=x=>Number.isFinite(Date.parse(x))?new Intl.DateTimeFormat('ru-RU'
 const pct=x=>typeof x==='number'&&Number.isFinite(x)?(x*100).toFixed(1)+'%':'—';
 const closeMatch=probability=>probability<.55;
 const asNum=x=>x==null?'—':Number(x).toFixed(1);
-let matches=[],fixtures=[],journal=[],report=null,research=null,mapInsights=null,filters={game:'all',view:['#brief','#daily'].includes(location.hash)?'daily':'today',period:'today',tournament:'all'},selected=null,expanded=false,loading=false,fixtureStatus=null;
+let matches=[],fixtures=[],journal=[],report=null,research=null,mapInsights=null,filters={game:'all',view:['#brief','#daily'].includes(location.hash)?'daily':'today',period:'today',tournament:'all',confidence:'all'},selected=null,expanded=false,loading=false,fixtureStatus=null;
 const assessments=new Map();
 const published=new Map();
 function forecastFor(fixture){
@@ -44,10 +45,13 @@ function sourceText(kind){
 }
 function activeFixtures(){
  const now=Date.now(), today=dayFmt.format(now), tomorrow=dayFmt.format(now+86400000);
+ const shortlist=filters.confidence==='cs2-shortlist';
+ const benchmark=shortlist?cs2ConfidenceBenchmark(research):null;
  return fixtures.filter(f=>filters.game==='all'||f.game===filters.game)
   .filter(f=>f.status==='upcoming'&&Date.parse(f.date)>now)
   .filter(f=>filters.period==='all'||dayFmt.format(new Date(f.date))===(filters.period==='today'?today:tomorrow))
   .filter(f=>filters.tournament==='all'||f.tournament===filters.tournament)
+  .filter(f=>!shortlist||qualifiesForCs2Shortlist(forecastFor(f),benchmark))
   .sort((a,b)=>Date.parse(a.date)-Date.parse(b.date));
 }
 function badge(text,cls=''){return el('span','tag'+(cls?' '+cls:''),text)}
@@ -66,7 +70,18 @@ function renderSources(){
 function renderFixtures(){
  document.querySelectorAll('[data-game]').forEach(b=>{const active=b.dataset.game===filters.game;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active))});
  const items=activeFixtures(),root=$('fixture-list');root.replaceChildren();
+ const shortlist=filters.confidence==='cs2-shortlist',note=$('confidence-note');
+ const benchmark=shortlist?cs2ConfidenceBenchmark(research):null;
+ note.hidden=!shortlist;
+ note.textContent=benchmark
+  ?'На историческом тесте '+benchmark.correct+' из '+benchmark.count+' попаданий · охват '+pct(benchmark.coverage)+' всех проверенных серий CS2'
+  :'Историческая проверка активной модели CS2 недоступна.';
  if(!items.length){
+  if(shortlist){
+   root.append(errorBlock('Нет прогнозов CS2 от 70% для выбранного периода и турнира'));
+   $('show-more').hidden=true;
+   return;
+  }
   const broken=(filters.game==='all'?['cs2','dota']:[filters.game]).some(game=>fixtureStatus?.sources?.[game]?.ok===false);
   root.append(errorBlock('Нет подтверждённых матчей для показа',broken?'Источник расписания сообщил об ошибке. Bets не показывает вымышленные игры.':'На момент снимка подходящих предстоящих встреч не найдено.'));$('show-more').hidden=true;return;
  }
@@ -323,7 +338,7 @@ function renderDaily(root){
  chooser.setAttribute('aria-label','Конец периода');
  chooser.onchange=()=>{if(chooser.value)filters.reviewDay=chooser.value;renderWorkspace()};
  const period=el('select');period.setAttribute('aria-label','Период итогов');
- period.replaceChildren(...[1,7,14,30,90].map(n=>new Option(n===1?'Один день':n+' дней',n)));
+ period.replaceChildren(...[1,2,7,14,30,90].map(n=>new Option(n===1?'Один день':n===2?'Два дня':n+' дней',n)));
  period.value=filters.reviewPeriod??1;
  period.onchange=()=>{filters.reviewPeriod=Number(period.value);renderWorkspace()};
  const game=el('select');game.setAttribute('aria-label','Дисциплина итогов');
@@ -339,6 +354,17 @@ function renderDaily(root){
   compBox('Технические исходы',t.technical??0),compBox('Ждём подтверждения',t.pending),compBox('Матчи впереди',t.upcoming),
   compBox('Точность',t.won+t.lost?pct(t.won/(t.won+t.lost)):'—',t.won+t.lost+' сверено'));
  root.append(grid);
+ const bands=confidenceBreakdown(rows);
+ if(bands.some(band=>band.settled)){
+  const details=el('details'),grid=el('div','comp-grid');
+  details.append(el('summary','','Точность по вероятности прогноза'));
+  for(const {min,max,settled,won} of bands){
+   const label=max===null?'От '+pct(min):pct(min)+' — менее '+pct(max);
+   grid.append(compBox(label,settled?pct(won/settled):'—',won+' из '+settled+' сверенных прогнозов'));
+  }
+  details.append(grid);
+  root.append(details);
+ }
  const totals=totalTally(rows);
  if(totals.total){
   const grid=el('div','comp-grid');
@@ -398,7 +424,23 @@ function updateFilters(){
 }
 for(const btn of document.querySelectorAll('[data-view]'))btn.onclick=()=>{filters.view=btn.dataset.view;history.replaceState(null,'',filters.view==='daily'?'#daily':location.pathname+location.search);updateFilters()};
 for(const key of ['period','tournament'])$(key).onchange=()=>{filters[key]=$(key).value;updateFilters()};
-for(const btn of document.querySelectorAll('[data-game]'))btn.onclick=()=>{filters.game=btn.dataset.game;syncTournaments();updateFilters()};
+function setDiscipline(game){
+ filters.game=game;
+ syncTournaments();
+}
+$('prematch-confidence').onchange=()=>{
+ filters.confidence=$('prematch-confidence').value;
+ if(filters.confidence==='cs2-shortlist')setDiscipline('cs2');
+ updateFilters();
+};
+for(const btn of document.querySelectorAll('[data-game]'))btn.onclick=()=>{
+ if(btn.dataset.game!=='cs2'){
+  filters.confidence='all';
+  $('prematch-confidence').value='all';
+ }
+ setDiscipline(btn.dataset.game);
+ updateFilters();
+};
 load();
 setInterval(()=>{if(document.visibilityState==='visible')load()},120000);
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(()=>{}));

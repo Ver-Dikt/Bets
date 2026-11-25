@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {dailyRows,tally,totalTally} from '../src/daily.mjs';
+import {dailyRows,tally,totalTally,confidenceBreakdown,cs2ConfidenceBenchmark,qualifiesForCs2Shortlist} from '../src/daily.mjs';
 
 test('daily totals use one pre-match prediction per fixture and preserve the PARI subset',()=>{
  const now=Date.parse('2026-11-24T07:05:00Z'), date='2026-11-24T06:00:00Z';
@@ -40,4 +40,29 @@ test('technical results override old losses and only played maps settle saved to
  assert.equal(totalTally(rows).resolved,1);
  assert.equal(totalTally(rows).correct,1);
  assert.equal(totalTally(rows).technical,1);
+});
+
+test('the shortlist uses the historical benchmark for the approved active CS2 model version',()=>{
+ const winner={selected:'lightGBM',approved:true,models:{lightGBM:{confidence:{'0.7':{count:227,correct:175,coverage:.22}}}}};
+ const research={version:'v2',games:{cs2:{winner}}};
+ const active={game:'cs2',model:'lightGBM@v2',probability:.70};
+ const benchmark=cs2ConfidenceBenchmark(research);
+ assert.deepEqual(benchmark,{model:active.model,count:227,correct:175,coverage:.22});
+ assert.equal(qualifiesForCs2Shortlist(active,benchmark),true);
+ for(const entry of [{probability:.6999},{probability:1.1},{model:'lightGBM@v1'},{game:'dota'},{model:'legacy'}]){
+  assert.equal(qualifiesForCs2Shortlist({...active,...entry},benchmark),false);
+ }
+ assert.equal(qualifiesForCs2Shortlist(undefined,benchmark),false);
+ winner.approved=false;
+ assert.equal(cs2ConfidenceBenchmark(research),null);
+ assert.equal(qualifiesForCs2Shortlist(active,null),false);
+});
+
+test('confidence bands cover exact thresholds and count only decided played forecasts',()=>{
+ const rows=[
+  [.5,1],[.5499,0],[.55,1],[.6499,1],[.65,0],[.6999,1],[.7,0],[1,1],
+  [.71,null],[.74,1,true],[NaN,1],[1.001,1]
+ ].map(([probability,actual,technical])=>({forecast:{probability},actual,technical}));
+ assert.deepEqual(confidenceBreakdown(rows).map(({settled,won})=>[settled,won]),
+  [[2,1],[2,2],[2,1],[2,1]]);
 });

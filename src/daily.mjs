@@ -69,8 +69,41 @@ export function tally(rows, pick=row=>row.forecast?.pick){
  return {total:forecasts.length,won,lost,upcoming,pending:forecasts.length-won-lost-upcoming-technical,...(technical?{technical}:{})};
 }
 
+export const cs2ConfidenceThreshold=.70;
+
+export function cs2ConfidenceBenchmark(research){
+ const winner=research?.games?.cs2?.winner;
+ const test=winner?.models?.[winner.selected]?.confidence?.[String(cs2ConfidenceThreshold)];
+ if(research?.version&&winner?.approved&&test?.count>0){
+  return {...test,model:winner.selected+'@'+research.version};
+ }
+ return null;
+}
+
+export function qualifiesForCs2Shortlist(forecast,benchmark){
+ return Boolean(benchmark&&forecast?.game==='cs2'&&forecast.model===benchmark.model&&
+  Number.isFinite(forecast.probability)&&forecast.probability>=cs2ConfidenceThreshold&&forecast.probability<=1);
+}
+
+export function confidenceBreakdown(rows){
+ const bands=[
+  {min:.5,max:.55,settled:0,won:0},
+  {min:.55,max:.65,settled:0,won:0},
+  {min:.65,max:cs2ConfidenceThreshold,settled:0,won:0},
+  {min:cs2ConfidenceThreshold,max:null,settled:0,won:0}
+ ];
+ for(const {forecast,actual,technical} of rows){
+  const p=forecast?.probability;
+  if(technical||(actual!==0&&actual!==1)||!Number.isFinite(p)||p<.5||p>1)continue;
+  const band=bands.find(({max})=>max===null||p<max);
+  band.settled++;
+  band.won+=actual;
+ }
+ return bands;
+}
+
 export function reviewPeriod(day, days) {
- if(!/^\d{4}-\d{2}-\d{2}$/.test(day)||![1,7,14,30,90].includes(days))throw Error('Invalid review period');
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(day)||![1,2,7,14,30,90].includes(days))throw Error('Invalid review period');
  return new Date(Date.parse(day+'T00:00:00Z')-(days-1)*86400000).toISOString().slice(0,10);
 }
 
