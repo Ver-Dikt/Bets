@@ -122,7 +122,10 @@ for(const id of ['apiSport','oddslink']){
   :source.error));
 }
 const recordedAt=new Date().toISOString();
-const snapshot={schemaVersion:1,generatedAt:recordedAt,fixtures:fixtures.map(({score,...row})=>row),sources:status,pariCoverage:joined.coverage,
+const snapshot={schemaVersion:1,generatedAt:recordedAt,fixtures:fixtures.map(({score,...row})=>row.status==='live'&&
+ Array.isArray(score)&&score.length===2&&score.every(n=>Number.isSafeInteger(n)&&n>=0)&&
+ /^Bo[1357]$/.test(row.format)&&score.every(n=>n<(Number(row.format.slice(2))+1)/2)
+ ?{...row,liveScore:score}:row),sources:status,pariCoverage:joined.coverage,
   label:'Source-labeled fixture and bookmaker snapshots.'};
 await mkdir(dirname(dest),{recursive:true});
 const journalPath=resolve(process.env.BETS_JOURNAL_PATH??'data/public/journal.json');

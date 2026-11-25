@@ -1,7 +1,32 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {dailyRows,tally,totalTally,confidenceBreakdown,cs2ConfidenceBenchmark,qualifiesForCs2Shortlist,verifiedForecastRows,
- forecastPrice,pricedResults,qualifiesForPricedCs2Shortlist} from '../src/daily.mjs';
+ forecastPrice,pricedResults,qualifiesForPricedCs2Shortlist,inPlayFixtures} from '../src/daily.mjs';
+
+test('live listings keep saved forecasts through a delayed start or a fixture feed gap',()=>{
+ const now=Date.parse('2026-11-25T09:42:00Z');
+ const event={a:'A',b:'B',game:'cs2',format:'Bo3',date:'2026-11-25T08:00:00Z',status:'live',fetchedAt:'2026-11-25T09:41:00Z'};
+ const record={a:event.a,b:event.b,game:event.game,format:event.format,pick:'A',kickoff:event.date,createdAt:'2026-11-25T07:50:00Z'};
+ const eventAt=(id,fields={})=>({...event,id,...fields});
+ const forecast=(fixtureId,fields={})=>({type:'forecast',record:{...record,id:fixtureId+'@v1',fixtureId,...fields}});
+ const rows=inPlayFixtures([
+  eventAt('bo3-10',{date:'2026-11-25T08:15:00Z',liveScore:[1,0]}),
+  eventAt('bo3-11',{fetchedAt:'2026-11-25T08:55:00Z'}),
+  eventAt('bo3-12'),eventAt('bo3-13'),
+  eventAt('bo3-14',{date:'2026-11-25T10:00:00Z',status:'upcoming'})
+ ],[
+  forecast('bo3-10'),forecast('bo3-13'),forecast('bo3-15'),
+  forecast('bo3-16',{kickoff:'2026-11-24T23:00:00Z',createdAt:'2026-11-24T22:30:00Z'}),
+  forecast('bo3-17',{createdAt:'2026-11-25T08:30:00Z'}),
+  {type:'settlement',fixtureId:'bo3-12',forecastId:'bo3-12@v1',result:1}
+ ],[
+  {id:'cs-13',discipline:'cs2',kind:'series',a:'A',b:'B',winner:'A',date:event.date,finishedAt:'2026-11-25T09:30:00Z'}
+ ],now);
+ assert.deepEqual(rows.map(({id,confirmed,forecastKickoff})=>[id,confirmed,forecastKickoff]),[
+  ['bo3-10',true,event.date],['bo3-11',false,null],['bo3-15',false,event.date]
+ ]);
+ assert.deepEqual(rows[0].liveScore,[1,0]);
+});
 
 test('daily totals use one pre-match prediction per fixture and preserve the PARI subset',()=>{
  const now=Date.parse('2026-11-24T07:05:00Z'), date='2026-11-24T06:00:00Z';

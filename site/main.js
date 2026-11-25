@@ -1,6 +1,6 @@
 import {dailyRows,tally,reviewPeriod,totalTally,errorReview,compareJournalWinners,
  confidenceBreakdown,cs2ConfidenceBenchmark,qualifiesForCs2Shortlist,verifiedForecastRows,forecastPrice,pricedResults,
- qualifiesForPricedCs2Shortlist} from './daily.mjs';
+ qualifiesForPricedCs2Shortlist,inPlayFixtures} from './daily.mjs';
 import {analyzeFixture,probabilitySteps} from './analysis.mjs';
 const modelNames={
  dynamicElo:'Dynamic Elo',glicko2:'Glicko-2',trueSkill:'TrueSkill',bradleyTerry:'Bradley–Terry',
@@ -21,10 +21,11 @@ const asNum=x=>x==null?'—':Number(x).toFixed(1);
 let matches=[],fixtures=[],journal=[],report=null,research=null,mapInsights=null,filters={game:'all',view:['#brief','#daily'].includes(location.hash)?'daily':'today',period:'today',tournament:'all',confidence:'recorded'},selected=null,expanded=false,loading=false,fixtureStatus=null;
 const assessments=new Map();
 const published=new Map();
+let playing=[];
 const cs2ShortlistMode=()=>['cs2-shortlist','cs2-priced'].includes(filters.confidence);
 function forecastFor(fixture){
  const forecast=published.get(fixture.id);
- if(forecast?.kickoff===fixture.date&&forecast.a===fixture.a&&forecast.b===fixture.b&&forecast.format===fixture.format&&
+ if(forecast?.kickoff===(fixture.forecastKickoff??fixture.date)&&forecast.a===fixture.a&&forecast.b===fixture.b&&forecast.format===fixture.format&&
     forecast.probabilityBasis!=='map')return forecast;
 }
 
@@ -50,12 +51,14 @@ function activeFixtures(){
  const shortlist=cs2ShortlistMode();
  const priced=filters.confidence==='cs2-priced';
  const benchmark=shortlist?cs2ConfidenceBenchmark(research):null;
- return fixtures.filter(f=>filters.game==='all'||f.game===filters.game)
-  .filter(f=>f.status==='upcoming'&&Date.parse(f.date)>now)
-  .filter(f=>filters.period==='all'||dayFmt.format(new Date(f.date))===(filters.period==='today'?today:tomorrow))
+ const upcoming=fixtures.filter(f=>f.status==='upcoming'&&Date.parse(f.date)>now&&
+  (filters.period==='all'||dayFmt.format(new Date(f.date))===(filters.period==='today'?today:tomorrow)));
+ const pool=filters.period==='live'?playing:filters.period==='today'?[...playing,...upcoming]:upcoming;
+ return pool.filter(f=>filters.game==='all'||f.game===filters.game)
   .filter(f=>filters.tournament==='all'||f.tournament===filters.tournament)
-  .filter(f=>filters.confidence!=='recorded'||forecastFor(f))
+  .filter(f=>f.inPlay||filters.confidence!=='recorded'||forecastFor(f))
   .filter(f=>{
+   if(f.inPlay&&filters.period==='live')return true;
    if(!shortlist)return true;
    const forecast=forecastFor(f);
    if(!priced)return qualifiesForCs2Shortlist(forecast,benchmark);
@@ -64,7 +67,7 @@ function activeFixtures(){
     forecast?.oddsSource===(board.bookmaker??'PARI')&&forecast?.odds?.every((odd,i)=>odd===board.odds?.[i])&&
     qualifiesForPricedCs2Shortlist(forecast,benchmark,now));
   })
-  .sort((a,b)=>Date.parse(a.date)-Date.parse(b.date));
+  .sort((a,b)=>Number(Boolean(b.inPlay))-Number(Boolean(a.inPlay))||Date.parse(a.date)-Date.parse(b.date));
 }
 function badge(text,cls=''){return el('span','tag'+(cls?' '+cls:''),text)}
 function renderSources(){
@@ -84,11 +87,16 @@ function renderFixtures(){
  const items=activeFixtures(),root=$('fixture-list');root.replaceChildren();
  const shortlist=cs2ShortlistMode(),priced=filters.confidence==='cs2-priced',note=$('confidence-note');
  const benchmark=shortlist?cs2ConfidenceBenchmark(research):null;
- note.hidden=!shortlist;
+ note.hidden=!shortlist||filters.period==='live';
  note.textContent=priced?'Победитель CS2 от 70% с коэффициентом выше порога безубыточности. Снимок цены должен быть свежее 45 минут.':benchmark
   ?'На историческом тесте '+benchmark.correct+' из '+benchmark.count+' попаданий · охват '+pct(benchmark.coverage)+' всех проверенных серий CS2'
   :'Историческая проверка активной модели CS2 недоступна.';
  if(!items.length){
+  if(filters.period==='live'){
+   root.append(errorBlock('Сейчас в списке нет начавшихся матчей'));
+   $('show-more').hidden=true;
+   return;
+  }
   if(shortlist){
    root.append(errorBlock(priced?'Нет прогнозов CS2 с подходящей ценой':'Нет прогнозов CS2 от 70% для выбранного периода и турнира',
     priced?'Здесь появляются только матчи со свежим коэффициентом.':null));
@@ -108,6 +116,7 @@ function renderFixtures(){
   button.type='button';button.setAttribute('aria-label','Открыть анализ '+f.a+' против '+f.b);
   const meta=el('div','fixture-top');
   meta.append(el('span','',shortTime(f.date)),badge(f.game==='cs2'?'CS2':'DOTA 2'));
+  if(f.inPlay)meta.append(badge(f.confirmed?'В игре':'Ждём статус',f.confirmed?'live':'weak'));
   const name=el('div','fixture-name',f.a+'  —  '+f.b);
   const foot=el('div','fixture-foot');
   const label=f.tournament||'Турнир не указан';
@@ -218,6 +227,18 @@ function renderAnalysis(){
  if(!selected){root.append(errorBlock('Выбери игру из расписания','Подробный разбор сформируется по истории именно этих команд.'));return}
  const f=selected;
  addMeta(root,f);
+ if(f.inPlay){
+  const live=el('div','comp-grid');
+  const observed=shortTime(f.fetchedAt);
+  const mapScore=f.confirmed&&f.liveScore;
+  const kills=f.confirmed&&f.liveState?.kills?.every(Number.isSafeInteger)&&f.liveState.kills;
+  const score=mapScore||kills;
+  const metric=mapScore?'Счёт по картам · ':kills?'Убийства на текущей карте · ':'';
+  live.append(compBox(f.confirmed?'Последний снимок матча':'Статус матча',
+   score?f.a+' '+score.join(' : ')+' '+f.b:f.confirmed?'В игре':'Время старта прошло',
+   f.confirmed?metric+observed+' · '+f.source:'Подтверждение старта или результата ещё не поступило.'));
+  root.append(live);
+ }
  const saved=forecastFor(f);
  const r=assessment(f);
  if(!saved){
@@ -233,7 +254,7 @@ function renderAnalysis(){
  root.append(labels,bar);
  const verdict=el('div','selection');
  const favoriteProbability=Math.max(a,b);
- verdict.append(el('small','',closeMatch(favoriteProbability)?'ПОЧТИ РАВНЫЙ МАТЧ':'МОДЕЛЬНЫЙ ФАВОРИТ'),
+ verdict.append(el('small','',f.inPlay?'ПРЕДМАТЧЕВЫЙ ПРОГНОЗ':closeMatch(favoriteProbability)?'ПОЧТИ РАВНЫЙ МАТЧ':'МОДЕЛЬНЫЙ ФАВОРИТ'),
   el('b','',saved.pick+' · '+pct(favoriteProbability)),
   paragraph('', 'Записано '+shortTime(saved.createdAt)+' · '+(modelNames[saved.model.split('@')[0]]??'Контрольная модель')));
  root.append(verdict);
@@ -301,24 +322,26 @@ async function load(){
   journal=journalResult.value.events;
   published.clear();
   for(const {type,record} of journal){
-   if(type==='forecast'&&Date.parse(record.createdAt)<Date.parse(record.kickoff))published.set(record.fixtureId,record);
+   if(type==='forecast'&&record?.fixtureId&&record.probabilityBasis!=='map'&&Date.parse(record.createdAt)<Date.parse(record.kickoff)&&
+    !(Date.parse(published.get(record.fixtureId)?.createdAt)>Date.parse(record.createdAt)))published.set(record.fixtureId,record);
   }
  }
  if(researchResult.status==='fulfilled')research=researchResult.value;
  assessments.clear();
+ playing=inPlayFixtures(fixtures,journal,matches,Date.now());
  syncTournaments();
  renderSources();
  const available=activeFixtures();
  if(!selected&&available.length)selected=available[0];
  if(selected&&!available.some(f=>f.id===selected.id))selected=available[0]||null;
- if(selected){const fresh=fixtures.find(f=>f.id===selected.id);if(fresh)selected=fresh}
+ if(selected){const fresh=available.find(f=>f.id===selected.id);if(fresh)selected=fresh}
  renderFixtures();renderAnalysis();renderWorkspace();loading=false;
 }
 $('show-more').onclick=()=>{expanded=!expanded;renderFixtures()};
 $('refresh').onclick=load;
 function syncTournaments(){
  const select=$('tournament');
- const names=[...new Set(fixtures.filter(f=>filters.game==='all'||f.game===filters.game).map(f=>f.tournament).filter(Boolean))].sort();
+ const names=[...new Set([...fixtures,...playing].filter(f=>filters.game==='all'||f.game===filters.game).map(f=>f.tournament).filter(Boolean))].sort();
  select.replaceChildren(new Option('Все турниры','all'),...names.map(name=>new Option(name,name)));
  if(!names.includes(filters.tournament))filters.tournament='all';
  select.value=filters.tournament;

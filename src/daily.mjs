@@ -75,6 +75,48 @@ export function verifiedForecastRows(rows, game='all'){
   (game==='all'||forecast.game===game)&&!technical&&Boolean(winner)&&(actual===0||actual===1));
 }
 
+export function inPlayFixtures(fixtures,journal,matches,now){
+ const window=8*3600000;
+ const snapshotAge=45*60000;
+ const byId=new Map(fixtures.map(f=>[f.id,f]));
+ const records=new Map();
+ const ended=new Set();
+ for(const entry of journal){
+  const p=entry.record;
+  if(entry.type==='forecast'&&p?.fixtureId&&p.probabilityBasis!=='map'&&Date.parse(p.createdAt)<Date.parse(p.kickoff)&&
+   !(Date.parse(records.get(p.fixtureId)?.createdAt)>Date.parse(p.createdAt))){
+   records.set(p.fixtureId,p);
+  }
+  if((entry.type==='settlement'&&(entry.result===0||entry.result===1))||entry.type==='technical-result'){
+   ended.add(entry.fixtureId??entry.forecastId?.split('@')[0]);
+  }
+ }
+ const recent=[...records.values()].filter(p=>now-Date.parse(p.kickoff)>=0&&now-Date.parse(p.kickoff)<window);
+ const checked=reconcilePaper(recent.map(p=>({...p,actual:null})),matches,new Date(now).toISOString());
+ for(const p of checked.records)if(p.actual===0||p.actual===1||p.technical)ended.add(p.fixtureId);
+ const results=new Map(matches.filter(m=>m?.kind==='series'&&[m.a,m.b].includes(m.winner)).map(m=>[m.id,m]));
+ for(const f of fixtures){
+  const final=results.get(/^bo3-\d+$/.test(f.id)?'cs-'+f.id.slice(4):f.id);
+  if(final?.discipline===f.game&&[final.a,final.b].includes(f.a)&&[final.a,final.b].includes(f.b)&&
+   Date.parse(final.date)<=now&&(!final.finishedAt||Date.parse(final.finishedAt)<=now)&&
+   (!final.resultObservedAt||Date.parse(final.resultObservedAt)<=now))ended.add(f.id);
+ }
+ for(const p of recent)if(!byId.has(p.fixtureId)){
+  byId.set(p.fixtureId,{id:p.fixtureId,a:p.a,b:p.b,date:p.kickoff,game:p.game,format:p.format,
+   tournament:p.tournament,source:p.source,fetchedAt:p.createdAt,status:'upcoming'});
+ }
+ return [...byId.values()].flatMap(f=>{
+  const age=now-Date.parse(f.date);
+  if(ended.has(f.id)||!['upcoming','live'].includes(f.status)||!(age>=0&&age<window))return [];
+  const elapsed=now-Date.parse(f.fetchedAt);
+  const confirmed=f.status==='live'&&elapsed>=0&&elapsed<snapshotAge;
+  const p=records.get(f.id);
+  const compatible=p&&p.game===f.game&&p.a===f.a&&p.b===f.b&&p.format===f.format&&
+   Date.parse(p.createdAt)<Date.parse(f.date)&&Math.abs(Date.parse(p.kickoff)-Date.parse(f.date))<=2*3600000;
+  return [{...f,inPlay:true,confirmed,forecastKickoff:compatible?p.kickoff:null}];
+ });
+}
+
 export function forecastPrice(forecast){
  const observed=Date.parse(forecast.oddsObservedAt), created=Date.parse(forecast.createdAt);
  if((forecast.oddsSource!=='PARI'&&forecast.oddsProvider!=='OddsLink')||!forecast.oddsSource||
