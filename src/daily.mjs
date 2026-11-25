@@ -75,6 +75,18 @@ export function verifiedForecastRows(rows, game='all'){
   (game==='all'||forecast.game===game)&&!technical&&Boolean(winner)&&(actual===0||actual===1));
 }
 
+const publishedChoiceThreshold=.55;
+
+export function publishedWinnerPick(forecast){
+ const probability=forecast?.probability;
+ return Number.isFinite(probability)&&probability>=publishedChoiceThreshold&&probability<=1?forecast.pick:null;
+}
+
+export function hasPublishedTotalPick(total){
+ return total?.validated===true&&Number.isFinite(total.over)&&total.over>=0&&total.over<=1&&
+  Math.max(total.over,1-total.over)>=publishedChoiceThreshold;
+}
+
 export function inPlayFixtures(fixtures,journal,matches,now){
  const window=8*3600000;
  const snapshotAge=45*60000;

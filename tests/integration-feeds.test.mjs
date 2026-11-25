@@ -29,6 +29,7 @@ test('PARI reverses prices when provider team order is reversed',()=>{
 
 test('the Esport Agenda PVISION alias resolves to the main PARIVISION fixture',()=>{
  assert.equal(sameTeams({game:'cs2',a:'PVISION',b:'DENDELE CS'},{game:'cs2',a:'PARIVISION',b:'DENDELE'}),1);
+ assert.equal(sameTeams({game:'cs2',a:'GOSH',b:'NIP'},{game:'cs2',a:'Ninjas in Pyjamas',b:'BC.Game'}),-1);
 });
 
 test('Agenda accepts exact dated fixtures and reads separately displayed Bo format',()=>{

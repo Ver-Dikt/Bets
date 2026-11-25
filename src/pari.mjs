@@ -10,6 +10,8 @@ const aliases = {
     ['teamliquid', 'liquid'], ['bcg', 'bcgame'], ['fazeclan', 'faze'],
     ['donstuesports', 'donstu'], ['misaesports', 'misa'], ['dramaesports', 'drama'],
     ['havugaming', 'havu'], ['kuusamogg', 'kuusamo'], ['dendelecs','dendele'], ['pvision','parivision'],
+    ['nip','ninjasinpyjamas'], ['gosh','bcgame'], ['firefluxesports','fireflux'],
+    ['lunacyteam','lunacy'], ['nordicpartnersgaming','nordicpartners'], ['gremioesports','gremio'],
   ]),
   dota: new Map([['aurora','auroragaming'],['spiritacademy','teamspiritacademy'],
     ['innercirclexinsanity','innercircle'],['liquid','teamliquid']]),

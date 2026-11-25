@@ -1,7 +1,18 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {dailyRows,tally,totalTally,confidenceBreakdown,cs2ConfidenceBenchmark,qualifiesForCs2Shortlist,verifiedForecastRows,
- forecastPrice,pricedResults,qualifiesForPricedCs2Shortlist,inPlayFixtures} from '../src/daily.mjs';
+ forecastPrice,pricedResults,qualifiesForPricedCs2Shortlist,inPlayFixtures,publishedWinnerPick,hasPublishedTotalPick} from '../src/daily.mjs';
+
+test('the published picks exclude near-equal winners and weak or exploratory totals',()=>{
+ assert.equal(publishedWinnerPick({pick:'DENDELE',probability:.5276}),null);
+ assert.equal(publishedWinnerPick({pick:'FlyQuest',probability:.67475}),'FlyQuest');
+ assert.equal(publishedWinnerPick({pick:'A',probability:.55}),'A');
+ assert.equal(publishedWinnerPick({pick:'A',probability:1.1}),null);
+ assert.equal(hasPublishedTotalPick({validated:false,over:.43}),false);
+ assert.equal(hasPublishedTotalPick({validated:true,over:.4999}),false);
+ assert.equal(hasPublishedTotalPick({validated:true,over:.45}),true);
+ assert.equal(hasPublishedTotalPick({validated:true,over:.55}),true);
+});
 
 test('live listings keep saved forecasts through a delayed start or a fixture feed gap',()=>{
  const now=Date.parse('2026-11-25T09:42:00Z');

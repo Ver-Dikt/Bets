@@ -91,6 +91,7 @@ const excluded=new Set();
 for(const item of secondary){
  const same=merged.filter(row=>row.id!==item.id&&row.status===item.status&&
    (row.source==='bo3.gg (unofficial)'||row.source==='dota.haglund.dev (Liquipedia schedule)')&&
+   (!row.format||!item.format||row.format===item.format)&&
    Math.abs(Date.parse(item.date)-Date.parse(row.date))<=30*60000&&sameTeams(row,item));
  if(same.length===1){
   const other=same[0];

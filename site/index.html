@@ -108,10 +108,11 @@ details p{color:#92a9bf;font-size:12px;line-height:1.6}details h3{font-size:13px
    <div class="filter-grid" id="prematch-filters">
      <label>Период<select id="period"><option value="today">Сегодня</option><option value="live">В игре</option><option value="tomorrow">Завтра</option><option value="all">Все предстоящие</option></select></label>
      <label>Турнир<select id="tournament"><option value="all">Все турниры</option></select></label>
-     <label>Прогноз<select id="prematch-confidence"><option value="recorded">С прогнозом</option><option value="all">Всё расписание</option><option value="cs2-shortlist">CS2 · от 70%</option><option value="cs2-priced">CS2 · от 70% + цена</option></select></label>
+     <label>Прогноз<select id="prematch-confidence"><option value="recorded">С оценкой модели</option><option value="picked">С выбором победителя</option><option value="all">Всё расписание</option><option value="cs2-shortlist">CS2 · от 70%</option><option value="cs2-priced">CS2 · от 70% + цена</option></select></label>
    </div>
    <p id="confidence-note" class="muted" hidden></p>
    <div class="source-row"><span id="cs2-source">CS2: проверка…</span><span id="dota-source">Dota: проверка…</span></div>
+   <p id="schedule-count" class="muted" aria-live="polite" hidden></p>
    <div id="source-warning"></div>
    <div id="fixture-list" aria-live="polite"><div class="empty">Получаю реальные матчи из последнего опубликованного снимка…</div></div>
    <button id="show-more" class="more" hidden>Показать ещё</button>

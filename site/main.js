@@ -1,6 +1,6 @@
 import {dailyRows,tally,reviewPeriod,totalTally,errorReview,compareJournalWinners,
  confidenceBreakdown,cs2ConfidenceBenchmark,qualifiesForCs2Shortlist,verifiedForecastRows,forecastPrice,pricedResults,
- qualifiesForPricedCs2Shortlist,inPlayFixtures} from './daily.mjs';
+ qualifiesForPricedCs2Shortlist,inPlayFixtures,publishedWinnerPick,hasPublishedTotalPick} from './daily.mjs';
 import {analyzeFixture,probabilitySteps} from './analysis.mjs';
 const modelNames={
  dynamicElo:'Dynamic Elo',glicko2:'Glicko-2',trueSkill:'TrueSkill',bradleyTerry:'Bradley–Terry',
@@ -16,7 +16,6 @@ const dateFmt=new Intl.DateTimeFormat('ru-RU',{timeZone:moscow,day:'numeric',mon
 const shortTime=x=>Number.isFinite(Date.parse(x))?dateFmt.format(new Date(x)):'Время неизвестно';
 const dateLong=x=>Number.isFinite(Date.parse(x))?new Intl.DateTimeFormat('ru-RU',{timeZone:moscow,day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(x)):'Время неизвестно';
 const pct=x=>typeof x==='number'&&Number.isFinite(x)?(x*100).toFixed(1)+'%':'—';
-const closeMatch=probability=>probability<.55;
 const asNum=x=>x==null?'—':Number(x).toFixed(1);
 let matches=[],fixtures=[],journal=[],report=null,research=null,mapInsights=null,filters={game:'all',view:['#brief','#daily'].includes(location.hash)?'daily':'today',period:'today',tournament:'all',confidence:'recorded'},selected=null,expanded=false,loading=false,fixtureStatus=null;
 const assessments=new Map();
@@ -59,6 +58,7 @@ function activeFixtures(){
   .filter(f=>f.inPlay||filters.confidence!=='recorded'||forecastFor(f))
   .filter(f=>{
    if(f.inPlay&&filters.period==='live')return true;
+   if(filters.confidence==='picked')return Boolean(publishedWinnerPick(forecastFor(f)));
    if(!shortlist)return true;
    const forecast=forecastFor(f);
    if(!priced)return qualifiesForCs2Shortlist(forecast,benchmark);
@@ -85,6 +85,17 @@ function renderSources(){
 function renderFixtures(){
  document.querySelectorAll('[data-game]').forEach(b=>{const active=b.dataset.game===filters.game;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active))});
  const items=activeFixtures(),root=$('fixture-list');root.replaceChildren();
+ const count=$('schedule-count');
+ if(count){
+  count.hidden=!fixtureStatus;
+  const upcoming=items.filter(f=>!f.inPlay).length;
+  const live=items.filter(f=>f.confirmed).length;
+  const waiting=items.length-upcoming-live;
+  const counts=['Предстоит · '+upcoming];
+  if(live||filters.period==='live')counts.push('В игре · '+live);
+  if(waiting)counts.push('Ждём статус · '+waiting);
+  count.textContent=(filters.period==='live'?counts.slice(1):counts).join('   /   ');
+ }
  const shortlist=cs2ShortlistMode(),priced=filters.confidence==='cs2-priced',note=$('confidence-note');
  const benchmark=shortlist?cs2ConfidenceBenchmark(research):null;
  note.hidden=!shortlist||filters.period==='live';
@@ -105,7 +116,9 @@ function renderFixtures(){
   }
   const broken=(filters.game==='all'?['cs2','dota']:[filters.game]).some(game=>fixtureStatus?.sources?.[game]?.ok===false);
   const onlyRecorded=filters.confidence==='recorded';
-  root.append(errorBlock(onlyRecorded?'Нет предстоящих матчей с записанным прогнозом':'Нет предстоящих матчей',
+  const title=filters.confidence==='picked'?'Нет матчей с выбором победителя'
+   :onlyRecorded?'Нет предстоящих матчей с оценкой модели':'Нет предстоящих матчей';
+  root.append(errorBlock(title,
    broken?'Источник расписания сообщил об ошибке.':onlyRecorded?'Для просмотра остальных матчей выбери «Всё расписание».':null));
   $('show-more').hidden=true;
   return;
@@ -125,9 +138,10 @@ function renderFixtures(){
   if(f.confirmation?.length)button.append(el('div','meta','Сопоставлено с '+f.confirmation.join(', ')));
   const saved=forecastFor(f);
   if(saved){
+   const pick=publishedWinnerPick(saved);
    const preview=el('div','fixture-foot');
    preview.style.borderTop='1px solid #304658';preview.style.paddingTop='9px';
-   preview.append(el('span','',closeMatch(saved.probability)?'Почти равный матч':'Прогноз · '+saved.pick),el('span','win',pct(saved.probability)));
+   preview.append(el('span','',pick?'Прогноз · '+pick:'Почти равный матч'),el('span','win',pct(saved.probability)));
    button.append(preview);
   }else button.append(el('div','meta','Прогноз не записан'));
   button.addEventListener('click',()=>{selected=f;renderFixtures();renderAnalysis();if(window.matchMedia('(max-width:820px)').matches)$('analysis-panel').scrollIntoView({behavior:'smooth',block:'start'})});
@@ -254,29 +268,39 @@ function renderAnalysis(){
  root.append(labels,bar);
  const verdict=el('div','selection');
  const favoriteProbability=Math.max(a,b);
- verdict.append(el('small','',f.inPlay?'ПРЕДМАТЧЕВЫЙ ПРОГНОЗ':closeMatch(favoriteProbability)?'ПОЧТИ РАВНЫЙ МАТЧ':'МОДЕЛЬНЫЙ ФАВОРИТ'),
-  el('b','',saved.pick+' · '+pct(favoriteProbability)),
+ const pick=publishedWinnerPick(saved);
+ verdict.append(el('small','',pick?(f.inPlay?'ПРЕДМАТЧЕВЫЙ ПРОГНОЗ':'МОДЕЛЬНЫЙ ФАВОРИТ'):'ПОЧТИ РАВНЫЙ МАТЧ'),
+  el('b','',pick?pick+' · '+pct(favoriteProbability):'Без выбора победителя'),
   paragraph('', 'Записано '+shortTime(saved.createdAt)+' · '+(modelNames[saved.model.split('@')[0]]??'Контрольная модель')));
  root.append(verdict);
  const price=forecastPrice(saved);
- const prices=el('div','comp-grid');
- prices.append(compBox('Коэффициент безубыточности', (1/favoriteProbability).toFixed(2),saved.pick+' · по оценке BETS'));
- if(price){
-  prices.append(compBox(price.bookmaker+' · '+shortTime(price.observedAt),price.odds.toFixed(2),
-   (price.provider?price.provider+' · ':'')+'Для безубыточности нужно '+pct(price.breakEven)),
-   compBox('Ожидаемая доходность по модели',pct(price.expectedReturn)));
- }else prices.append(compBox('Коэффициент букмекера','—','Снимок линии до матча отсутствует'));
- root.append(prices);
+ if(pick){
+  const prices=el('div','comp-grid');
+  prices.append(compBox('Коэффициент безубыточности', (1/favoriteProbability).toFixed(2),pick+' · по оценке BETS'));
+  if(price){
+   prices.append(compBox(price.bookmaker+' · '+shortTime(price.observedAt),price.odds.toFixed(2),
+    (price.provider?price.provider+' · ':'')+'Для безубыточности нужно '+pct(price.breakEven)),
+    compBox('Ожидаемая доходность по модели',pct(price.expectedReturn)));
+  }else prices.append(compBox('Коэффициент букмекера','—','Снимок линии до матча отсутствует'));
+  root.append(prices);
+ }
  const total=saved.total;
  if(total){
-  const line=String(total.line).replace('.',',');
-  const grid=el('div','comp-grid');
-  grid.append(compBox('ТБ '+line,pct(total.over),f.format==='Bo3'?'Будет 3-я карта':'Будет 5-я карта'),
-              compBox('ТМ '+line,pct(total.under),f.format==='Bo3'?'Две карты':'Три или четыре карты'));
-  root.append(el('h3','analysis-head','Количество карт · '+f.format),grid,
-   paragraph('muted',total.validated?'Вероятности прошли историческую проверку.':'Исследовательская оценка количества карт.'));
+  root.append(el('h3','analysis-head','Количество карт · '+f.format));
+  if(hasPublishedTotalPick(total)){
+   const line=String(total.line).replace('.',',');
+   const grid=el('div','comp-grid');
+   grid.append(compBox('ТБ '+line,pct(total.over),f.format==='Bo3'?'Будет 3-я карта':'Будет 5-я карта'),
+               compBox('ТМ '+line,pct(total.under),f.format==='Bo3'?'Две карты':'Три или четыре карты'));
+   root.append(grid);
+  }else root.append(paragraph('muted','По тоталу есть только оценка модели. Выбора ТБ или ТМ нет.'));
  }
  const detail=el('details');detail.append(el('summary','','Данные и сравнение моделей'));root.append(detail);
+ if(total&&!hasPublishedTotalPick(total)){
+  const line=String(total.line).replace('.',',');
+  detail.append(compBox('Предматчевая оценка тотала','ТБ '+line+' '+pct(total.over)+' / ТМ '+line+' '+pct(total.under),
+   total.validated?'Вероятности слишком близки':'Исследовательская оценка'));
+ }
  if(saved.research){
   const {probabilities,evidence,total}=saved.research;
   const grid=el('div','comp-grid');
@@ -398,11 +422,13 @@ function renderDaily(root){
  const controls=el('div','tabs');controls.append(chooser,period,game,reload);root.append(controls);
  const rows=verifiedForecastRows(dailyRows({day:chooser.value,from:reviewPeriod(chooser.value,Number(period.value)),
   fixtures:[],journal,matches,now:Date.now()}),game.value);
- const t=tally(rows), grid=el('div','comp-grid');
+ const picks=rows.filter(({forecast})=>publishedWinnerPick(forecast));
+ const t=tally(picks), grid=el('div','comp-grid');
  grid.append(compBox('Сверенные прогнозы победителя',t.total),compBox('Попадания',t.won),compBox('Промахи',t.lost),
   compBox('Точность',t.total?pct(t.won/t.total):'—'));
+ if(rows.length>picks.length)grid.append(compBox('Без выбора победителя',rows.length-picks.length,'Модельная вероятность ниже 55%'));
  root.append(grid);
- const priced=pricedResults(rows);
+ const priced=pricedResults(picks);
  const returns=el('div','comp-grid');
  returns.append(compBox('С предматчевым коэффициентом',priced.all.priced+' из '+t.total),
   compBox('ROI по всем прогнозам с ценой',pct(priced.all.roi),priced.all.priced?'Расчёт по 1 условной единице на прогноз':'Пока нет сверенных прогнозов с ценой'),
@@ -411,22 +437,24 @@ function renderDaily(root){
  const bands=confidenceBreakdown(rows);
  if(bands.some(band=>band.settled)){
   const details=el('details'),grid=el('div','comp-grid');
-  details.append(el('summary','','Точность по вероятности прогноза'));
+  details.append(el('summary','','Точность модельных оценок по диапазонам'));
   for(const {min,max,settled,won} of bands){
    const label=max===null?'От '+pct(min):pct(min)+' — менее '+pct(max);
-   grid.append(compBox(label,settled?pct(won/settled):'—',won+' из '+settled+' сверенных прогнозов'));
+   grid.append(compBox(label,settled?pct(won/settled):'—',won+' из '+settled+' оценок'+(max===.55?' · без выбора победителя':'')));
   }
   details.append(grid);
   root.append(details);
  }
- const totals=totalTally(rows);
- if(totals.resolved){
+ const recordedTotals=totalTally(rows);
+ const totals=totalTally(rows.filter(({total})=>hasPublishedTotalPick(total)));
+ if(recordedTotals.resolved){
   const grid=el('div','comp-grid');
   grid.append(compBox('Количество карт · сверенные прогнозы',totals.resolved),
-   compBox('Точность',totals.decisive?pct(totals.correct/totals.decisive):'—',totals.correct+' / '+totals.decisive+' прогнозов с выбором'));
+   compBox('Точность',totals.decisive?pct(totals.correct/totals.decisive):'—',totals.correct+' / '+totals.decisive+' прогнозов с выбором'),
+   compBox('Оценки без выбора тотала',recordedTotals.resolved-totals.resolved));
   root.append(grid);
  }
- const review=errorReview(rows);
+ const review=errorReview(picks);
  if(review.misses){
   const details=el('details');details.append(el('summary','','Разбор промахов · '+review.misses),
    paragraph('muted',review.confident+' ошибок при вероятности от 65% · '+review.disagreement+' с расхождением с контрольной моделью'));
@@ -446,11 +474,14 @@ function renderDaily(root){
  historicalResearch(root);
  if(!rows.length)root.append(paragraph('muted','За этот период нет прогнозов с подтверждённым результатом.'));
  for(const {forecast,winner,total,totalSaved,totalActual,actualMaps,source} of rows){
-  const result=(winner===forecast.pick?'Попадание':'Промах')+' · победитель '+winner;
-  const row=compBox(shortTime(forecast.kickoff)+' · '+forecast.a+' — '+forecast.b,forecast.pick+' · '+pct(forecast.probability),result);
+  const pick=publishedWinnerPick(forecast);
+  const label=pick?pick+' · '+pct(forecast.probability):'Без выбора победителя';
+  const result=(pick?(winner===pick?'Попадание':'Промах')+' · ':'')+'Победитель '+winner;
+  const row=compBox(shortTime(forecast.kickoff)+' · '+forecast.a+' — '+forecast.b,label,result);
   if(totalSaved){
    const line=String(total.line).replace('.',',');
-   row.append(paragraph('muted','Предматчевый тотал · ТБ '+line+' '+pct(total.over)+' / ТМ '+line+' '+pct(total.under)));
+   row.append(paragraph('muted',(hasPublishedTotalPick(total)?'Предматчевый тотал':'Оценка без выбора тотала')+
+    ' · ТБ '+line+' '+pct(total.over)+' / ТМ '+line+' '+pct(total.under)));
    if(typeof totalActual==='boolean')row.append(paragraph('muted','Итог · '+actualMaps+' карт · '+(totalActual?'ТБ ':'ТМ ')+line));
    else row.append(paragraph('muted','Итог по картам не подтверждён'));
   }else if(actualMaps!==null)row.append(paragraph('muted','Итог · '+actualMaps+' карт'));
