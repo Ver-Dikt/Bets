@@ -496,5 +496,23 @@ for(const btn of document.querySelectorAll('[data-game]'))btn.onclick=()=>{
  updateFilters();
 };
 load();
-setInterval(()=>{if(document.visibilityState==='visible')load()},120000);
-if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(()=>{}));
+let pwaRegistration;
+function refreshVisible(){
+ if(document.visibilityState!=='visible')return;
+ load();
+ pwaRegistration?.update().catch(()=>{});
+}
+setInterval(refreshVisible,120000);
+if('serviceWorker' in navigator){
+ const workers=navigator.serviceWorker;
+ let hadController=Boolean(workers.controller);
+ workers.addEventListener('controllerchange',()=>{
+  if(hadController)location.reload();
+  hadController=true;
+ });
+ window.addEventListener('load',async()=>{
+  try{pwaRegistration=await workers.register('./sw.js',{scope:'./',updateViaCache:'none'})}catch{}
+ });
+ document.addEventListener('visibilitychange',refreshVisible);
+ window.addEventListener('online',refreshVisible);
+}

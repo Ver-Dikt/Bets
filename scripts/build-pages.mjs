@@ -1,6 +1,7 @@
 // Static GitHub Pages package: only selected public fields are shipped to the website.
 // Note: making the whole source repository Public also exposes its tracked Git files.
 import {execFileSync} from 'node:child_process';
+import {createHash} from 'node:crypto';
 import {readFile,writeFile,copyFile,mkdir} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {verifiedMapCount} from '../src/settlement.mjs';
@@ -18,15 +19,22 @@ const safe=archive.matches.filter(m=>m&&typeof m.id==='string'&&['cs2','dota'].i
 })).sort((a,b)=>Date.parse(a.date)-Date.parse(b.date));
 if(safe.length<1)throw Error('No finished games; refusing empty site publication');
 await mkdir(dist,{recursive:true});
-for(const filename of ['index.html','main.js','brief.mjs','brief.json','manifest.webmanifest','sw.js']){
- await copyFile(resolve(root,'site',filename),resolve(dist,filename));
+const shellHash=createHash('sha256');
+for(const [folder,files] of [
+ ['site',['index.html','main.js','brief.mjs','manifest.webmanifest']],
+ ['src',['analysis.mjs','daily.mjs','settlement.mjs','live.mjs','calibration.mjs','evidence-time.mjs','roster-factor.mjs']],
+ ['public',['engine.mjs','identity.mjs','icon.svg']]
+]){
+ for(const file of files){
+  const asset=await readFile(resolve(root,folder,file));
+  shellHash.update(file+'\0').update(asset);
+  await writeFile(resolve(dist,file),asset);
+ }
 }
-for(const filename of ['analysis.mjs','daily.mjs','settlement.mjs','live.mjs','calibration.mjs','evidence-time.mjs','roster-factor.mjs']){
- await copyFile(resolve(root,'src',filename),resolve(dist,filename));
-}
-for(const filename of ['engine.mjs','identity.mjs','icon.svg']){
- await copyFile(resolve(root,'public',filename),resolve(dist,filename));
-}
+const worker=await readFile(resolve(root,'site/sw.js'),'utf8');
+const version=shellHash.update(worker).digest('hex').slice(0,16);
+await writeFile(resolve(dist,'sw.js'),worker.replace('__SHELL_VERSION__',version));
+await copyFile(resolve(root,'site/brief.json'),resolve(dist,'brief.json'));
 const report=await read('data/private/report.json').catch(()=>null);
 const publishedReport={schemaVersion:1,games:{}};
 for(const game of ['cs2','dota']){
