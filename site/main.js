@@ -1,5 +1,5 @@
 import {dailyRows,tally,reviewPeriod,totalTally,errorReview,compareJournalWinners,
- confidenceBreakdown,cs2ConfidenceBenchmark,qualifiesForCs2Shortlist} from './daily.mjs';
+ confidenceBreakdown,cs2ConfidenceBenchmark,qualifiesForCs2Shortlist,verifiedForecastRows} from './daily.mjs';
 import {analyzeFixture,probabilitySteps} from './analysis.mjs';
 const modelNames={
  dynamicElo:'Dynamic Elo',glicko2:'Glicko-2',trueSkill:'TrueSkill',bradleyTerry:'Bradley–Terry',
@@ -17,7 +17,7 @@ const dateLong=x=>Number.isFinite(Date.parse(x))?new Intl.DateTimeFormat('ru-RU'
 const pct=x=>typeof x==='number'&&Number.isFinite(x)?(x*100).toFixed(1)+'%':'—';
 const closeMatch=probability=>probability<.55;
 const asNum=x=>x==null?'—':Number(x).toFixed(1);
-let matches=[],fixtures=[],journal=[],report=null,research=null,mapInsights=null,filters={game:'all',view:['#brief','#daily'].includes(location.hash)?'daily':'today',period:'today',tournament:'all',confidence:'all'},selected=null,expanded=false,loading=false,fixtureStatus=null;
+let matches=[],fixtures=[],journal=[],report=null,research=null,mapInsights=null,filters={game:'all',view:['#brief','#daily'].includes(location.hash)?'daily':'today',period:'today',tournament:'all',confidence:'recorded'},selected=null,expanded=false,loading=false,fixtureStatus=null;
 const assessments=new Map();
 const published=new Map();
 function forecastFor(fixture){
@@ -51,6 +51,7 @@ function activeFixtures(){
   .filter(f=>f.status==='upcoming'&&Date.parse(f.date)>now)
   .filter(f=>filters.period==='all'||dayFmt.format(new Date(f.date))===(filters.period==='today'?today:tomorrow))
   .filter(f=>filters.tournament==='all'||f.tournament===filters.tournament)
+  .filter(f=>filters.confidence!=='recorded'||forecastFor(f))
   .filter(f=>!shortlist||qualifiesForCs2Shortlist(forecastFor(f),benchmark))
   .sort((a,b)=>Date.parse(a.date)-Date.parse(b.date));
 }
@@ -83,7 +84,11 @@ function renderFixtures(){
    return;
   }
   const broken=(filters.game==='all'?['cs2','dota']:[filters.game]).some(game=>fixtureStatus?.sources?.[game]?.ok===false);
-  root.append(errorBlock('Нет подтверждённых матчей для показа',broken?'Источник расписания сообщил об ошибке. Bets не показывает вымышленные игры.':'На момент снимка подходящих предстоящих встреч не найдено.'));$('show-more').hidden=true;return;
+  const onlyRecorded=filters.confidence==='recorded';
+  root.append(errorBlock(onlyRecorded?'Нет предстоящих матчей с записанным прогнозом':'Нет предстоящих матчей',
+   broken?'Источник расписания сообщил об ошибке.':onlyRecorded?'Для просмотра остальных матчей выбери «Всё расписание».':null));
+  $('show-more').hidden=true;
+  return;
  }
  const shown=expanded?items:items.slice(0,10);
  for(const f of shown){
@@ -347,12 +352,11 @@ function renderDaily(root){
  game.onchange=()=>{filters.reviewGame=game.value;renderWorkspace()};
  const reload=el('button','tab','Обновить');reload.type='button';reload.onclick=load;
  const controls=el('div','tabs');controls.append(chooser,period,game,reload);root.append(controls);
- const rows=dailyRows({day:chooser.value,from:reviewPeriod(chooser.value,Number(period.value)),fixtures:[],journal,matches,now:Date.now()})
-  .filter(row=>row.forecast&&row.forecast.probabilityBasis!=='map'&&(game.value==='all'||row.forecast.game===game.value));
+ const rows=verifiedForecastRows(dailyRows({day:chooser.value,from:reviewPeriod(chooser.value,Number(period.value)),
+  fixtures:[],journal,matches,now:Date.now()}),game.value);
  const t=tally(rows), grid=el('div','comp-grid');
- grid.append(compBox('Прогнозы победителя',t.total),compBox('Попадания',t.won),compBox('Промахи',t.lost),
-  compBox('Технические исходы',t.technical??0),compBox('Ждём подтверждения',t.pending),compBox('Матчи впереди',t.upcoming),
-  compBox('Точность',t.won+t.lost?pct(t.won/(t.won+t.lost)):'—',t.won+t.lost+' сверено'));
+ grid.append(compBox('Сверенные прогнозы победителя',t.total),compBox('Попадания',t.won),compBox('Промахи',t.lost),
+  compBox('Точность',t.total?pct(t.won/t.total):'—'));
  root.append(grid);
  const bands=confidenceBreakdown(rows);
  if(bands.some(band=>band.settled)){
@@ -366,9 +370,9 @@ function renderDaily(root){
   root.append(details);
  }
  const totals=totalTally(rows);
- if(totals.total){
+ if(totals.resolved){
   const grid=el('div','comp-grid');
-  grid.append(compBox('Количество карт · прогнозы',totals.total),compBox('Сверено',totals.resolved),compBox('Технические исходы',totals.technical),compBox('Ждём подтверждения',totals.pending),
+  grid.append(compBox('Количество карт · сверенные прогнозы',totals.resolved),
    compBox('Точность',totals.decisive?pct(totals.correct/totals.decisive):'—',totals.correct+' / '+totals.decisive+' прогнозов с выбором'));
   root.append(grid);
  }
@@ -390,15 +394,15 @@ function renderDaily(root){
   root.append(details);
  }
  historicalResearch(root);
- if(!rows.length)root.append(paragraph('muted','За этот период нет записанных прогнозов.'));
- for(const {forecast,winner,upcoming,total,totalSaved,totalActual,actualMaps,source,technical} of rows){
-  const result=technical?'Технический исход':winner?(winner===forecast.pick?'Попадание':'Промах')+' · победитель '+winner:upcoming?'Предстоит':'Ждём подтверждения';
+ if(!rows.length)root.append(paragraph('muted','За этот период нет прогнозов с подтверждённым результатом.'));
+ for(const {forecast,winner,total,totalSaved,totalActual,actualMaps,source} of rows){
+  const result=(winner===forecast.pick?'Попадание':'Промах')+' · победитель '+winner;
   const row=compBox(shortTime(forecast.kickoff)+' · '+forecast.a+' — '+forecast.b,forecast.pick+' · '+pct(forecast.probability),result);
   if(totalSaved){
    const line=String(total.line).replace('.',',');
    row.append(paragraph('muted','Предматчевый тотал · ТБ '+line+' '+pct(total.over)+' / ТМ '+line+' '+pct(total.under)));
    if(typeof totalActual==='boolean')row.append(paragraph('muted','Итог · '+actualMaps+' карт · '+(totalActual?'ТБ ':'ТМ ')+line));
-   else if(!technical)row.append(paragraph('muted','Количество карт ждёт подтверждения'));
+   else row.append(paragraph('muted','Итог по картам не подтверждён'));
   }else if(actualMaps!==null)row.append(paragraph('muted','Итог · '+actualMaps+' карт'));
   if(source)row.append(paragraph('muted','Источник итога · '+source));
   root.append(row);
@@ -434,9 +438,9 @@ $('prematch-confidence').onchange=()=>{
  updateFilters();
 };
 for(const btn of document.querySelectorAll('[data-game]'))btn.onclick=()=>{
- if(btn.dataset.game!=='cs2'){
-  filters.confidence='all';
-  $('prematch-confidence').value='all';
+ if(btn.dataset.game!=='cs2'&&filters.confidence==='cs2-shortlist'){
+  filters.confidence='recorded';
+  $('prematch-confidence').value='recorded';
  }
  setDiscipline(btn.dataset.game);
  updateFilters();

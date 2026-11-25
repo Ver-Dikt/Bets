@@ -69,6 +69,11 @@ export function tally(rows, pick=row=>row.forecast?.pick){
  return {total:forecasts.length,won,lost,upcoming,pending:forecasts.length-won-lost-upcoming-technical,...(technical?{technical}:{})};
 }
 
+export function verifiedForecastRows(rows, game='all'){
+ return rows.filter(({forecast,winner,actual,technical})=>forecast?.pick&&forecast.probabilityBasis!=='map'&&
+  (game==='all'||forecast.game===game)&&!technical&&Boolean(winner)&&(actual===0||actual===1));
+}
+
 export const cs2ConfidenceThreshold=.70;
 
 export function cs2ConfidenceBenchmark(research){

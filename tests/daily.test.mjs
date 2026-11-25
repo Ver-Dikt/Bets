@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {dailyRows,tally,totalTally,confidenceBreakdown,cs2ConfidenceBenchmark,qualifiesForCs2Shortlist} from '../src/daily.mjs';
+import {dailyRows,tally,totalTally,confidenceBreakdown,cs2ConfidenceBenchmark,qualifiesForCs2Shortlist,verifiedForecastRows} from '../src/daily.mjs';
 
 test('daily totals use one pre-match prediction per fixture and preserve the PARI subset',()=>{
  const now=Date.parse('2026-11-24T07:05:00Z'), date='2026-11-24T06:00:00Z';
@@ -65,4 +65,28 @@ test('confidence bands cover exact thresholds and count only decided played fore
  ].map(([probability,actual,technical])=>({forecast:{probability},actual,technical}));
  assert.deepEqual(confidenceBreakdown(rows).map(({settled,won})=>[settled,won]),
   [[2,1],[2,2],[2,1],[2,1]]);
+});
+
+test('the main report only includes played series forecasts as their results become confirmed',()=>{
+ const kickoff='2026-11-24T06:00:00Z';
+ const base={game:'cs2',a:'A',b:'B',pick:'A',kickoff,createdAt:'2026-11-24T05:00:00Z',format:'Bo3',
+  total:{line:2.5,over:.4,under:.6}};
+ const journal=[
+  {type:'forecast',record:{...base,id:'played',fixtureId:'bo3-10'}},
+  {type:'forecast',record:{...base,id:'pending',fixtureId:'bo3-11'}},
+  {type:'forecast',record:{...base,id:'technical',fixtureId:'bo3-12'}},
+  {type:'forecast',record:{...base,id:'upcoming',fixtureId:'bo3-13',kickoff:'2026-11-24T12:00:00Z'}},
+  {type:'forecast',record:{...base,id:'map',fixtureId:'bo3-14',probabilityBasis:'map'}},
+  {type:'settlement',forecastId:'map',result:1},
+  {type:'skip',fixtureId:'bo3-15',game:'cs2',kickoff}
+ ];
+ const result={a:'A',b:'B',winner:'B',discipline:'cs2',date:kickoff,format:'Bo3',finishedAt:'2026-11-24T08:00:00Z'};
+ const matches=[{...result,id:'cs-10'}, {...result,id:'cs-12',resultKind:'technical'}];
+ const report=()=>verifiedForecastRows(dailyRows({day:'2026-11-24',fixtures:[],journal,matches,
+  now:Date.parse('2026-11-24T09:00:00Z')}),'cs2');
+ assert.deepEqual(report().map(row=>row.forecast.id),['played']);
+ assert.equal(totalTally(report()).resolved,0);
+ matches.push({...result,id:'cs-11',winner:'A',mapCount:2});
+ assert.deepEqual(tally(report()),{total:2,won:1,lost:1,upcoming:0,pending:0});
+ assert.equal(totalTally(report()).resolved,1);
 });
