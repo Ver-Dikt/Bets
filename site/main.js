@@ -418,10 +418,15 @@ function renderDaily(root){
  game.replaceChildren(new Option('Все игры','all'),new Option('CS2','cs2'),new Option('Dota 2','dota'));
  game.value=filters.reviewGame??'all';
  game.onchange=()=>{filters.reviewGame=game.value;renderWorkspace()};
+ const format=el('select');format.setAttribute('aria-label','Формат серии');
+ format.replaceChildren(new Option('Все форматы','all'),...['Bo1','Bo3','Bo5','Bo7'].map(name=>new Option(name,name)));
+ format.value=filters.reviewFormat??'all';
+ format.onchange=()=>{filters.reviewFormat=format.value;renderWorkspace()};
  const reload=el('button','tab','Обновить');reload.type='button';reload.onclick=load;
- const controls=el('div','tabs');controls.append(chooser,period,game,reload);root.append(controls);
+ const controls=el('div','tabs');controls.append(chooser,period,game,format,reload);root.append(controls);
  const rows=verifiedForecastRows(dailyRows({day:chooser.value,from:reviewPeriod(chooser.value,Number(period.value)),
-  fixtures:[],journal,matches,now:Date.now()}),game.value);
+  fixtures:[],journal,matches,now:Date.now()}),game.value)
+  .filter(({forecast})=>format.value==='all'||forecast.format===format.value);
  const picks=rows.filter(({forecast})=>publishedWinnerPick(forecast));
  const t=tally(picks), grid=el('div','comp-grid');
  grid.append(compBox('Сверенные прогнозы победителя',t.total),compBox('Попадания',t.won),compBox('Промахи',t.lost),
@@ -471,7 +476,7 @@ function renderDaily(root){
   details.append(grid);
   root.append(details);
  }
- historicalResearch(root);
+ if(format.value==='all')historicalResearch(root);
  if(!rows.length)root.append(paragraph('muted','За этот период нет прогнозов с подтверждённым результатом.'));
  for(const {forecast,winner,total,totalSaved,totalActual,actualMaps,source} of rows){
   const pick=publishedWinnerPick(forecast);

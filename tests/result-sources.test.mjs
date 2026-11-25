@@ -1,12 +1,23 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {auditResult,csResultsById,parseFaceitResults,recentDotaResults} from '../src/result-sources.mjs';
+import {auditResult,csResultsById,latestUnresolved,parseFaceitResults,recentDotaResults} from '../src/result-sources.mjs';
 import {reconcilePaper} from '../src/settlement.mjs';
 import {matchDotaResults} from '../src/dota-series.mjs';
 
 const at=Date.parse('2026-11-24T21:00:00Z');
 const kickoff='2026-11-24T17:00:00Z',createdAt='2026-11-24T15:00:00Z';
 const record={fixtureId:'bo3-22',game:'cs2',a:'Alpha',b:'Beta',pick:'Alpha',kickoff,createdAt,format:'Bo3',actual:null,tournament:'ESEA Advanced'};
+
+test('direct result checks resolve older pending forecasts before revisiting settled CS2 series',()=>{
+ const events=[
+  {type:'forecast',record},
+  {type:'settlement',fixtureId:record.fixtureId,result:1},
+  {type:'forecast',record:{...record,fixtureId:'bo3-23'}},
+  {type:'forecast',record:{...record,fixtureId:'bo3-24',kickoff:'2026-11-24T16:00:00Z'}},
+  {type:'forecast',record:{...record,fixtureId:'bo3-25',kickoff:'2026-11-24T22:00:00Z'}}
+ ];
+ assert.deepEqual(latestUnresolved(events,at).map(row=>row.fixtureId),['bo3-24','bo3-23','bo3-22']);
+});
 
 test('bo3 ID backfill ignores unrelated and live rows but retains verified forfeits',async()=>{
  const response={id:22,discipline_id:1,status:'defwin',team1:{name:'Alpha'},team2:{name:'Beta'},team1_id:1,team2_id:2,winner_team_id:2,start_date:kickoff,bo_type:3};

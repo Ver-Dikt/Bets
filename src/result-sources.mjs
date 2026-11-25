@@ -10,7 +10,8 @@ export function latestUnresolved(events,at){
   const age=at-Date.parse(row.kickoff);
   // Recheck settled CS2 rows too: later feed snapshots can identify a forfeit.
   return age>0&&age<=72*3600000&&(row.game==='cs2'||!settled.has(row.fixtureId));
- });
+ }).sort((a,b)=>Number(settled.has(a.fixtureId))-Number(settled.has(b.fixtureId))||
+  Date.parse(a.kickoff)-Date.parse(b.kickoff));
 }
 
 export async function csResultsById(records,request=fetchJson){
