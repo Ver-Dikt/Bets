@@ -109,6 +109,14 @@ export function qualifiesForCs2Shortlist(forecast,benchmark){
   Number.isFinite(forecast.probability)&&forecast.probability>=cs2ConfidenceThreshold&&forecast.probability<=1);
 }
 
+export function qualifiesForPricedCs2Shortlist(forecast,benchmark,now){
+ if(!qualifiesForCs2Shortlist(forecast,benchmark)||Date.parse(forecast.kickoff)<=now)return false;
+ const price=forecastPrice(forecast);
+ if(!price)return false;
+ const age=now-Date.parse(price.observedAt);
+ return age>=0&&age<45*60000&&price.expectedReturn>0;
+}
+
 export function confidenceBreakdown(rows){
  const bands=[
   {min:.5,max:.55,settled:0,won:0},

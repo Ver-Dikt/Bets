@@ -1,5 +1,6 @@
 import {dailyRows,tally,reviewPeriod,totalTally,errorReview,compareJournalWinners,
- confidenceBreakdown,cs2ConfidenceBenchmark,qualifiesForCs2Shortlist,verifiedForecastRows,forecastPrice,pricedResults} from './daily.mjs';
+ confidenceBreakdown,cs2ConfidenceBenchmark,qualifiesForCs2Shortlist,verifiedForecastRows,forecastPrice,pricedResults,
+ qualifiesForPricedCs2Shortlist} from './daily.mjs';
 import {analyzeFixture,probabilitySteps} from './analysis.mjs';
 const modelNames={
  dynamicElo:'Dynamic Elo',glicko2:'Glicko-2',trueSkill:'TrueSkill',bradleyTerry:'Bradley–Terry',
@@ -20,6 +21,7 @@ const asNum=x=>x==null?'—':Number(x).toFixed(1);
 let matches=[],fixtures=[],journal=[],report=null,research=null,mapInsights=null,filters={game:'all',view:['#brief','#daily'].includes(location.hash)?'daily':'today',period:'today',tournament:'all',confidence:'recorded'},selected=null,expanded=false,loading=false,fixtureStatus=null;
 const assessments=new Map();
 const published=new Map();
+const cs2ShortlistMode=()=>['cs2-shortlist','cs2-priced'].includes(filters.confidence);
 function forecastFor(fixture){
  const forecast=published.get(fixture.id);
  if(forecast?.kickoff===fixture.date&&forecast.a===fixture.a&&forecast.b===fixture.b&&forecast.format===fixture.format&&
@@ -45,14 +47,16 @@ function sourceText(kind){
 }
 function activeFixtures(){
  const now=Date.now(), today=dayFmt.format(now), tomorrow=dayFmt.format(now+86400000);
- const shortlist=filters.confidence==='cs2-shortlist';
+ const shortlist=cs2ShortlistMode();
+ const priced=filters.confidence==='cs2-priced';
  const benchmark=shortlist?cs2ConfidenceBenchmark(research):null;
  return fixtures.filter(f=>filters.game==='all'||f.game===filters.game)
   .filter(f=>f.status==='upcoming'&&Date.parse(f.date)>now)
   .filter(f=>filters.period==='all'||dayFmt.format(new Date(f.date))===(filters.period==='today'?today:tomorrow))
   .filter(f=>filters.tournament==='all'||f.tournament===filters.tournament)
   .filter(f=>filters.confidence!=='recorded'||forecastFor(f))
-  .filter(f=>!shortlist||qualifiesForCs2Shortlist(forecastFor(f),benchmark))
+  .filter(f=>!shortlist||(priced?qualifiesForPricedCs2Shortlist(forecastFor(f),benchmark,now):
+   qualifiesForCs2Shortlist(forecastFor(f),benchmark)))
   .sort((a,b)=>Date.parse(a.date)-Date.parse(b.date));
 }
 function badge(text,cls=''){return el('span','tag'+(cls?' '+cls:''),text)}
@@ -71,15 +75,16 @@ function renderSources(){
 function renderFixtures(){
  document.querySelectorAll('[data-game]').forEach(b=>{const active=b.dataset.game===filters.game;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active))});
  const items=activeFixtures(),root=$('fixture-list');root.replaceChildren();
- const shortlist=filters.confidence==='cs2-shortlist',note=$('confidence-note');
+ const shortlist=cs2ShortlistMode(),priced=filters.confidence==='cs2-priced',note=$('confidence-note');
  const benchmark=shortlist?cs2ConfidenceBenchmark(research):null;
  note.hidden=!shortlist;
- note.textContent=benchmark
+ note.textContent=priced?'Победитель CS2 от 70% с коэффициентом PARI выше порога безубыточности. Снимок цены должен быть свежее 45 минут.':benchmark
   ?'На историческом тесте '+benchmark.correct+' из '+benchmark.count+' попаданий · охват '+pct(benchmark.coverage)+' всех проверенных серий CS2'
   :'Историческая проверка активной модели CS2 недоступна.';
  if(!items.length){
   if(shortlist){
-   root.append(errorBlock('Нет прогнозов CS2 от 70% для выбранного периода и турнира'));
+   root.append(errorBlock(priced?'Нет прогнозов CS2 с подходящей ценой':'Нет прогнозов CS2 от 70% для выбранного периода и турнира',
+    priced&&fixtureStatus?.sources?.pari?.ok===false?'Автоматическая линия PARI недоступна.':null));
    $('show-more').hidden=true;
    return;
   }
@@ -448,11 +453,11 @@ function setDiscipline(game){
 }
 $('prematch-confidence').onchange=()=>{
  filters.confidence=$('prematch-confidence').value;
- if(filters.confidence==='cs2-shortlist')setDiscipline('cs2');
+ if(cs2ShortlistMode())setDiscipline('cs2');
  updateFilters();
 };
 for(const btn of document.querySelectorAll('[data-game]'))btn.onclick=()=>{
- if(btn.dataset.game!=='cs2'&&filters.confidence==='cs2-shortlist'){
+ if(btn.dataset.game!=='cs2'&&cs2ShortlistMode()){
   filters.confidence='recorded';
   $('prematch-confidence').value='recorded';
  }

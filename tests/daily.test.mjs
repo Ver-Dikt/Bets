@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {dailyRows,tally,totalTally,confidenceBreakdown,cs2ConfidenceBenchmark,qualifiesForCs2Shortlist,verifiedForecastRows,
- forecastPrice,pricedResults} from '../src/daily.mjs';
+ forecastPrice,pricedResults,qualifiesForPricedCs2Shortlist} from '../src/daily.mjs';
 
 test('daily totals use one pre-match prediction per fixture and preserve the PARI subset',()=>{
  const now=Date.parse('2026-11-24T07:05:00Z'), date='2026-11-24T06:00:00Z';
@@ -109,4 +109,15 @@ test('paper ROI uses the selected side and excludes untimestamped or post-foreca
  assert.equal(positive.priced,1);
  assert.equal(positive.roi,1);
  assert.equal(pricedResults(rows.slice(2)).all.roi,null);
+});
+
+test('price shortlist requires a fresh favorable quote for the approved pre-match pick',()=>{
+ const now=Date.parse('2026-11-24T05:30:00Z'),benchmark={model:'lightGBM@current'};
+ const forecast={game:'cs2',model:benchmark.model,a:'A',b:'B',pick:'B',probability:.7,odds:[2.6,1.5],oddsSource:'PARI',
+  oddsObservedAt:'2026-11-24T05:00:00Z',createdAt:'2026-11-24T05:10:00Z',kickoff:'2026-11-24T06:00:00Z'};
+ assert.equal(qualifiesForPricedCs2Shortlist(forecast,benchmark,now),true);
+ for(const change of [{odds:[2.6,1.1]},{odds:undefined},{probability:.699},{oddsObservedAt:'2026-11-24T04:45:00Z'},
+  {kickoff:'2026-11-24T05:30:00Z'},{createdAt:'2026-11-24T04:59:00Z'}]){
+  assert.equal(qualifiesForPricedCs2Shortlist({...forecast,...change},benchmark,now),false);
+ }
 });
