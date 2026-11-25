@@ -24,6 +24,10 @@ test('pre-match quotes are linked uniquely, aligned to the match orientation and
  assert.equal(forecastPrice({...fixture,pick:'FaZe',probability:.7,odds:linked.bookPrice.odds,oddsSource:'Pinnacle',
   oddsProvider:'OddsLink',oddsObservedAt:observedAt,createdAt:checkedAt,kickoff}).odds,1.6);
  assert.equal(attachExternalPrices([fixture],[...oddsLink,...apiSport],[],now)[0].bookPrice.bookmaker,'PARI');
+ const noFormat=apiSportLines({matches:[{...sportMatch,esports:null,tournament:null}]},now);
+ assert.equal(noFormat[0].format,null);
+ assert.equal(attachExternalPrices([fixture],noFormat,[],now)[0].bookPrice.bookmaker,'PARI');
+ assert.ok(attachExternalPrices([fixture,{...fixture,id:'dota-copy',game:'dota'}],noFormat,[],now).every(row=>!row.bookPrice));
  assert.ok(attachExternalPrices([fixture,{...fixture,id:'ambiguous'}],oddsLink,[],now).every(row=>!row.bookPrice));
  assert.equal(attachExternalPrices([fixture],[],[linked],now)[0].bookPrice.bookmaker,'Pinnacle');
  assert.equal(attachExternalPrices([fixture],[],[linked],now+31*60000)[0].bookPrice,undefined);
@@ -55,8 +59,9 @@ test('provider requests use separate auth headers, expose statuses and skip poll
  assert.equal(result.lines.length,2);
  assert.equal(result.sources.oddslink.partial,true);
  assert.equal(result.sources.apiSport.quotes,1);
- assert.deepEqual(called.map(row=>row.header),['X-API-Key','X-API-Key','Authorization']);
+ assert.deepEqual(called.map(row=>row.header),['X-API-Key','X-API-Key','Authorization','Authorization']);
+ assert.equal(result.sources.apiSport.research.events,1);
  assert.ok(called.every(row=>!row.url.includes(row.key)));
  await externalBoards(checkedAt,{...opts,poll:false,previous:result.sources});
- assert.equal(called.length,3);
+ assert.equal(called.length,4);
 });

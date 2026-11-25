@@ -9,6 +9,14 @@ const books=key=>Object.hasOwn(names,key)?names[key]:null;
 const teams=(a,b)=>typeof a==='string'&&Boolean(a.trim())&&typeof b==='string'&&Boolean(b.trim());
 const recent=(time,at)=>Number.isFinite(time)&&time<=at&&at-time<maxAge;
 const validOdds=odds=>odds.length===2&&odds.every(price=>Number.isFinite(price)&&price>1);
+const sportCategory=event=>[event.tournament?.category?.name,event.category?.name,event.tournament?.category?.translations?.en]
+ .filter(Boolean).join(' ');
+const apiSportGame=event=>{
+ const category=sportCategory(event);
+ if(/counter[ -]?strike|\bcs2\b/i.test(category))return 'cs2';
+ if(/\bdota\b/i.test(category))return 'dota';
+ return /league of legends|valorant|rainbow six|starcraft|rocket league|overwatch/i.test(category)?'other':null;
+};
 
 export function oddsLinkLines(payload,game,at){
  if(!Array.isArray(payload))throw Error('Неизвестный формат ответа OddsLink');
@@ -44,12 +52,11 @@ export function apiSportLines(payload,at,coverage={}){
   const a=homeTeam?.name,b=awayTeam?.name,bestOf=esports?.bestOf;
   if(status!=='notstarted'||!Number.isSafeInteger(start)||start<=at||!teams(a,b)||!Number.isSafeInteger(event.id))return [];
   coverage.upcoming++;
-  if(![1,3,5,7].includes(bestOf))return [];
-  coverage.formats++;
-  const category=[event.tournament?.category?.name,event.category?.name,event.tournament?.category?.translations?.en].filter(Boolean).join(' ');
-  const game=/counter[ -]?strike|\bcs2\b/i.test(category)?'cs2':/\bdota\b/i.test(category)?'dota':null;
-  if(!game||teamKey(game,a)===teamKey(game,b))return [];
-  coverage.disciplines++;
+  if(bestOf!=null&&![1,3,5,7].includes(bestOf))return [];
+  if(bestOf!=null)coverage.formats++;
+  const game=apiSportGame(event);
+  if(game==='other'||game&&teamKey(game,a)===teamKey(game,b))return [];
+  if(game)coverage.disciplines++;
   const keys=market?.stakeKeys;
   if(!board?.isBettingActive||market?.status!=='open'||market.hasArgument!==false||
    (market.stage!=null&&market.stage!=='prematch')||!Array.isArray(keys)||keys.length!==2||!keys.includes('w1')||!keys.includes('w2'))return [];
@@ -58,7 +65,7 @@ export function apiSportLines(payload,at,coverage={}){
   coverage.openTwoWay++;
   if(!recent(board.updatedAt,at))return [];
   coverage.freshPrices++;
-  return [{id:String(event.id),game,a,b,date:new Date(start).toISOString(),format:'Bo'+bestOf,
+  return [{id:String(event.id),game,a,b,date:new Date(start).toISOString(),format:bestOf?'Bo'+bestOf:null,
    bookmaker:'PARI',provider:'API-SPORT',odds,observedAt:new Date(board.updatedAt).toISOString(),priority:0}];
  });
 }
@@ -66,6 +73,23 @@ export function apiSportLines(payload,at,coverage={}){
 async function requestBoard(url,header,key){
  return fetchJson(url,{retries:0,request:(address,options)=>fetch(address,{...options,redirect:'error',
   headers:{...options.headers,[header]:key}})});
+}
+
+export function apiSportResearchCoverage(payload){
+ if(!Array.isArray(payload?.matches))throw Error('Неизвестный формат ответа API-SPORT');
+ const coverage={events:payload.matches.length,seriesWithMaps:0,finishedMaps:0,withMapNames:0,withLineups:0,withDraft:0};
+ for(const event of payload.matches){
+  if(event.status!=='finished'||!Array.isArray(event.esports?.games))continue;
+  const maps=event.esports.games.filter(map=>map?.status==='finished'&&[1,2].includes(map.winnerCode));
+  if(maps.length)coverage.seriesWithMaps++;
+  for(const map of maps){
+   coverage.finishedMaps++;
+   if(map.map)coverage.withMapNames++;
+   if(map.homeTeamPlayers?.length===5&&map.awayTeamPlayers?.length===5)coverage.withLineups++;
+   if(map.bans?.home?.length||map.bans?.away?.length)coverage.withDraft++;
+  }
+ }
+ return coverage;
 }
 
 export async function externalBoards(fetchedAt,{oddsLinkKey,apiSportKey,poll=true,previous={},request=requestBoard,now=Date.now}){
@@ -83,15 +107,27 @@ export async function externalBoards(fetchedAt,{oddsLinkKey,apiSportKey,poll=tru
    url.search=new URLSearchParams({date:fetchedAt.slice(0,10),status:'notstarted',with_bk_odds:'true',bookmaker_ids:'pari'});
    const payload=await request(url.toString(),'Authorization',apiSportKey);
    const coverage={};
-   return {lines:apiSportLines(payload,now(),coverage),coverage};
+   const lines=apiSportLines(payload,now(),coverage);
+   const day=new Date(Date.parse(fetchedAt)-86400000).toISOString().slice(0,10);
+   let research=previous.apiSport?.research;
+   if(research?.day!==day){
+    url.search=new URLSearchParams({date:day,status:'finished'});
+    try{
+     research={day,...apiSportResearchCoverage(await request(url.toString(),'Authorization',apiSportKey))};
+    }catch{
+     research={day,error:'Исторические данные не получены'};
+    }
+   }
+   return {lines,coverage:{...coverage},research};
   }]
  ];
  const responses=await Promise.all(queries.map(async ([id,source,key,load])=>{
   if(!key)return [id,[],{ok:false,source,error:'Ключ не настроен'}];
   if(!poll)return [id,[],previous[id]??{ok:false,source,error:'Ожидается обновление'}];
   try{
-   const {lines,partial,coverage}=await load();
-   return [id,lines,{ok:true,source,checkedAt:fetchedAt,quotes:lines.length,...(partial?{partial:true}:{}),...(coverage?{coverage}:{})}];
+   const {lines,partial,coverage,research}=await load();
+   return [id,lines,{ok:true,source,checkedAt:fetchedAt,quotes:lines.length,...(partial?{partial:true}:{}),
+    ...(coverage?{coverage}:{}),...(research?{research}:{})}];
   }catch(error){
    const code=/HTTP (\d{3})/.exec(error.message)?.[1];
    return [id,[],{ok:false,source,checkedAt:fetchedAt,error:code?'HTTP '+code:'Источник недоступен или вернул неожиданный формат'}];
@@ -103,13 +139,14 @@ export async function externalBoards(fetchedAt,{oddsLinkKey,apiSportKey,poll=tru
 export function attachExternalPrices(fixtures,lines,previous,at){
  const byFixture=new Map();
  for(const line of lines){
+  const orientation=f=>sameTeams(f,line.game==null?{...line,game:f.game}:line);
   const candidates=fixtures.filter(f=>f.status==='upcoming'&&Date.parse(f.date)>at&&Date.parse(line.date)>at&&recent(Date.parse(line.observedAt),at)&&
-   (line.format===f.format||!line.format&&['Bo1','Bo3','Bo5'].includes(f.format))&&
-   Math.abs(Date.parse(f.date)-Date.parse(line.date))<=maxKickoffOffset&&sameTeams(f,line));
+   (line.format===f.format||!line.format&&['Bo1','Bo3','Bo5','Bo7'].includes(f.format))&&
+   Math.abs(Date.parse(f.date)-Date.parse(line.date))<=(line.game&&line.format?maxKickoffOffset:10*60000)&&orientation(f));
   if(candidates.length!==1)continue;
   const [match]=candidates;
   const records=byFixture.get(match.id)??[];
-  records.push(line);
+  records.push({...line,orientation:orientation(match)});
   byFixture.set(match.id,records);
  }
  const oldById=new Map(previous.map(f=>[f.id,f]));
@@ -120,7 +157,7 @@ export function attachExternalPrices(fixtures,lines,previous,at){
   const best=choices.filter(line=>choices.filter(row=>row.provider===line.provider&&row.bookmaker===line.bookmaker).length===1)
    .sort((a,b)=>a.priority-b.priority)[0];
   if(best){
-   const odds=sameTeams(fixture,best)===1?best.odds:[...best.odds].reverse();
+   const odds=best.orientation===1?best.odds:[...best.odds].reverse();
    return {...fixture,bookPrice:{odds,bookmaker:best.bookmaker,provider:best.provider,date:best.date,
     observedAt:best.observedAt,freshUntil:new Date(Date.parse(best.observedAt)+maxAge).toISOString(),mode:'feed'}};
   }
