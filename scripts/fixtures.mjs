@@ -113,6 +113,14 @@ async function atomicWrite(file,data){
  await rename(temporary,file);
 }
 const fixtures=await enrichRosters(mergeFixtures(pricedFixtures).slice(0,300),archive.matches,previous?.fixtures??[],fetchedAt);
+for(const id of ['apiSport','oddslink']){
+ const source=status[id];
+ const published=fixtures.filter(f=>f.bookPrice?.provider===source.source);
+ source.matched={cs2:published.filter(f=>f.game==='cs2').length,dota:published.filter(f=>f.game==='dota').length};
+ if(pollBookmakers)console.log(source.source+': '+(source.ok
+  ?source.quotes+' котировок, выбрано для '+source.matched.cs2+' матчей CS2 и '+source.matched.dota+' матчей Dota 2'
+  :source.error));
+}
 const recordedAt=new Date().toISOString();
 const snapshot={schemaVersion:1,generatedAt:recordedAt,fixtures:fixtures.map(({score,...row})=>row),sources:status,pariCoverage:joined.coverage,
   label:'Source-labeled fixture and bookmaker snapshots.'};
