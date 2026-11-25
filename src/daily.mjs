@@ -77,12 +77,14 @@ export function verifiedForecastRows(rows, game='all'){
 
 export function forecastPrice(forecast){
  const observed=Date.parse(forecast.oddsObservedAt), created=Date.parse(forecast.createdAt);
- if(forecast.oddsSource!=='PARI'||!(observed<=created&&created<Date.parse(forecast.kickoff)))return null;
+ if((forecast.oddsSource!=='PARI'&&forecast.oddsProvider!=='OddsLink')||!forecast.oddsSource||
+  !(observed<=created&&created<Date.parse(forecast.kickoff)))return null;
  const {pick,a,b,probability}=forecast;
  const index=pick===a?0:pick===b?1:-1;
  const odds=forecast.odds?.[index];
  if(!Number.isFinite(odds)||odds<=1||!Number.isFinite(probability)||probability<=0||probability>1)return null;
- return {odds,probability,breakEven:1/odds,expectedReturn:probability*odds-1,observedAt:forecast.oddsObservedAt};
+ return {odds,probability,breakEven:1/odds,expectedReturn:probability*odds-1,observedAt:forecast.oddsObservedAt,
+  bookmaker:forecast.oddsSource,provider:forecast.oddsProvider};
 }
 
 export function pricedResults(rows){

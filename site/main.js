@@ -55,8 +55,15 @@ function activeFixtures(){
   .filter(f=>filters.period==='all'||dayFmt.format(new Date(f.date))===(filters.period==='today'?today:tomorrow))
   .filter(f=>filters.tournament==='all'||f.tournament===filters.tournament)
   .filter(f=>filters.confidence!=='recorded'||forecastFor(f))
-  .filter(f=>!shortlist||(priced?qualifiesForPricedCs2Shortlist(forecastFor(f),benchmark,now):
-   qualifiesForCs2Shortlist(forecastFor(f),benchmark)))
+  .filter(f=>{
+   if(!shortlist)return true;
+   const forecast=forecastFor(f);
+   if(!priced)return qualifiesForCs2Shortlist(forecast,benchmark);
+   const board=forecast?.oddsProvider?f.bookPrice:f.pari;
+   return Boolean(board&&Date.parse(board.date)>now&&Date.parse(board.freshUntil)>now&&
+    forecast?.oddsSource===(board.bookmaker??'PARI')&&forecast?.odds?.every((odd,i)=>odd===board.odds?.[i])&&
+    qualifiesForPricedCs2Shortlist(forecast,benchmark,now));
+  })
   .sort((a,b)=>Date.parse(a.date)-Date.parse(b.date));
 }
 function badge(text,cls=''){return el('span','tag'+(cls?' '+cls:''),text)}
@@ -78,13 +85,13 @@ function renderFixtures(){
  const shortlist=cs2ShortlistMode(),priced=filters.confidence==='cs2-priced',note=$('confidence-note');
  const benchmark=shortlist?cs2ConfidenceBenchmark(research):null;
  note.hidden=!shortlist;
- note.textContent=priced?'Победитель CS2 от 70% с коэффициентом PARI выше порога безубыточности. Снимок цены должен быть свежее 45 минут.':benchmark
+ note.textContent=priced?'Победитель CS2 от 70% с коэффициентом выше порога безубыточности. Снимок цены должен быть свежее 45 минут.':benchmark
   ?'На историческом тесте '+benchmark.correct+' из '+benchmark.count+' попаданий · охват '+pct(benchmark.coverage)+' всех проверенных серий CS2'
   :'Историческая проверка активной модели CS2 недоступна.';
  if(!items.length){
   if(shortlist){
    root.append(errorBlock(priced?'Нет прогнозов CS2 с подходящей ценой':'Нет прогнозов CS2 от 70% для выбранного периода и турнира',
-    priced&&fixtureStatus?.sources?.pari?.ok===false?'Автоматическая линия PARI недоступна.':null));
+    priced?'Здесь появляются только матчи со свежим коэффициентом.':null));
    $('show-more').hidden=true;
    return;
   }
@@ -234,9 +241,10 @@ function renderAnalysis(){
  const prices=el('div','comp-grid');
  prices.append(compBox('Коэффициент безубыточности', (1/favoriteProbability).toFixed(2),saved.pick+' · по оценке BETS'));
  if(price){
-  prices.append(compBox('PARI · '+shortTime(price.observedAt),price.odds.toFixed(2),'Для безубыточности нужно '+pct(price.breakEven)),
+  prices.append(compBox(price.bookmaker+' · '+shortTime(price.observedAt),price.odds.toFixed(2),
+   (price.provider?price.provider+' · ':'')+'Для безубыточности нужно '+pct(price.breakEven)),
    compBox('Ожидаемая доходность по модели',pct(price.expectedReturn)));
- }else prices.append(compBox('Коэффициент PARI','—','Снимок линии до матча отсутствует'));
+ }else prices.append(compBox('Коэффициент букмекера','—','Снимок линии до матча отсутствует'));
  root.append(prices);
  const total=saved.total;
  if(total){
@@ -373,7 +381,7 @@ function renderDaily(root){
  root.append(grid);
  const priced=pricedResults(rows);
  const returns=el('div','comp-grid');
- returns.append(compBox('С предматчевым коэффициентом PARI',priced.all.priced+' из '+t.total),
+ returns.append(compBox('С предматчевым коэффициентом',priced.all.priced+' из '+t.total),
   compBox('ROI по всем прогнозам с ценой',pct(priced.all.roi),priced.all.priced?'Расчёт по 1 условной единице на прогноз':'Пока нет сверенных прогнозов с ценой'),
   compBox('ROI при положительной оценке доходности',pct(priced.positive.roi),priced.positive.priced+' сверенных прогнозов'));
  root.append(returns);

@@ -2,13 +2,16 @@ name: Bets Fixtures — CS2 & Dota 2
 on:
   workflow_dispatch:
   schedule:
-    - cron: "7,37 * * * *"
+    - cron: "7 0-23/2 * * *"
+    - cron: "7 1-23/2 * * *"
+    - cron: "37 * * * *"
   push:
     branches: [main]
     paths:
       - "src/fixtures.mjs"
       - "src/pandascore.mjs"
       - "src/pari.mjs"
+      - "src/bookmaker-feeds.mjs"
       - "scripts/journal.mjs"
       - "scripts/journal-integrity.mjs"
       - "src/research*.mjs"
@@ -48,6 +51,9 @@ jobs:
       - name: Fetch CS2 and Dota 2 verified upcoming snapshots
         env:
           BETS_PARI_FEED_URL: ${{ secrets.BETS_PARI_FEED_URL }}
+          BETS_ODDSLINK_API_KEY: ${{ secrets.BETS_ODDSLINK_API_KEY }}
+          BETS_API_SPORT_API_KEY: ${{ secrets.BETS_API_SPORT_API_KEY }}
+          BETS_POLL_BOOKMAKERS: ${{ github.event_name != 'schedule' || github.event.schedule == '7 0-23/2 * * *' }}
           BETS_FACEIT_TOKEN: ${{ secrets.BETS_FACEIT_TOKEN }}
           BETS_FACEIT_CHAMPIONSHIPS: ${{ vars.BETS_FACEIT_CHAMPIONSHIPS }}
           BETS_PANDASCORE_TOKEN: ${{ secrets.BETS_PANDASCORE_TOKEN }}

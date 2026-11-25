@@ -6,7 +6,7 @@
 | bo3.gg finished API (unofficial) | CS2 daily finished events | Best effort Worker API | May reject / block / change; third-party endpoint not an official documented free API |
 | HLTV | CS2 stats, rankings, rosters | Manual evidence source; no crawler | Site terms and protections; do not promise unrestricted free API |
 | Liquipedia | Rosters and tournaments | Manual evidence source | Licensing / access conditions |
-| Bookmakers | Price snapshots | Manual input only | No provider account access; no full historical line |
+| API-SPORT / OddsLink | Pre-match winner prices | Optional Actions secrets | Coverage depends on provider and access plan; no historical backfill |
 | Independent forecasters | Timestamped tips | Research-only | Duplicated tips, selective reports, paid data and survivorship bias |
 
 ## Desired future providers
@@ -19,4 +19,6 @@ Schedules, verified LIVE score, drafts/veto, economic state, odds with timestamp
 - OpenDota Live is filtered to recent professional maps. It does not establish a link to a scheduled series. Score-conditioned series calculations require a linked provider series and a previously recorded forecast. Detailed real-time data depend on provider coverage.
 - PandaScore fixtures, scores and finals are optional via the GitHub Actions secret `BETS_PANDASCORE_TOKEN`. Enable only with terms that permit the intended use and publication.
 - `BETS_PARI_FEED_URL` accepts an authorized HTTPS endpoint returning normalized JSON `{schemaVersion:1, bookmaker:"PARI", observedAt, events:[{id,game,a,b,date,tournament,format,status,odds:[a,b]}]}`. UTC timestamps or explicit offsets are required. This is a Bets input contract, not an official PARI API. The public PARI page was independently available for comparison, but the executable production feed has not been verified. A local capture with the same contract can be supplied via `BETS_PARI_CAPTURE_PATH`; this configuration is for local checks and should not be used to publish private screenshots or capture data.
+- Set the repository Actions secrets `BETS_ODDSLINK_API_KEY` and `BETS_API_SPORT_API_KEY` to use each provider independently. API-SPORT needs esports and PARI markets enabled on its key. Automatic pulls run every two hours, with two OddsLink requests per pull (up to 744 in a 31-day month, plus manual and code-triggered runs) and one API-SPORT request for the current UTC date.
+- Only uniquely matched, recent, two-way pre-match series prices are recorded. PARI takes precedence, followed by a fixed OddsLink bookmaker order. The displayed bookmaker is the one that offered the price. The snapshot's `sources` records authentication, provider errors and the number of usable quotes without publishing credentials.
 - The source code and license notices of the vendored packages matched their upstream copies at csgopred `fce7cfc07351df540bedccac3c71808295d6fa34` and CS2API `fec0f6755dac3b4dc6b70d4bcf672d3fb9fb5c6b`. Code licenses are separate from conditions covering source data.

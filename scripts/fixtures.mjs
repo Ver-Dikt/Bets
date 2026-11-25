@@ -13,6 +13,7 @@ import {researchArchive} from './research-archive.mjs';
 import {randomUUID} from 'node:crypto';
 import {readArchive,mergeArchive} from '../src/archive.mjs';
 import {loadPari, joinPari, sameTeams} from '../src/pari.mjs';
+import {attachExternalPrices,externalBoards} from '../src/bookmaker-feeds.mjs';
 import {normalizeCSFixtures,normalizeDotaFixtures,mergeFixtures} from '../src/fixtures.mjs';
 import {readFile,writeFile,mkdir,rename} from 'node:fs/promises';
 import {resolve,dirname} from 'node:path';
@@ -98,13 +99,20 @@ for(const item of secondary){
  }
 }
 const joined=joinPari(merged.filter(row=>!excluded.has(row.id)),pari.lines,new Date().toISOString());
+const pollBookmakers=process.env.BETS_POLL_BOOKMAKERS!=='false';
+const boards=await externalBoards(fetchedAt,{oddsLinkKey:process.env.BETS_ODDSLINK_API_KEY,
+ apiSportKey:process.env.BETS_API_SPORT_API_KEY,poll:pollBookmakers,previous:previous?.sources});
+Object.assign(status,boards.sources);
+const cachedPrices=pollBookmakers?[]:(previous?.fixtures??[]).filter(f=>f.bookPrice?.provider==='OddsLink'
+ ?Boolean(process.env.BETS_ODDSLINK_API_KEY):Boolean(process.env.BETS_API_SPORT_API_KEY));
+const pricedFixtures=attachExternalPrices(joined.fixtures,boards.lines,cachedPrices,Date.now());
 const archive=await researchArchive(await readArchive(resolve(process.env.BETS_ARCHIVE_PATH??'data/private/matches.json')));
 async function atomicWrite(file,data){
  const temporary=file+'.'+randomUUID()+'.tmp';
  await writeFile(temporary,JSON.stringify(data)+'\n',{flag:'wx'});
  await rename(temporary,file);
 }
-const fixtures=await enrichRosters(mergeFixtures(joined.fixtures).slice(0,300),archive.matches,previous?.fixtures??[],fetchedAt);
+const fixtures=await enrichRosters(mergeFixtures(pricedFixtures).slice(0,300),archive.matches,previous?.fixtures??[],fetchedAt);
 const recordedAt=new Date().toISOString();
 const snapshot={schemaVersion:1,generatedAt:recordedAt,fixtures:fixtures.map(({score,...row})=>row),sources:status,pariCoverage:joined.coverage,
   label:'Source-labeled fixture and bookmaker snapshots.'};
