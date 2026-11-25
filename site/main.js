@@ -276,7 +276,7 @@ function renderAnalysis(){
  const price=forecastPrice(saved);
  if(pick){
   const prices=el('div','comp-grid');
-  prices.append(compBox('Коэффициент безубыточности', (1/favoriteProbability).toFixed(2),pick+' · по оценке BETS'));
+  prices.append(compBox('Расчётный порог BETS', (1/favoriteProbability).toFixed(2),'1 ÷ вероятность BETS · '+pick));
   if(price){
    prices.append(compBox(price.bookmaker+' · '+shortTime(price.observedAt),price.odds.toFixed(2),
     (price.provider?price.provider+' · ':'')+'Для безубыточности нужно '+pct(price.breakEven)),

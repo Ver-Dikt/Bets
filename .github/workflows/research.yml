@@ -1,6 +1,8 @@
 name: Bets research validation
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "43 5 * * 1"
   push:
     branches: [main]
     paths:
