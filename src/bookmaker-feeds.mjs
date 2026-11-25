@@ -30,22 +30,34 @@ export function oddsLinkLines(payload,game,at){
  });
 }
 
-export function apiSportLines(payload,at){
+export function apiSportLines(payload,at,coverage={}){
  if(!Array.isArray(payload?.matches))throw Error('Неизвестный формат ответа API-SPORT');
+ Object.assign(coverage,{events:payload.matches.length,pariBoards:0,winnerMarkets:0,upcoming:0,
+  formats:0,disciplines:0,openTwoWay:0,freshPrices:0});
  return payload.matches.flatMap(event=>{
   const {startTimestamp:start,homeTeam,awayTeam,status,esports,oddsBk}=event;
+  const board=oddsBk?.pari,market=board?.markets?.result;
+  if(!board)return [];
+  coverage.pariBoards++;
+  if(!market)return [];
+  coverage.winnerMarkets++;
   const a=homeTeam?.name,b=awayTeam?.name,bestOf=esports?.bestOf;
-  if(status!=='notstarted'||!Number.isSafeInteger(start)||start<=at||!teams(a,b)||
-   ![1,3,5,7].includes(bestOf)||!Number.isSafeInteger(event.id))return [];
+  if(status!=='notstarted'||!Number.isSafeInteger(start)||start<=at||!teams(a,b)||!Number.isSafeInteger(event.id))return [];
+  coverage.upcoming++;
+  if(![1,3,5,7].includes(bestOf))return [];
+  coverage.formats++;
   const category=[event.tournament?.category?.name,event.category?.name,event.tournament?.category?.translations?.en].filter(Boolean).join(' ');
   const game=/counter[ -]?strike|\bcs2\b/i.test(category)?'cs2':/\bdota\b/i.test(category)?'dota':null;
   if(!game||teamKey(game,a)===teamKey(game,b))return [];
-  const board=oddsBk?.pari,market=board?.markets?.result;
+  coverage.disciplines++;
   const keys=market?.stakeKeys;
   if(!board?.isBettingActive||market?.status!=='open'||market.hasArgument!==false||
    (market.stage!=null&&market.stage!=='prematch')||!Array.isArray(keys)||keys.length!==2||!keys.includes('w1')||!keys.includes('w2'))return [];
   const odds=['w1','w2'].map(key=>market.stakes?.[key]?.suspended?null:market.stakes?.[key]?.factor);
-  if(!recent(board.updatedAt,at)||!validOdds(odds))return [];
+  if(!validOdds(odds))return [];
+  coverage.openTwoWay++;
+  if(!recent(board.updatedAt,at))return [];
+  coverage.freshPrices++;
   return [{id:String(event.id),game,a,b,date:new Date(start).toISOString(),format:'Bo'+bestOf,
    bookmaker:'PARI',provider:'API-SPORT',odds,observedAt:new Date(board.updatedAt).toISOString(),priority:0}];
  });
@@ -70,15 +82,16 @@ export async function externalBoards(fetchedAt,{oddsLinkKey,apiSportKey,poll=tru
    const url=new URL('https://api.api-sport.ru/v2/esports/matches');
    url.search=new URLSearchParams({date:fetchedAt.slice(0,10),status:'notstarted',with_bk_odds:'true',bookmaker_ids:'pari'});
    const payload=await request(url.toString(),'Authorization',apiSportKey);
-   return {lines:apiSportLines(payload,now())};
+   const coverage={};
+   return {lines:apiSportLines(payload,now(),coverage),coverage};
   }]
  ];
  const responses=await Promise.all(queries.map(async ([id,source,key,load])=>{
   if(!key)return [id,[],{ok:false,source,error:'Ключ не настроен'}];
   if(!poll)return [id,[],previous[id]??{ok:false,source,error:'Ожидается обновление'}];
   try{
-   const {lines,partial}=await load();
-   return [id,lines,{ok:true,source,checkedAt:fetchedAt,quotes:lines.length,...(partial?{partial:true}:{})}];
+   const {lines,partial,coverage}=await load();
+   return [id,lines,{ok:true,source,checkedAt:fetchedAt,quotes:lines.length,...(partial?{partial:true}:{}),...(coverage?{coverage}:{})}];
   }catch(error){
    const code=/HTTP (\d{3})/.exec(error.message)?.[1];
    return [id,[],{ok:false,source,checkedAt:fetchedAt,error:code?'HTTP '+code:'Источник недоступен или вернул неожиданный формат'}];
