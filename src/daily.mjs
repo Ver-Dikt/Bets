@@ -1,5 +1,6 @@
 import {reconcilePaper} from './settlement.mjs';
 import {forecastTotal} from './live.mjs';
+import {score} from './engine.mjs';
 
 const dayFormat=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Moscow',year:'numeric',month:'2-digit',day:'2-digit'});
 export const moscowDay=value=>Number.isFinite(Date.parse(value))?dayFormat.format(new Date(value)):null;
@@ -72,6 +73,24 @@ export function tally(rows, pick=row=>row.forecast?.pick){
 export function verifiedForecastRows(rows, game='all'){
  return rows.filter(({forecast,winner,actual,technical})=>forecast?.pick&&forecast.probabilityBasis!=='map'&&
   (game==='all'||forecast.game===game)&&!technical&&Boolean(winner)&&(actual===0||actual===1));
+}
+
+export function forecastPrice(forecast){
+ const observed=Date.parse(forecast.oddsObservedAt), created=Date.parse(forecast.createdAt);
+ if(forecast.oddsSource!=='PARI'||!(observed<=created&&created<Date.parse(forecast.kickoff)))return null;
+ const {pick,a,b,probability}=forecast;
+ const index=pick===a?0:pick===b?1:-1;
+ const odds=forecast.odds?.[index];
+ if(!Number.isFinite(odds)||odds<=1||!Number.isFinite(probability)||probability<=0||probability>1)return null;
+ return {odds,probability,breakEven:1/odds,expectedReturn:probability*odds-1,observedAt:forecast.oddsObservedAt};
+}
+
+export function pricedResults(rows){
+ const records=verifiedForecastRows(rows).flatMap(({forecast,actual})=>{
+  const price=forecastPrice(forecast);
+  return price?[{...price,actual}]:[];
+ });
+ return {all:score(records),positive:score(records.filter(r=>r.expectedReturn>0))};
 }
 
 export const cs2ConfidenceThreshold=.70;

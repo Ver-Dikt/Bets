@@ -1,4 +1,4 @@
-const CACHE = 'bets-pages-v16';
+const CACHE = 'bets-pages-v17';
 const DATA = new Set(['snapshot.json','report.json','fixtures.json','map-insights.json','journal.json','release.json','brief.json','research.json']);
 const ASSETS = ['./','./main.js','./brief.mjs','./daily.mjs','./analysis.mjs','./settlement.mjs','./engine.mjs','./identity.mjs',
   './live.mjs','./calibration.mjs','./evidence-time.mjs','./roster-factor.mjs','./manifest.webmanifest','./icon.svg',...[...DATA].map(name=>'./'+name)];

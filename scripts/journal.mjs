@@ -24,7 +24,13 @@ export function updateJournal(before, fixtures, history, series, recordedAt, map
     const sameInputs=previous?.kickoff===fixture.date&&previous.format===fixture.format&&previous.rosters?.join(',')===rosters?.join(',');
     const challenger=research.get(fixture.id);
     const sameVersion=previous?.research?.version===challenger?.version;
-    if(sameInputs&&sameVersion&&time-Date.parse(previous.createdAt)<6*3600000)continue;
+    const pari=fixture.pari;
+    const observed=Date.parse(pari?.observedAt);
+    const priced=['feed','capture'].includes(pari?.mode)&&observed<=time&&Date.parse(pari.freshUntil)>time&&
+      time<Date.parse(pari.date)&&Array.isArray(pari.odds)&&pari.odds.length===2&&pari.odds.every(odd=>Number.isFinite(odd)&&odd>1);
+    const updatedPrice=priced&&(!previous?.oddsObservedAt||
+      (observed>Date.parse(previous.oddsObservedAt)&&pari.odds.some((price,i)=>price!==previous.odds?.[i])));
+    if(sameInputs&&sameVersion&&!updatedPrice&&time-Date.parse(previous.createdAt)<6*3600000)continue;
     const forecast=analyzeFixture(fixture,history,'','',time,maps[fixture.id],report[fixture.game]?.calibration);
     if(forecast.status!=='ok'||forecast.probabilityBasis==='map'){
       if(!gaps.has(fixture.id)){
@@ -48,8 +54,8 @@ export function updateJournal(before, fixtures, history, series, recordedAt, map
       profileEvidence:fixture.rosters?.map(profile=>profile&&Date.parse(profile.observedAt)<=time?profile:null),
       evidence:{historyA:forecast.comparisons.a.count,historyB:forecast.comparisons.b.count,
       map:forecast.mapContribution,roster:forecast.rosterContribution},reasons:forecast.reasons,calibrationDelta:forecast.calibrationDelta,
-      odds:fixture.pari?.mode==='feed'&&Date.parse(fixture.pari.freshUntil)>time?fixture.pari.odds:null};
-    if(sameInputs&&sameVersion&&previous.model===record.model&&Math.abs(previous.probabilityA-pa)<.01)continue;
+      odds:priced?pari.odds:null,oddsObservedAt:priced?pari.observedAt:undefined,oddsSource:priced?'PARI':undefined};
+    if(sameInputs&&sameVersion&&!updatedPrice&&previous.model===record.model&&Math.abs(previous.probabilityA-pa)<.01)continue;
     const candidateTotal=challenger?.total;
     const over=candidateTotal?.approved?candidateTotal.probabilities[candidateTotal.selected]:null;
     const total=Number.isFinite(over)?{line:candidateTotal.line,over,under:1-over,model:candidateTotal.selected,validated:true}

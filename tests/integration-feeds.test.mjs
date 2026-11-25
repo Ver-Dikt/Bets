@@ -99,3 +99,18 @@ test('scheduled forecasts, live and settlement append without changing existing 
  assert.deepEqual(settled.events.slice(0,2),live.events);
  assert.equal(settled.events[2].result,0);
 });
+
+test('a new pre-match quote is paired with a forecast even inside the refresh interval',()=>{
+ const history=Array.from({length:24},(_,i)=>({id:'h'+i,discipline:'cs2',a:'FaZe',b:'Wildcard',winner:'FaZe',
+  date:new Date(Date.UTC(2026,9,i+1)).toISOString(),source:'archive'}));
+ const original=updateJournal({schemaVersion:1,events:[]},[fixture],history,[],at);
+ const now='2026-11-24T05:30:00Z';
+ const lines=parsePari({schemaVersion:1,bookmaker:'PARI',observedAt:now,events:[quote]},{fetchedAt:now,mode:'feed'});
+ const next=joinPari([{...fixture,fetchedAt:now}],lines,now).fixtures;
+ const priced=updateJournal(original,next,history,[],now);
+ assert.deepEqual(priced.events[0],original.events[0]);
+ assert.deepEqual(priced.events[1].record.odds,[1.6,2.5]);
+ assert.equal(priced.events[1].record.oddsObservedAt,now);
+ assert.equal(priced.events[1].record.oddsSource,'PARI');
+ assert.deepEqual(updateJournal(priced,next,history,[],now),priced);
+});

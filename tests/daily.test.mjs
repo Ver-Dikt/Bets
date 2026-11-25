@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {dailyRows,tally,totalTally,confidenceBreakdown,cs2ConfidenceBenchmark,qualifiesForCs2Shortlist,verifiedForecastRows} from '../src/daily.mjs';
+import {dailyRows,tally,totalTally,confidenceBreakdown,cs2ConfidenceBenchmark,qualifiesForCs2Shortlist,verifiedForecastRows,
+ forecastPrice,pricedResults} from '../src/daily.mjs';
 
 test('daily totals use one pre-match prediction per fixture and preserve the PARI subset',()=>{
  const now=Date.parse('2026-11-24T07:05:00Z'), date='2026-11-24T06:00:00Z';
@@ -89,4 +90,23 @@ test('the main report only includes played series forecasts as their results bec
  matches.push({...result,id:'cs-11',winner:'A',mapCount:2});
  assert.deepEqual(tally(report()),{total:2,won:1,lost:1,upcoming:0,pending:0});
  assert.equal(totalTally(report()).resolved,1);
+});
+
+test('paper ROI uses the selected side and excludes untimestamped or post-forecast quotes',()=>{
+ const forecast={a:'A',b:'B',pick:'B',probability:.6,odds:[1.4,2],oddsSource:'PARI',
+  oddsObservedAt:'2026-11-24T05:00:00Z',createdAt:'2026-11-24T05:10:00Z',kickoff:'2026-11-24T06:00:00Z'};
+ assert.equal(forecastPrice(forecast).odds,2);
+ const rows=[
+  {forecast,actual:1,winner:'B'},
+  {forecast:{...forecast,odds:[2.5,1.4]},actual:0,winner:'A'},
+  {forecast:{...forecast,oddsObservedAt:'24 ноября, утро'},actual:1,winner:'B'},
+  {forecast:{...forecast,oddsObservedAt:'2026-11-24T05:11:00Z'},actual:1,winner:'B'},
+  {forecast,actual:null}
+ ];
+ const {all,positive}=pricedResults(rows);
+ assert.equal(all.priced,2);
+ assert.equal(all.roi,0);
+ assert.equal(positive.priced,1);
+ assert.equal(positive.roi,1);
+ assert.equal(pricedResults(rows.slice(2)).all.roi,null);
 });

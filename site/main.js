@@ -1,5 +1,5 @@
 import {dailyRows,tally,reviewPeriod,totalTally,errorReview,compareJournalWinners,
- confidenceBreakdown,cs2ConfidenceBenchmark,qualifiesForCs2Shortlist,verifiedForecastRows} from './daily.mjs';
+ confidenceBreakdown,cs2ConfidenceBenchmark,qualifiesForCs2Shortlist,verifiedForecastRows,forecastPrice,pricedResults} from './daily.mjs';
 import {analyzeFixture,probabilitySteps} from './analysis.mjs';
 const modelNames={
  dynamicElo:'Dynamic Elo',glicko2:'Glicko-2',trueSkill:'TrueSkill',bradleyTerry:'Bradley–Terry',
@@ -225,6 +225,14 @@ function renderAnalysis(){
   el('b','',saved.pick+' · '+pct(favoriteProbability)),
   paragraph('', 'Записано '+shortTime(saved.createdAt)+' · '+(modelNames[saved.model.split('@')[0]]??'Контрольная модель')));
  root.append(verdict);
+ const price=forecastPrice(saved);
+ const prices=el('div','comp-grid');
+ prices.append(compBox('Коэффициент безубыточности', (1/favoriteProbability).toFixed(2),saved.pick+' · по оценке BETS'));
+ if(price){
+  prices.append(compBox('PARI · '+shortTime(price.observedAt),price.odds.toFixed(2),'Для безубыточности нужно '+pct(price.breakEven)),
+   compBox('Ожидаемая доходность по модели',pct(price.expectedReturn)));
+ }else prices.append(compBox('Коэффициент PARI','—','Снимок линии до матча отсутствует'));
+ root.append(prices);
  const total=saved.total;
  if(total){
   const line=String(total.line).replace('.',',');
@@ -358,6 +366,12 @@ function renderDaily(root){
  grid.append(compBox('Сверенные прогнозы победителя',t.total),compBox('Попадания',t.won),compBox('Промахи',t.lost),
   compBox('Точность',t.total?pct(t.won/t.total):'—'));
  root.append(grid);
+ const priced=pricedResults(rows);
+ const returns=el('div','comp-grid');
+ returns.append(compBox('С предматчевым коэффициентом PARI',priced.all.priced+' из '+t.total),
+  compBox('ROI по всем прогнозам с ценой',pct(priced.all.roi),priced.all.priced?'Расчёт по 1 условной единице на прогноз':'Пока нет сверенных прогнозов с ценой'),
+  compBox('ROI при положительной оценке доходности',pct(priced.positive.roi),priced.positive.priced+' сверенных прогнозов'));
+ root.append(returns);
  const bands=confidenceBreakdown(rows);
  if(bands.some(band=>band.settled)){
   const details=el('details'),grid=el('div','comp-grid');
