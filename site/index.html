@@ -43,7 +43,7 @@ h3{font-size:15px;margin:0;font-weight:680}.muted,.sub{color:#97aabe}small{font-
 .fixture-name{font-size:16px;font-weight:735;letter-spacing:-.015em;line-height:1.35}
 .fixture-foot{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:11px;font-size:12px;color:#b2c8d5}
 .tag{color:#89dfc0;font-size:11px;background:#193f3b;padding:4px 8px;border-radius:6px;white-space:nowrap}
-.tag.live{background:#482a28;color:#f3aaa0}.tag.weak{background:#343126;color:#efcd8f}
+.model-control{overflow-wrap:anywhere}.tag.live{background:#482a28;color:#f3aaa0}.tag.weak{background:#343126;color:#efcd8f}
 .count{font-size:12px;color:#819bb1}
 button.more{background:#1b3145;color:#c9e5ec;border:1px solid #3a5766;border-radius:9px;padding:11px 14px;width:100%;margin:4px 0}
 .empty{border:1px dashed #395069;border-radius:13px;color:#8ea9bf;padding:22px;font-size:13px;text-align:center}
@@ -108,7 +108,7 @@ details p{color:#92a9bf;font-size:12px;line-height:1.6}details h3{font-size:13px
    <div class="filter-grid" id="prematch-filters">
      <label>Период<select id="period"><option value="today">Сегодня</option><option value="live">В игре</option><option value="tomorrow">Завтра</option><option value="all">Все предстоящие</option></select></label>
      <label>Турнир<select id="tournament"><option value="all">Все турниры</option></select></label>
-     <label>Прогноз<select id="prematch-confidence"><option value="recorded">С оценкой модели</option><option value="picked">С выбором победителя</option><option value="all">Всё расписание</option><option value="cs2-shortlist">CS2 · от 70%</option><option value="cs2-priced">CS2 · от 70% + цена</option></select></label>
+     <label>Прогноз<select id="prematch-confidence"><option value="recorded">С оценкой модели</option><option value="picked">С выбором победителя</option><option value="all">Всё расписание</option><option value="cs2-agreement">CS2 · обе модели от 55%</option><option value="cs2-shortlist">CS2 · от 70%</option><option value="cs2-agreement70">CS2 · обе модели от 70%</option><option value="cs2-priced">CS2 · от 70% + цена</option></select></label>
    </div>
    <p id="confidence-note" class="muted" hidden></p>
    <div class="source-row"><span id="cs2-source">CS2: проверка…</span><span id="dota-source">Dota: проверка…</span></div>

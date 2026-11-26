@@ -1,6 +1,6 @@
 import {dailyRows,tally,reviewPeriod,totalTally,errorReview,compareJournalWinners,
  confidenceBreakdown,cs2ConfidenceBenchmark,qualifiesForCs2Shortlist,verifiedForecastRows,forecastPrice,pricedResults,
- qualifiesForPricedCs2Shortlist,inPlayFixtures,publishedWinnerPick,hasPublishedTotalPick} from './daily.mjs';
+ qualifiesForPricedCs2Shortlist,inPlayFixtures,publishedWinnerPick,hasPublishedTotalPick,compareCs2Forecast,cs2ComparisonResults} from './daily.mjs';
 import {analyzeFixture,probabilitySteps} from './analysis.mjs';
 const modelNames={
  dynamicElo:'Dynamic Elo',glicko2:'Glicko-2',trueSkill:'TrueSkill',bradleyTerry:'Bradley–Terry',
@@ -22,6 +22,10 @@ const assessments=new Map();
 const published=new Map();
 let playing=[];
 const cs2ShortlistMode=()=>['cs2-shortlist','cs2-priced'].includes(filters.confidence);
+const agreementThreshold=()=>({ 'cs2-agreement':.55, 'cs2-agreement70':.70 })[filters.confidence];
+const cs2OnlyMode=()=>cs2ShortlistMode()||Boolean(agreementThreshold());
+const comparisonLabels={agreement:'Обе модели за одну команду от 55%',weak:'Хотя бы одна модель ниже 55%',different:'Модели выбрали разные команды'};
+const modelFavorite=choice=>choice.team?choice.team+' · '+pct(choice.probability):'Равные шансы · 50%';
 function forecastFor(fixture){
  const forecast=published.get(fixture.id);
  if(forecast?.kickoff===(fixture.forecastKickoff??fixture.date)&&forecast.a===fixture.a&&forecast.b===fixture.b&&forecast.format===fixture.format&&
@@ -52,13 +56,18 @@ function activeFixtures(){
  const benchmark=shortlist?cs2ConfidenceBenchmark(research):null;
  const upcoming=fixtures.filter(f=>f.status==='upcoming'&&Date.parse(f.date)>now&&
   (filters.period==='all'||dayFmt.format(new Date(f.date))===(filters.period==='today'?today:tomorrow)));
- const pool=filters.period==='live'?playing:filters.period==='today'?[...playing,...upcoming]:upcoming;
+ const pool=filters.period==='live'?playing.filter(f=>f.confirmed):filters.period==='today'?[...playing,...upcoming]:upcoming;
  return pool.filter(f=>filters.game==='all'||f.game===filters.game)
   .filter(f=>filters.tournament==='all'||f.tournament===filters.tournament)
   .filter(f=>f.inPlay||filters.confidence!=='recorded'||forecastFor(f))
   .filter(f=>{
    if(f.inPlay&&filters.period==='live')return true;
    if(filters.confidence==='picked')return Boolean(publishedWinnerPick(forecastFor(f)));
+   const threshold=agreementThreshold();
+   if(threshold){
+    const pair=compareCs2Forecast(forecastFor(f));
+    return !f.inPlay&&pair?.group==='agreement'&&Math.min(pair.primary.probability,pair.reference.probability)>=threshold;
+   }
    if(!shortlist)return true;
    const forecast=forecastFor(f);
    if(!priced)return qualifiesForCs2Shortlist(forecast,benchmark);
@@ -77,6 +86,10 @@ function renderSources(){
  if(!fixtureStatus){root.append(el('div','source-warning','Нет опубликованного снимка расписания. Придумывать матчи нельзя.'));return}
  const broken=Object.entries(fixtureStatus.sources||{}).filter(([game,v])=>['cs2','dota'].includes(game)&&!v?.ok);
  if(broken.length)root.append(el('div','source-warning','Расписание может быть неполным: '+broken.map(([game])=>game.toUpperCase()).join(', ')+'.'));
+ const now=Date.now();
+ const hasFreshPrice=fixtures.some(f=>f.status==='upcoming'&&Date.parse(f.date)>now&&
+  [f.bookPrice,f.pari].some(board=>board?.mode==='feed'&&Date.parse(board.freshUntil)>now));
+ if(!hasFreshPrice)root.append(el('div','source-warning','В опубликованном снимке нет свежих предматчевых цен.'));
  if(Number.isFinite(Date.parse(fixtureStatus.generatedAt))){
   const mins=(Date.now()-Date.parse(fixtureStatus.generatedAt))/60000;
   $('fixture-update').textContent=(mins>90?'Устаревший снимок · ':'Обновлено · ')+shortTime(fixtureStatus.generatedAt);
@@ -98,13 +111,14 @@ function renderFixtures(){
  }
  const shortlist=cs2ShortlistMode(),priced=filters.confidence==='cs2-priced',note=$('confidence-note');
  const benchmark=shortlist?cs2ConfidenceBenchmark(research):null;
- note.hidden=!shortlist||filters.period==='live';
- note.textContent=priced?'Победитель CS2 от 70% с коэффициентом выше порога безубыточности. Снимок цены должен быть свежее 45 минут.':benchmark
+ const threshold=agreementThreshold();
+ note.hidden=(!shortlist&&!threshold)||filters.period==='live';
+ note.textContent=threshold?'Обе модели выбрали одну команду с вероятностью от '+pct(threshold)+'.':priced?'Победитель CS2 от 70% с коэффициентом выше порога безубыточности. Снимок цены должен быть свежее 45 минут.':benchmark
   ?'На историческом тесте '+benchmark.correct+' из '+benchmark.count+' попаданий · охват '+pct(benchmark.coverage)+' всех проверенных серий CS2'
   :'Историческая проверка активной модели CS2 недоступна.';
  if(!items.length){
   if(filters.period==='live'){
-   root.append(errorBlock('Сейчас в списке нет начавшихся матчей'));
+   root.append(errorBlock('Нет матчей с подтверждённым live-статусом'));
    $('show-more').hidden=true;
    return;
   }
@@ -116,7 +130,7 @@ function renderFixtures(){
   }
   const broken=(filters.game==='all'?['cs2','dota']:[filters.game]).some(game=>fixtureStatus?.sources?.[game]?.ok===false);
   const onlyRecorded=filters.confidence==='recorded';
-  const title=filters.confidence==='picked'?'Нет матчей с выбором победителя'
+  const title=threshold?'Нет предстоящих матчей, где обе модели согласны при этом пороге':filters.confidence==='picked'?'Нет матчей с выбором победителя'
    :onlyRecorded?'Нет предстоящих матчей с оценкой модели':'Нет предстоящих матчей';
   root.append(errorBlock(title,
    broken?'Источник расписания сообщил об ошибке.':onlyRecorded?'Для просмотра остальных матчей выбери «Всё расписание».':null));
@@ -143,6 +157,12 @@ function renderFixtures(){
    preview.style.borderTop='1px solid #304658';preview.style.paddingTop='9px';
    preview.append(el('span','',pick?'Прогноз · '+pick:'Почти равный матч'),el('span','win',pct(saved.probability)));
    button.append(preview);
+   const pair=compareCs2Forecast(saved);
+   if(pair){
+    const control=el('div','fixture-foot model-control');
+    control.append(el('span','','Контроль · '+modelFavorite(pair.reference)),el('span','',pair.group==='agreement'?'Согласие':pair.group==='different'?'Расхождение':'Ниже порога'));
+    button.append(control);
+   }
   }else button.append(el('div','meta','Прогноз не записан'));
   button.addEventListener('click',()=>{selected=f;renderFixtures();renderAnalysis();if(window.matchMedia('(max-width:820px)').matches)$('analysis-panel').scrollIntoView({behavior:'smooth',block:'start'})});
   root.append(button);
@@ -273,13 +293,20 @@ function renderAnalysis(){
   el('b','',pick?pick+' · '+pct(favoriteProbability):'Без выбора победителя'),
   paragraph('', 'Записано '+shortTime(saved.createdAt)+' · '+(modelNames[saved.model.split('@')[0]]??'Контрольная модель')));
  root.append(verdict);
+ const paired=compareCs2Forecast(saved);
+ if(paired){
+  const comparison=el('div','comp-grid');
+  comparison.append(compBox('Основная · '+(modelNames[saved.research.selected]??saved.research.selected),modelFavorite(paired.primary)),
+   compBox('Контрольная модель',modelFavorite(paired.reference),comparisonLabels[paired.group]));
+  root.append(comparison);
+ }
  const price=forecastPrice(saved);
  if(pick){
   const prices=el('div','comp-grid');
   prices.append(compBox('Расчётный порог BETS', (1/favoriteProbability).toFixed(2),'1 ÷ вероятность BETS · '+pick));
   if(price){
    prices.append(compBox(price.bookmaker+' · '+shortTime(price.observedAt),price.odds.toFixed(2),
-    (price.provider?price.provider+' · ':'')+'Для безубыточности нужно '+pct(price.breakEven)),
+    (price.provider?price.provider+' · ':'')+'Снимок до старта · Для безубыточности нужно '+pct(price.breakEven)),
     compBox('Ожидаемая доходность по модели',pct(price.expectedReturn)));
   }else prices.append(compBox('Коэффициент букмекера','—','Снимок линии до матча отсутствует'));
   root.append(prices);
@@ -467,6 +494,26 @@ function renderDaily(root){
    forecast.pick+' · '+pct(forecast.probability),'Победитель '+winner+(error?.disagreement?' · контрольная модель выбрала иначе':'')));
   root.append(details);
  }
+ const activeWinner=research?.games?.cs2?.winner;
+ const activeVersion=activeWinner?.approved&&research.version?activeWinner.selected+'@'+research.version:null;
+ const paired=cs2ComparisonResults(rows.filter(({forecast})=>forecast.model===activeVersion));
+ if(paired.size){
+  const section=el('details');
+  const name=modelNames[activeWinner.selected]??activeWinner.selected;
+  section.append(el('summary','','CS2 · '+name+' и контрольная на одних и тех же матчах'));
+  const all=[...paired.values()].reduce((sum,group)=>({
+   matches:sum.matches+group.matches,primaryWins:sum.primaryWins+group.primaryWins,
+   referenceWins:sum.referenceWins+group.referenceWins
+  }),{matches:0,primaryWins:0,referenceWins:0});
+  const grid=el('div','comp-grid');
+  for(const [label,group] of [['Все общие матчи',all],...Object.entries(comparisonLabels).map(([key,label])=>[label,paired.get(key)])]){
+   if(!group)continue;
+   grid.append(compBox(label,group.matches+' матчей','Попадания · основная '+group.primaryWins+' / '+group.matches+
+    ' · контрольная '+group.referenceWins+' / '+group.matches));
+  }
+  section.append(grid,paragraph('muted','Для сравнения берём фаворитов обеих моделей, включая оценки ниже 55%. При 50% фаворита нет.'));
+  root.append(section);
+ }
  const comparison=compareJournalWinners(rows);
  if(comparison.length){
   const details=el('details');
@@ -520,11 +567,11 @@ function setDiscipline(game){
 }
 $('prematch-confidence').onchange=()=>{
  filters.confidence=$('prematch-confidence').value;
- if(cs2ShortlistMode())setDiscipline('cs2');
+ if(cs2OnlyMode())setDiscipline('cs2');
  updateFilters();
 };
 for(const btn of document.querySelectorAll('[data-game]'))btn.onclick=()=>{
- if(btn.dataset.game!=='cs2'&&cs2ShortlistMode()){
+ if(btn.dataset.game!=='cs2'&&cs2OnlyMode()){
   filters.confidence='recorded';
   $('prematch-confidence').value='recorded';
  }

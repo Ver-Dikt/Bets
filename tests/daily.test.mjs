@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {dailyRows,tally,totalTally,confidenceBreakdown,cs2ConfidenceBenchmark,qualifiesForCs2Shortlist,verifiedForecastRows,
- forecastPrice,pricedResults,qualifiesForPricedCs2Shortlist,inPlayFixtures,publishedWinnerPick,hasPublishedTotalPick} from '../src/daily.mjs';
+ forecastPrice,pricedResults,qualifiesForPricedCs2Shortlist,inPlayFixtures,publishedWinnerPick,hasPublishedTotalPick,compareCs2Forecast,cs2ComparisonResults} from '../src/daily.mjs';
 
 test('the published picks exclude near-equal winners and weak or exploratory totals',()=>{
  assert.equal(publishedWinnerPick({pick:'DENDELE',probability:.5276}),null);
@@ -12,6 +12,29 @@ test('the published picks exclude near-equal winners and weak or exploratory tot
  assert.equal(hasPublishedTotalPick({validated:true,over:.4999}),false);
  assert.equal(hasPublishedTotalPick({validated:true,over:.45}),true);
  assert.equal(hasPublishedTotalPick({validated:true,over:.55}),true);
+});
+
+test('CS2 model comparison uses the saved control on the same completed matches',()=>{
+ const research={selected:'lightGBM',version:'v1',approved:true};
+ const base={game:'cs2',a:'A',b:'B',model:'lightGBM@v1',research,pick:'A',probabilityA:.76};
+ const forecast=probabilityA=>({...base,control:{probabilityA}});
+ const row=(probabilityA,winner='A')=>({forecast:forecast(probabilityA),winner,actual:Number(winner==='A')});
+ assert.equal(compareCs2Forecast(forecast(.55)).group,'agreement');
+ assert.equal(compareCs2Forecast(forecast(.54)).group,'weak');
+ assert.equal(compareCs2Forecast(forecast(.46)).group,'different');
+ assert.deepEqual(compareCs2Forecast(forecast(.5)).reference,{team:null,probability:.5});
+ assert.equal(compareCs2Forecast(forecast(1.1)),null);
+ assert.equal(compareCs2Forecast({...forecast(.7),model:'legacy'}),null);
+ const summary=cs2ComparisonResults([
+  row(.74),row(.53,'B'),row(.43,'B'),row(.5),
+  {...row(.8),technical:true},{...row(.8),winner:null,actual:null},
+  {...row(.8),forecast:{...forecast(.8),game:'dota'}}
+ ]);
+ assert.deepEqual([...summary],[
+  ['agreement',{matches:1,primaryWins:1,referenceWins:1}],
+  ['weak',{matches:2,primaryWins:1,referenceWins:0}],
+  ['different',{matches:1,primaryWins:0,referenceWins:1}]
+ ]);
 });
 
 test('live listings keep saved forecasts through a delayed start or a fixture feed gap',()=>{

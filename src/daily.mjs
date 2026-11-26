@@ -82,6 +82,34 @@ export function publishedWinnerPick(forecast){
  return Number.isFinite(probability)&&probability>=publishedChoiceThreshold&&probability<=1?forecast.pick:null;
 }
 
+export function compareCs2Forecast(forecast){
+ const {game,model,research,probabilityA,control}=forecast??{};
+ if(game!=='cs2'||!research?.approved||model!==research.selected+'@'+research.version)return null;
+ const controlA=control?.probabilityA;
+ if(![probabilityA,controlA].every(p=>Number.isFinite(p)&&p>=0&&p<=1))return null;
+ const favorite=p=>p===.5?null:p>.5?forecast.a:forecast.b;
+ const primary={team:favorite(probabilityA),probability:Math.max(probabilityA,1-probabilityA)};
+ const reference={team:favorite(controlA),probability:Math.max(controlA,1-controlA)};
+ const group=!primary.team||!reference.team?'weak'
+  :primary.team!==reference.team?'different'
+  :Math.min(primary.probability,reference.probability)>=publishedChoiceThreshold?'agreement':'weak';
+ return {primary,reference,group};
+}
+
+export function cs2ComparisonResults(rows){
+ const groups=new Map();
+ for(const {forecast,winner} of verifiedForecastRows(rows,'cs2')){
+  const pair=compareCs2Forecast(forecast);
+  if(!pair)continue;
+  const group=groups.get(pair.group)??{matches:0,primaryWins:0,referenceWins:0};
+  group.matches++;
+  group.primaryWins+=Number(pair.primary.team===winner);
+  group.referenceWins+=Number(pair.reference.team===winner);
+  groups.set(pair.group,group);
+ }
+ return groups;
+}
+
 export function hasPublishedTotalPick(total){
  return total?.validated===true&&Number.isFinite(total.over)&&total.over>=0&&total.over<=1&&
   Math.max(total.over,1-total.over)>=publishedChoiceThreshold;
