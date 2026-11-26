@@ -107,7 +107,9 @@ export function cs2CoverageResults(rows){
  const checked=verifiedForecastRows(rows,'cs2').filter(({forecast})=>compareCs2Forecast(forecast));
  const primary=tally(checked,({forecast})=>publishedWinnerPick(forecast));
  const reserve=tally(checked,({forecast})=>cs2ReservePick(forecast)?.team);
- return {matches:checked.length,primary,reserve,
+ const conflicts=tally(checked,({forecast})=>compareCs2Forecast(forecast).group==='different'
+  ?cs2ReservePick(forecast)?.team:null);
+ return {matches:checked.length,primary,reserve,conflicts,
   expanded:{total:primary.total+reserve.total,won:primary.won+reserve.won}};
 }
 

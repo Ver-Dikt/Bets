@@ -295,14 +295,16 @@ function renderAnalysis(){
  const verdict=el('div','selection');
  const favoriteProbability=Math.max(a,b);
  const pick=publishedWinnerPick(saved);
- verdict.append(el('small','',pick?(f.inPlay?'ПРЕДМАТЧЕВЫЙ ПРОГНОЗ':'ОСНОВНОЙ ВЫБОР'):'ОЦЕНКА ОСНОВНОЙ МОДЕЛИ'),
-  el('b','',pick?pick+' · '+pct(favoriteProbability):'Без выбора победителя'),
-  paragraph('', 'Записано '+shortTime(saved.createdAt)+' · '+(modelNames[saved.model.split('@')[0]]??'Рейтинговая модель')));
- root.append(verdict);
  const reserve=cs2ReservePick(saved);
- if(reserve)root.append(compBox('Резервный выбор CS2',modelFavorite(reserve),
-  'Рейтинговая модель даёт от 55%, основная ниже порога.'));
  const paired=compareCs2Forecast(saved);
+ const title=pick?'ОСНОВНОЙ ВЫБОР':reserve?'РЕЗЕРВНЫЙ ВЫБОР':'ПРЕДМАТЧЕВАЯ ОЦЕНКА';
+ const explanation=reserve
+  ?(paired.group==='different'?'Модели склоняются к разным командам. ':'')+'Главная модель ниже 55%, выбор дала рейтинговая.'
+  :modelNames[saved.model.split('@')[0]]??'Рейтинговая модель';
+ verdict.append(el('small','',title),
+  el('b','',pick?pick+' · '+pct(favoriteProbability):reserve?modelFavorite(reserve):'Без выбора победителя'),
+  paragraph('',explanation+' · Снимок '+shortTime(saved.createdAt)));
+ root.append(verdict);
  if(paired){
   const comparison=el('div','comp-grid');
   const primaryDescription=saved.research.selected==='lightGBM'
@@ -353,18 +355,20 @@ function renderAnalysis(){
   const evidenceGrid=el('div','comp-grid');
   evidenceGrid.append(compBox('Завершённые серии',evidence.seriesA+' / '+evidence.seriesB),compBox('История карт',evidence.mapsA+' / '+evidence.mapsB),
    compBox('Текущий турнир',evidence.tournamentA+' / '+evidence.tournamentB),compBox('Последний общий патч',evidence.patchA&&evidence.patchB?evidence.patchA+' / '+evidence.patchB:'Нет данных'),
-   compBox('Матчи с подтверждённым составом',evidence.lineupsA+' / '+evidence.lineupsB),compBox('Форма за 10 серий',pct(evidence.formA)+' / '+pct(evidence.formB)));
+   compBox('Карты с известным составом',evidence.lineupsA+' / '+evidence.lineupsB),compBox('Форма за 10 серий',pct(evidence.formA)+' / '+pct(evidence.formB)));
   detail.append(el('h3','analysis-head','Что было известно до матча'),evidenceGrid);
  }else{
   drawReasonSummary(detail,{...saved,map:saved.evidence?.map,roster:saved.evidence?.roster});
   if(r.status==='ok')drawFactors(detail,r);
  }
  drawMapInsight(detail,f);
- detail.append(el('h3','analysis-head','Составы и игроки'));
+ detail.append(el('h3','analysis-head','Профили игроков до прогноза'));
  for(const [index,team] of [f.a,f.b].entries()){
-  const roster=(saved.profileEvidence??f.rosters)?.[index];
+  const snapshot=(saved.profileEvidence??f.rosters)?.[index];
+  const roster=Date.parse(snapshot?.observedAt)<=Date.parse(saved.createdAt)?snapshot:null;
   const players=roster?.players.map(player=>player.name+(player.metric==null?'':f.game==='dota'?' '+pct(player.metric):' '+player.metric.toFixed(2)));
-  detail.append(compBox(team,players?.join(' · ')??'Состав недоступен',roster?roster.source+' · '+shortTime(roster.observedAt):''));
+  detail.append(compBox(team,players?.join(' · ')??'Предматчевый профиль недоступен',
+   roster?roster.source+' · '+shortTime(roster.observedAt)+' · состав на матч не подтверждён':''));
  }
  if(saved.evidence?.roster)detail.append(compBox('Профили игроков',pct(saved.evidence.roster.a),'Поправка рейтинговой модели по профилям команд.'));
 
@@ -518,6 +522,9 @@ function renderDaily(root){
   for(const [label,stats] of [['Основной выбор',coverage.primary],['Резервный выбор рейтинговой модели',coverage.reserve],['Вместе',coverage.expanded]]){
    grid.append(compBox(label,stats.won+' / '+stats.total,stats.total?pct(stats.won/stats.total)+' точность':'Нет выборов'));
   }
+  const {reserve,conflicts}=coverage;
+  grid.append(compBox('Резерв при разногласии',conflicts.won+' / '+conflicts.total),
+   compBox('Резерв без разногласия',(reserve.won-conflicts.won)+' / '+(reserve.total-conflicts.total)));
   section.append(grid,paragraph('muted','Проверка правила по '+coverage.matches+' завершённым матчам с сохранёнными предматчевыми оценками обеих моделей.'));
   root.append(section);
  }

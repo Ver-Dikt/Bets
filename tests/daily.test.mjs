@@ -54,10 +54,12 @@ test('the CS2 reserve fills abstentions without replacing or double-counting pri
   {forecast:weak,winner:'A',actual:1},
   {forecast:weak,winner:'A',actual:1,technical:true}
  ];
- const {primary,reserve,expanded,matches}=cs2CoverageResults(rows);
+ const {primary,reserve,expanded,matches,conflicts}=cs2CoverageResults(rows);
  assert.equal(matches,3);
  assert.deepEqual([primary.won,primary.total,reserve.won,reserve.total],[1,1,1,2]);
  assert.deepEqual(expanded,{total:3,won:2});
+ assert.equal(conflicts.total,2);
+ assert.equal(conflicts.won,1);
 });
 
 test('live listings keep saved forecasts through a delayed start or a fixture feed gap',()=>{
