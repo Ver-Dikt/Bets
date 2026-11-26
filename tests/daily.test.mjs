@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {dailyRows,tally,totalTally,confidenceBreakdown,cs2ConfidenceBenchmark,qualifiesForCs2Shortlist,verifiedForecastRows,
- forecastPrice,pricedResults,qualifiesForPricedCs2Shortlist,inPlayFixtures,publishedWinnerPick,hasPublishedTotalPick,compareCs2Forecast,cs2ComparisonResults} from '../src/daily.mjs';
+ forecastPrice,pricedResults,qualifiesForPricedCs2Shortlist,inPlayFixtures,publishedWinnerPick,hasPublishedTotalPick,compareCs2Forecast,cs2ComparisonResults,cs2ReservePick,cs2CoverageResults} from '../src/daily.mjs';
 
 test('the published picks exclude near-equal winners and weak or exploratory totals',()=>{
  assert.equal(publishedWinnerPick({pick:'DENDELE',probability:.5276}),null);
@@ -35,6 +35,27 @@ test('CS2 model comparison uses the saved control on the same completed matches'
   ['weak',{matches:2,primaryWins:1,referenceWins:0}],
   ['different',{matches:1,primaryWins:0,referenceWins:1}]
  ]);
+});
+
+test('the CS2 reserve fills abstentions without replacing or double-counting primary picks',()=>{
+ const base={game:'cs2',a:'A',b:'B',model:'lightGBM@v1',
+  research:{selected:'lightGBM',version:'v1',approved:true},pick:'A'};
+ const strong={...base,probability:.62,probabilityA:.62,control:{probabilityA:.40}};
+ const weak={...base,probability:.53,probabilityA:.53,control:{probabilityA:.40}};
+ assert.equal(cs2ReservePick(strong),null);
+ assert.deepEqual(cs2ReservePick(weak),{team:'B',probability:.60});
+ assert.equal(cs2ReservePick({...weak,control:{probabilityA:.49}}),null);
+ assert.equal(cs2ReservePick({...weak,game:'dota'}),null);
+ const rows=[
+  {forecast:strong,winner:'A',actual:1},
+  {forecast:weak,winner:'B',actual:0},
+  {forecast:weak,winner:'A',actual:1},
+  {forecast:weak,winner:'A',actual:1,technical:true}
+ ];
+ const {primary,reserve,expanded,matches}=cs2CoverageResults(rows);
+ assert.equal(matches,3);
+ assert.deepEqual([primary.won,primary.total,reserve.won,reserve.total],[1,1,1,2]);
+ assert.deepEqual(expanded,{total:3,won:2});
 });
 
 test('live listings keep saved forecasts through a delayed start or a fixture feed gap',()=>{

@@ -96,6 +96,21 @@ export function compareCs2Forecast(forecast){
  return {primary,reference,group};
 }
 
+export function cs2ReservePick(forecast){
+ const pair=compareCs2Forecast(forecast);
+ if(pair&&pair.primary.probability<publishedChoiceThreshold&&
+    pair.reference.probability>=publishedChoiceThreshold)return pair.reference;
+ return null;
+}
+
+export function cs2CoverageResults(rows){
+ const checked=verifiedForecastRows(rows,'cs2').filter(({forecast})=>compareCs2Forecast(forecast));
+ const primary=tally(checked,({forecast})=>publishedWinnerPick(forecast));
+ const reserve=tally(checked,({forecast})=>cs2ReservePick(forecast)?.team);
+ return {matches:checked.length,primary,reserve,
+  expanded:{total:primary.total+reserve.total,won:primary.won+reserve.won}};
+}
+
 export function cs2ComparisonResults(rows){
  const groups=new Map();
  for(const {forecast,winner} of verifiedForecastRows(rows,'cs2')){
