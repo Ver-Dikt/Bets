@@ -116,8 +116,11 @@ export function cs2ComparisonResults(rows){
  for(const {forecast,winner} of verifiedForecastRows(rows,'cs2')){
   const pair=compareCs2Forecast(forecast);
   if(!pair)continue;
-  const group=groups.get(pair.group)??{matches:0,primaryWins:0,referenceWins:0};
+  const group=groups.get(pair.group)??{matches:0,primaryWins:0,referenceWins:0,primaryError:0,referenceError:0};
+  const resultA=Number(winner===forecast.a);
   group.matches++;
+  group.primaryError+=(forecast.probabilityA-resultA)**2;
+  group.referenceError+=(forecast.control.probabilityA-resultA)**2;
   group.primaryWins+=Number(pair.primary.team===winner);
   group.referenceWins+=Number(pair.reference.team===winner);
   groups.set(pair.group,group);
@@ -218,10 +221,10 @@ export function qualifiesForPricedCs2Shortlist(forecast,benchmark,now){
 
 export function confidenceBreakdown(rows){
  const bands=[
-  {min:.5,max:.55,settled:0,won:0},
-  {min:.55,max:.65,settled:0,won:0},
-  {min:.65,max:cs2ConfidenceThreshold,settled:0,won:0},
-  {min:cs2ConfidenceThreshold,max:null,settled:0,won:0}
+  {min:.5,max:.55,settled:0,won:0,expectedWins:0},
+  {min:.55,max:.65,settled:0,won:0,expectedWins:0},
+  {min:.65,max:cs2ConfidenceThreshold,settled:0,won:0,expectedWins:0},
+  {min:cs2ConfidenceThreshold,max:null,settled:0,won:0,expectedWins:0}
  ];
  for(const {forecast,actual,technical} of rows){
   const p=forecast?.probability;
@@ -229,6 +232,7 @@ export function confidenceBreakdown(rows){
   const band=bands.find(({max})=>max===null||p<max);
   band.settled++;
   band.won+=actual;
+  band.expectedWins+=p;
  }
  return bands;
 }

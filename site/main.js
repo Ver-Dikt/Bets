@@ -5,7 +5,7 @@ import {analyzeFixture,probabilitySteps} from './analysis.mjs';
 const modelNames={
  dynamicElo:'Dynamic Elo',glicko2:'Glicko-2',trueSkill:'TrueSkill',bradleyTerry:'Bradley–Terry',
  ratingBlend:'Ансамбль рейтингов',hybridBlend:'Ансамбль рейтингов и деревьев',
- bayesian:'Байесовская модель',catBoost:'CatBoost',lightGBM:'LightGBM',legacy:'Контрольная модель',
+ bayesian:'Байесовская модель',catBoost:'CatBoost',lightGBM:'LightGBM',legacy:'Рейтинговая модель',
  equalChance:'Равные шансы',formatPrior:'Историческая частота'
 };
 const $=id=>document.getElementById(id);
@@ -25,6 +25,7 @@ const cs2ShortlistMode=()=>['cs2-shortlist','cs2-priced'].includes(filters.confi
 const agreementThreshold=()=>({ 'cs2-agreement':.55, 'cs2-agreement70':.70 })[filters.confidence];
 const expandedCs2Mode=()=>filters.confidence==='cs2-expanded';
 const cs2OnlyMode=()=>cs2ShortlistMode()||expandedCs2Mode()||Boolean(agreementThreshold());
+const ratingModelHelp='Рассчитывает шансы по рейтингу силы, форме и очным встречам. При наличии данных учитывает карты и состав.';
 const comparisonLabels={agreement:'Обе модели за одну команду от 55%',weak:'Хотя бы одна модель ниже 55%',different:'Модели выбрали разные команды'};
 const modelFavorite=choice=>choice.team?choice.team+' · '+pct(choice.probability):'Равные шансы · 50%';
 function forecastFor(fixture){
@@ -118,7 +119,7 @@ function renderFixtures(){
  const benchmark=shortlist?cs2ConfidenceBenchmark(research):null;
  const threshold=agreementThreshold();
  note.hidden=(!shortlist&&!threshold&&!expandedCs2Mode())||filters.period==='live';
- note.textContent=expandedCs2Mode()?'Если основная модель ниже 55%, показываем резервный выбор контрольной модели от 55%.':threshold?'Обе модели выбрали одну команду с вероятностью от '+pct(threshold)+'.':priced?'Победитель CS2 от 70% с коэффициентом выше порога безубыточности. Снимок цены должен быть свежее 45 минут.':benchmark
+ note.textContent=expandedCs2Mode()?'Если основная модель ниже 55%, показываем резервный выбор рейтинговой модели от 55%.':threshold?'Обе модели выбрали одну команду с вероятностью от '+pct(threshold)+'.':priced?'Победитель CS2 от 70% с коэффициентом выше порога безубыточности. Снимок цены должен быть свежее 45 минут.':benchmark
   ?'На историческом тесте '+benchmark.correct+' из '+benchmark.count+' попаданий · охват '+pct(benchmark.coverage)+' всех проверенных серий CS2'
   :'Историческая проверка активной модели CS2 недоступна.';
  if(!items.length){
@@ -160,12 +161,12 @@ function renderFixtures(){
    const pick=publishedWinnerPick(saved),reserve=cs2ReservePick(saved);
    const preview=el('div','fixture-foot');
    preview.style.borderTop='1px solid #304658';preview.style.paddingTop='9px';
-   preview.append(el('span','',pick?'Прогноз · '+pick:reserve?'Резерв · '+reserve.team:'Почти равный матч'),el('span','win',pct(reserve?.probability??saved.probability)));
+   preview.append(el('span','',pick?'Основной выбор · '+pick:reserve?'Резерв · '+reserve.team:'Без выбора от 55%'),el('span','win',pct(reserve?.probability??saved.probability)));
    button.append(preview);
    const pair=compareCs2Forecast(saved);
    if(pair){
     const control=el('div','fixture-foot model-control');
-    control.append(el('span','','Контроль · '+modelFavorite(pair.reference)),el('span','',pair.group==='agreement'?'Согласие':pair.group==='different'?'Расхождение':'Ниже порога'));
+    control.append(el('span','','Рейтинговая модель · '+modelFavorite(pair.reference)),el('span','',pair.group==='agreement'?'Согласие':pair.group==='different'?'Расхождение':'Ниже порога'));
     button.append(control);
    }
   }else button.append(el('div','meta','Прогноз не записан'));
@@ -294,19 +295,22 @@ function renderAnalysis(){
  const verdict=el('div','selection');
  const favoriteProbability=Math.max(a,b);
  const pick=publishedWinnerPick(saved);
- verdict.append(el('small','',pick?(f.inPlay?'ПРЕДМАТЧЕВЫЙ ПРОГНОЗ':'МОДЕЛЬНЫЙ ФАВОРИТ'):'ПОЧТИ РАВНЫЙ МАТЧ'),
+ verdict.append(el('small','',pick?(f.inPlay?'ПРЕДМАТЧЕВЫЙ ПРОГНОЗ':'ОСНОВНОЙ ВЫБОР'):'ОЦЕНКА ОСНОВНОЙ МОДЕЛИ'),
   el('b','',pick?pick+' · '+pct(favoriteProbability):'Без выбора победителя'),
-  paragraph('', 'Записано '+shortTime(saved.createdAt)+' · '+(modelNames[saved.model.split('@')[0]]??'Контрольная модель')));
+  paragraph('', 'Записано '+shortTime(saved.createdAt)+' · '+(modelNames[saved.model.split('@')[0]]??'Рейтинговая модель')));
  root.append(verdict);
  const reserve=cs2ReservePick(saved);
  if(reserve)root.append(compBox('Резервный выбор CS2',modelFavorite(reserve),
-  'Контрольная модель даёт от 55%, основная ниже порога.'));
+  'Рейтинговая модель даёт от 55%, основная ниже порога.'));
  const paired=compareCs2Forecast(saved);
  if(paired){
   const comparison=el('div','comp-grid');
-  comparison.append(compBox('Основная · '+(modelNames[saved.research.selected]??saved.research.selected),modelFavorite(paired.primary)),
-   compBox('Контрольная модель',modelFavorite(paired.reference),comparisonLabels[paired.group]));
-  root.append(comparison);
+  const primaryDescription=saved.research.selected==='lightGBM'
+   ?'LightGBM учится на истории матчей и учитывает сочетания факторов.' :'Вероятность по активной модели.';
+  comparison.append(compBox('Основная модель',modelFavorite(paired.primary),primaryDescription),
+   compBox('Рейтинговая модель',modelFavorite(paired.reference),ratingModelHelp));
+  root.append(comparison,paragraph('muted',comparisonLabels[paired.group]));
+
  }
  const price=forecastPrice(saved);
  if(pick){
@@ -362,7 +366,7 @@ function renderAnalysis(){
   const players=roster?.players.map(player=>player.name+(player.metric==null?'':f.game==='dota'?' '+pct(player.metric):' '+player.metric.toFixed(2)));
   detail.append(compBox(team,players?.join(' · ')??'Состав недоступен',roster?roster.source+' · '+shortTime(roster.observedAt):''));
  }
- if(saved.evidence?.roster)detail.append(compBox('Профили игроков',pct(saved.evidence.roster.a),'Поправка контрольной модели по профилям команд.'));
+ if(saved.evidence?.roster)detail.append(compBox('Профили игроков',pct(saved.evidence.roster.a),'Поправка рейтинговой модели по профилям команд.'));
 
  detail.append(paragraph('muted','Данные встречи: '+f.source+'. Время получения: '+shortTime(f.fetchedAt)+'. Расчёт использует только исходы до старта этого матча.'));
 }
@@ -408,7 +412,7 @@ function syncTournaments(){
 function historicalResearch(root){
  if(!research?.version)return;
  const details=el('details');details.append(el('summary','','Историческая проверка моделей'));root.append(details);
- details.append(paragraph('muted','Модели обучались, отбирались и калибровались до финального тестового периода.'));
+ details.append(paragraph('muted','Модели обучались, отбирались и калибровались до финального тестового периода. Историческая рейтинговая модель использует рейтинг, форму и очные встречи. В текущих прогнозах рейтинговая модель может дополнительно учитывать карты и состав.'));
  for(const [game,report] of Object.entries(research.games)){
   const label=game==='cs2'?'CS2':'Dota 2';
   for(const [name,value] of [['Победитель',report.winner],...Object.entries(report.totals)]){
@@ -477,10 +481,11 @@ function renderDaily(root){
  const bands=confidenceBreakdown(rows);
  if(bands.some(band=>band.settled)){
   const details=el('details'),grid=el('div','comp-grid');
-  details.append(el('summary','','Точность модельных оценок по диапазонам'));
-  for(const {min,max,settled,won} of bands){
+  details.append(el('summary','','Оценка модели и фактические попадания'));
+  for(const {min,max,settled,won,expectedWins} of bands){
    const label=max===null?'От '+pct(min):pct(min)+' — менее '+pct(max);
-   grid.append(compBox(label,settled?pct(won/settled):'—',won+' из '+settled+' оценок'+(max===.55?' · без выбора победителя':'')));
+   const summary=settled?won+' из '+settled+' · модель в среднем дала '+pct(expectedWins/settled):'Нет завершённых матчей';
+   grid.append(compBox(label,settled?pct(won/settled):'—',summary+(max===.55?' · без выбора победителя':'')));
   }
   details.append(grid);
   root.append(details);
@@ -497,9 +502,9 @@ function renderDaily(root){
  const review=errorReview(picks);
  if(review.misses){
   const details=el('details');details.append(el('summary','','Разбор промахов · '+review.misses),
-   paragraph('muted',review.confident+' ошибок при вероятности от 65% · '+review.disagreement+' с расхождением с контрольной моделью'));
+   paragraph('muted',review.confident+' ошибок при вероятности от 65% · '+review.disagreement+' с расхождением с рейтинговой моделью'));
   for(const {forecast,winner,error} of review.latest)details.append(compBox(forecast.a+' — '+forecast.b,
-   forecast.pick+' · '+pct(forecast.probability),'Победитель '+winner+(error?.disagreement?' · контрольная модель выбрала иначе':'')));
+   forecast.pick+' · '+pct(forecast.probability),'Победитель '+winner+(error?.disagreement?' · рейтинговая модель выбрала иначе':'')));
   root.append(details);
  }
  const activeWinner=research?.games?.cs2?.winner;
@@ -510,7 +515,7 @@ function renderDaily(root){
   const section=el('details');
   section.append(el('summary','','CS2 · что даёт резервный отбор'));
   const grid=el('div','comp-grid');
-  for(const [label,stats] of [['Основной выбор',coverage.primary],['Резервный выбор контроля',coverage.reserve],['Вместе',coverage.expanded]]){
+  for(const [label,stats] of [['Основной выбор',coverage.primary],['Резервный выбор рейтинговой модели',coverage.reserve],['Вместе',coverage.expanded]]){
    grid.append(compBox(label,stats.won+' / '+stats.total,stats.total?pct(stats.won/stats.total)+' точность':'Нет выборов'));
   }
   section.append(grid,paragraph('muted','Проверка правила по '+coverage.matches+' завершённым матчам с сохранёнными предматчевыми оценками обеих моделей.'));
@@ -520,18 +525,23 @@ function renderDaily(root){
  if(paired.size){
   const section=el('details');
   const name=modelNames[activeWinner.selected]??activeWinner.selected;
-  section.append(el('summary','','CS2 · '+name+' и контрольная на одних и тех же матчах'));
+  section.append(el('summary','','CS2 · '+name+' и рейтинговая модель на одних и тех же матчах'));
   const all=[...paired.values()].reduce((sum,group)=>({
    matches:sum.matches+group.matches,primaryWins:sum.primaryWins+group.primaryWins,
-   referenceWins:sum.referenceWins+group.referenceWins
-  }),{matches:0,primaryWins:0,referenceWins:0});
+   referenceWins:sum.referenceWins+group.referenceWins,
+   primaryError:sum.primaryError+group.primaryError,
+   referenceError:sum.referenceError+group.referenceError
+  }),{matches:0,primaryWins:0,referenceWins:0,primaryError:0,referenceError:0});
   const grid=el('div','comp-grid');
+  grid.append(compBox('Ошибка вероятностей · Brier',
+   (all.primaryError/all.matches).toFixed(3)+' / '+(all.referenceError/all.matches).toFixed(3),
+   'Основная / рейтинговая на тех же '+all.matches+' матчах. Ниже — лучше.'));
   for(const [label,group] of [['Все общие матчи',all],...Object.entries(comparisonLabels).map(([key,label])=>[label,paired.get(key)])]){
    if(!group)continue;
    grid.append(compBox(label,group.matches+' матчей','Попадания · основная '+group.primaryWins+' / '+group.matches+
-    ' · контрольная '+group.referenceWins+' / '+group.matches));
+    ' · рейтинговая '+group.referenceWins+' / '+group.matches));
   }
-  section.append(grid,paragraph('muted','Для сравнения берём фаворитов обеих моделей, включая оценки ниже 55%. При 50% фаворита нет.'));
+  section.append(grid,paragraph('muted','Сравнение включает оценки ниже 55%. При 50% фаворита нет. У резервного отбора своя статистика.'));
   root.append(section);
  }
  const comparison=compareJournalWinners(rows);

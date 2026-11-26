@@ -30,11 +30,13 @@ test('CS2 model comparison uses the saved control on the same completed matches'
   {...row(.8),technical:true},{...row(.8),winner:null,actual:null},
   {...row(.8),forecast:{...forecast(.8),game:'dota'}}
  ]);
- assert.deepEqual([...summary],[
+ assert.deepEqual([...summary].map(([key,{matches,primaryWins,referenceWins}])=>[key,{matches,primaryWins,referenceWins}]),[
   ['agreement',{matches:1,primaryWins:1,referenceWins:1}],
   ['weak',{matches:2,primaryWins:1,referenceWins:0}],
   ['different',{matches:1,primaryWins:0,referenceWins:1}]
  ]);
+ assert.ok(Math.abs(summary.get('agreement').primaryError-.0576)<1e-12);
+ assert.ok(Math.abs(summary.get('different').referenceError-.1849)<1e-12);
 });
 
 test('the CS2 reserve fills abstentions without replacing or double-counting primary picks',()=>{
@@ -144,8 +146,10 @@ test('confidence bands cover exact thresholds and count only decided played fore
   [.5,1],[.5499,0],[.55,1],[.6499,1],[.65,0],[.6999,1],[.7,0],[1,1],
   [.71,null],[.74,1,true],[NaN,1],[1.001,1]
  ].map(([probability,actual,technical])=>({forecast:{probability},actual,technical}));
- assert.deepEqual(confidenceBreakdown(rows).map(({settled,won})=>[settled,won]),
-  [[2,1],[2,2],[2,1],[2,1]]);
+ const bands=confidenceBreakdown(rows);
+ assert.deepEqual(bands.map(({settled,won})=>[settled,won]),[[2,1],[2,2],[2,1],[2,1]]);
+ assert.ok(Math.abs(bands[0].expectedWins-1.0499)<1e-12);
+ assert.equal(bands[3].expectedWins,1.7);
 });
 
 test('the main report only includes played series forecasts as their results become confirmed',()=>{
