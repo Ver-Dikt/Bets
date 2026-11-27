@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {dailyRows,tally,totalTally,confidenceBreakdown,cs2ConfidenceBenchmark,qualifiesForCs2Shortlist,verifiedForecastRows,
- forecastPrice,pricedResults,qualifiesForPricedCs2Shortlist,inPlayFixtures,publishedWinnerPick,hasPublishedTotalPick,compareCs2Forecast,cs2ComparisonResults,cs2ReservePick,cs2CoverageResults} from '../src/daily.mjs';
+ forecastPrice,pricedResults,qualifiesForPricedCs2Shortlist,inPlayFixtures,publishedWinnerPick,hasPublishedTotalPick,compareCs2Forecast,cs2ComparisonResults,cs2ReservePick,cs2CoverageResults,replayDailySelection} from '../src/daily.mjs';
 
 test('the published picks exclude near-equal winners and weak or exploratory totals',()=>{
  assert.equal(publishedWinnerPick({pick:'DENDELE',probability:.5276}),null);
@@ -206,4 +206,32 @@ test('price shortlist requires a fresh favorable quote for the approved pre-matc
   {kickoff:'2026-11-24T05:30:00Z'},{createdAt:'2026-11-24T04:59:00Z'}]){
   assert.equal(qualifiesForPricedCs2Shortlist({...forecast,...change},benchmark,now),false);
  }
+});
+
+test('daily replay freezes the first qualifying entry and ranks only prices known at that update',()=>{
+ const record=(fixtureId,odds,createdAt='2026-11-25T08:00:00Z',overrides={})=>({
+  fixtureId,a:fixtureId,b:'Opponent',pick:fixtureId,game:'cs2',format:'Bo3',probability:.6,
+  odds:[odds,2],oddsSource:'PARI',oddsObservedAt:createdAt,createdAt,
+  kickoff:'2026-11-25T12:00:00Z',...overrides});
+ const first=record('first',2);
+ const second=record('second',2.2);
+ const later=record('later',4,'2026-11-25T11:30:00Z');
+ const stale=record('stale',7,undefined,{oddsObservedAt:'2026-11-25T07:00:00Z'});
+ const live=record('live',7,'2026-11-25T12:01:00Z');
+ const pending=record('pending',2,'2026-11-26T08:00:00Z',{kickoff:'2026-11-26T12:00:00Z'});
+ const alternative=record('other',8,undefined,{oddsSource:'Betway',oddsProvider:'OddsLink'});
+ const records=[first,second,later,stale,live,pending,alternative];
+ const journal=records.map(record=>({type:'forecast',record}));
+ journal.push({type:'settlement',fixtureId:'second',checkedAt:'2026-11-25T15:00:00Z'});
+ const rows=[{forecast:first,winner:first.a},{forecast:second,winner:second.b},{forecast:later,winner:later.a}];
+ const replay=replayDailySelection({journal,rows,source:'pari',from:'2026-11-24',day:'2026-11-26',now:Date.parse('2026-11-26T11:00:00Z')});
+ const {one,two}=replay.scenarios[1];
+ assert.equal(replay.covered,4);
+ assert.deepEqual(one.picks.map(p=>p.id),['second','pending']);
+ assert.deepEqual(two.picks.map(p=>p.id),['second','first','pending']);
+ assert.equal(one.profit,-1);
+ assert.equal(one.drawdown,1);
+ assert.equal(one.pending,1);
+ assert.equal(two.closed,2);
+ assert.equal(two.roi,0);
 });

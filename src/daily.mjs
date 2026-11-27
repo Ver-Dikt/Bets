@@ -280,3 +280,72 @@ export function compareJournalWinners(rows) {
  }
  return [...buckets].map(([name,result])=>({name,...result,brier:result.brier/result.settled}));
 }
+
+// A replay executes at each journal timestamp, while the quoted price is fresh.
+export function replayDailySelection({journal,rows,from,day,game='all',format='all',source='all',now}){
+ const outcomes=new Map(rows.filter(row=>row.forecast).map(row=>[row.forecast.fixtureId,row]));
+ const starts=new Map();
+ const finals=new Map();
+ const candidates=[];
+ const seenEvents=new Map();
+ for(const entry of journal){
+  if(['settlement','technical-result'].includes(entry.type)&&Date.parse(entry.checkedAt)<=now){
+   const id=entry.fixtureId??entry.forecastId?.split('@')[0];
+   if(id)finals.set(id,entry);
+  }
+ }
+ for(const {record:p,type} of journal){
+  if(type!=='forecast'||!p?.fixtureId)continue;
+  const start=Date.parse(p.kickoff);
+  if(Number.isFinite(start))starts.set(p.fixtureId,Math.min(start,starts.get(p.fixtureId)??Infinity));
+ }
+ for(const {record:p,type} of journal){
+  if(type!=='forecast'||!p?.fixtureId||!publishedWinnerPick(p)||p.probabilityBasis==='map'||
+   (game!=='all'&&p.game!==game)||(format!=='all'&&p.format!==format))continue;
+  const date=moscowDay(p.kickoff);
+  if(!date||date<from||date>day)continue;
+  const at=Date.parse(p.createdAt);
+  const price=forecastPrice(p);
+  const kickoff=starts.get(p.fixtureId);
+  if(!(at<=now&&at<kickoff)||!price||(source==='pari'&&price.bookmaker!=='PARI')||at-Date.parse(price.observedAt)>=45*60000)continue;
+  const matchKey=JSON.stringify([p.game,p.format,date,kickoff,[p.a,p.b].map(team=>team.toLowerCase()).sort()]);
+  const match=seenEvents.get(matchKey)??p.fixtureId;
+  seenEvents.set(matchKey,match);
+  candidates.push({p,price,at,date,match});
+ }
+ candidates.sort((a,b)=>a.at-b.at||b.price.expectedReturn-a.price.expectedReturn||a.p.fixtureId.localeCompare(b.p.fixtureId));
+ function select(limit,minReturn){
+  const visited=new Set(),daily=new Map(),picks=[];
+  for(const {p,price,date,match,at} of candidates){
+   if(visited.has(match)||(daily.get(date)??0)>=limit||price.expectedReturn<minReturn)continue;
+   visited.add(match);daily.set(date,(daily.get(date)??0)+1);
+   const result=outcomes.get(p.fixtureId), final=finals.get(p.fixtureId);
+   const decision={day:date,id:p.fixtureId,team:p.pick,a:p.a,b:p.b,at,odds:price.odds,expectedReturn:price.expectedReturn,bookmaker:price.bookmaker};
+   if(result?.technical){picks.push({...decision,state:'void'});continue}
+   if(!result?.winner){picks.push({...decision,state:'pending'});continue}
+   const win=result.winner===p.pick;
+   picks.push({...decision,state:win?'won':'lost',profit:win?price.odds-1:-1,settledAt:Date.parse(final?.checkedAt)});
+  }
+  let pnl=0,peak=0,drawdown=0,streak=0,maxStreak=0;
+  const closed=picks.filter(x=>Number.isFinite(x.profit));
+  // Group equally timed confirmations so a batch has one equity point.
+  const batches=new Map();
+  for(const pick of closed){
+   if(!Number.isFinite(pick.settledAt))continue;
+   batches.set(pick.settledAt,(batches.get(pick.settledAt)??0)+pick.profit);
+  }
+  for(const [,profit] of [...batches].sort((a,b)=>a[0]-b[0])){
+   pnl+=profit;peak=Math.max(pnl,peak);drawdown=Math.max(drawdown,peak-pnl);
+  }
+  for(const {state} of picks){
+   if(state==='void')continue;
+   streak=state==='lost'?streak+1:0;maxStreak=Math.max(maxStreak,streak);
+  }
+  const profit=closed.reduce((sum,x)=>sum+x.profit,0);
+  return {picks,closed:closed.length,won:closed.filter(x=>x.state==='won').length,
+   pending:picks.filter(x=>x.state==='pending').length,voids:picks.filter(x=>x.state==='void').length,
+   profit,roi:closed.length?profit/closed.length:null,drawdown:batches.size&&closed.every(x=>Number.isFinite(x.settledAt))?drawdown:null,maxStreak};
+ }
+ return {covered:new Set(candidates.map(x=>x.match)).size,baseline:select(Infinity,-Infinity),
+  scenarios:[0,.03,.05].map(threshold=>({threshold,one:select(1,threshold),two:select(2,threshold)}))};
+}

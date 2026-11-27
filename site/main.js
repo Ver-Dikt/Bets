@@ -1,6 +1,6 @@
 import {dailyRows,tally,reviewPeriod,totalTally,errorReview,compareJournalWinners,
  confidenceBreakdown,cs2ConfidenceBenchmark,qualifiesForCs2Shortlist,verifiedForecastRows,forecastPrice,pricedResults,
- qualifiesForPricedCs2Shortlist,inPlayFixtures,publishedWinnerPick,hasPublishedTotalPick,compareCs2Forecast,cs2ComparisonResults,cs2ReservePick,cs2CoverageResults} from './daily.mjs';
+ qualifiesForPricedCs2Shortlist,inPlayFixtures,publishedWinnerPick,hasPublishedTotalPick,compareCs2Forecast,cs2ComparisonResults,cs2ReservePick,cs2CoverageResults,replayDailySelection} from './daily.mjs';
 import {analyzeFixture,probabilitySteps} from './analysis.mjs';
 const modelNames={
  dynamicElo:'Dynamic Elo',glicko2:'Glicko-2',trueSkill:'TrueSkill',bradleyTerry:'Bradley–Terry',
@@ -17,7 +17,7 @@ const shortTime=x=>Number.isFinite(Date.parse(x))?dateFmt.format(new Date(x)):'�
 const dateLong=x=>Number.isFinite(Date.parse(x))?new Intl.DateTimeFormat('ru-RU',{timeZone:moscow,day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(x)):'Время неизвестно';
 const pct=x=>typeof x==='number'&&Number.isFinite(x)?(x*100).toFixed(1)+'%':'—';
 const asNum=x=>x==null?'—':Number(x).toFixed(1);
-let matches=[],fixtures=[],journal=[],report=null,research=null,mapInsights=null,filters={game:'all',view:['#brief','#daily'].includes(location.hash)?'daily':'today',period:'today',tournament:'all',confidence:'recorded'},selected=null,expanded=false,loading=false,fixtureStatus=null;
+let matches=[],fixtures=[],journal=[],report=null,research=null,mapInsights=null,filters={game:'all',view:(['#brief','#daily'].includes(location.hash)||new URLSearchParams(location.search).has('selection'))?'daily':'today',period:'today',tournament:'all',confidence:'recorded'},selected=null,expanded=false,loading=false,fixtureStatus=null;
 const assessments=new Map();
 const published=new Map();
 let playing=[];
@@ -449,6 +449,49 @@ function historicalResearch(root){
   }
  }
 }
+function renderSelectionReplay(root,{day,game,format,now}){
+ const from='2026-11-24';
+ if(day<from)return;
+ const rows=dailyRows({day,from,fixtures,journal,matches,now});
+ const source=filters.replaySource??'all';
+ const {covered,baseline,scenarios}=replayDailySelection({journal,rows,from,day,game,format,source,now});
+ const panel=el('details');
+ panel.id='selection';
+ panel.open=filters.replayOpen??new URLSearchParams(location.search).has('selection');
+ panel.ontoggle=()=>{filters.replayOpen=panel.open};
+ const feed=el('select');
+ feed.setAttribute('aria-label','Котировки для бэктеста');
+ feed.append(new Option('Только PARI','pari'),new Option('PARI и OddsLink','all'));
+ feed.value=source;
+ feed.onchange=()=>{filters.replaySource=feed.value;filters.replayOpen=true;renderWorkspace()};
+ panel.append(el('summary','','Бэктест · до двух выборов в день'),feed,
+  paragraph('muted','С 24.11.2026 по '+day+' включительно, по Москве. Матчи с прогнозом от 55% и сохранённой ценой: '+covered+'.'),
+  paragraph('muted','На каждом обновлении берём подходящие цены, которым меньше 45 минут. Внутри обновления сначала идёт наибольшая расчётная доходность. Уже сделанный выбор занимает дневное место. Размер — 1 условная единица. Источники: PARI и другие букмекеры через OddsLink.'));
+ const grid=el('div','comp-grid');
+ const describe=(label,result)=>{
+  const {closed,won,pending,voids,profit,roi,drawdown,maxStreak}=result;
+  return compBox(label,closed?((profit>0?'+':'')+profit.toFixed(2)+' ед. · ROI '+pct(roi)):'—',
+   won+' / '+closed+' попаданий · ждут '+pending+' · возвратов '+voids+
+   (closed?' · серия промахов '+maxStreak:'')+
+   (drawdown===null?'':' · просадка '+drawdown.toFixed(2)+' ед.'));
+ };
+ grid.append(describe('Все прогнозы от 55% с ценой',baseline));
+ for(const {threshold,one,two} of scenarios){
+  const label=pct(threshold)+' мин. расчётной доходности';
+  grid.append(describe('До одного · '+label,one),describe('До двух · '+label,two));
+ }
+ panel.append(grid);
+ const log=el('details');
+ log.append(el('summary','','Матчи · до двух при запасе от 3%'));
+ const status={won:'попадание',lost:'промах',pending:'ждёт результата',void:'возврат'};
+ for(const pick of scenarios[1].two.picks){
+  log.append(paragraph('muted',pick.day+' · '+shortTime(new Date(pick.at).toISOString())+' · '+pick.a+' — '+pick.b+
+   ' · '+pick.team+' '+pick.odds.toFixed(2)+' ('+pick.bookmaker+') · '+status[pick.state]));
+ }
+ if(!scenarios[1].two.picks.length)log.append(paragraph('muted','Подходящих цен за период нет.'));
+ panel.append(log,paragraph('muted','Исторический прогон. Разные правила используют одни и те же доступные записи, но выбирают разное число матчей.'));
+ root.append(panel);
+}
 function renderDaily(root){
  const chooser=el('input');chooser.type='date';chooser.value=filters.reviewDay??dayFmt.format(Date.now());
  chooser.setAttribute('aria-label','Конец периода');
@@ -482,6 +525,7 @@ function renderDaily(root){
   compBox('ROI по всем прогнозам с ценой',pct(priced.all.roi),priced.all.priced?'Расчёт по 1 условной единице на прогноз':'Пока нет сверенных прогнозов с ценой'),
   compBox('ROI при положительной оценке доходности',pct(priced.positive.roi),priced.positive.priced+' сверенных прогнозов'));
  root.append(returns);
+ renderSelectionReplay(root,{day:chooser.value,game:game.value,format:format.value,now:Date.now()});
  const bands=confidenceBreakdown(rows);
  if(bands.some(band=>band.settled)){
   const details=el('details'),grid=el('div','comp-grid');
