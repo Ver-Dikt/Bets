@@ -449,11 +449,36 @@ function historicalResearch(root){
   }
  }
 }
+const dailySelectionThreshold=.01;
+const selectionStatus={won:'попадание',lost:'промах',pending:'ждём результат',void:'возврат'};
+
+function renderTodaySelection(){
+ const now=Date.now(),day=dayFmt.format(now),root=$('today-selection');
+ const rows=dailyRows({day,fixtures,journal,matches,now});
+ const replay=replayDailySelection({journal,rows,from:day,day,source:'pari',now});
+ const {picks}=replay.scenarios.find(({threshold})=>threshold===dailySelectionThreshold).two;
+ const title=el('div','panel-heading');
+ const historyLink=el('a','','Бэктест');
+ historyLink.href='?selection=1#daily';
+ title.append(el('h2','','Выбор на сегодня'),historyLink);
+ root.replaceChildren(title,paragraph('muted',
+  new Intl.DateTimeFormat('ru-RU',{timeZone:moscow,day:'numeric',month:'long'}).format(now)+
+  ' · PARI · до двух матчей · расчётный запас от +1%'));
+ const grid=el('div','comp-grid');
+ for(const pick of picks){
+  const status=pick.state==='pending'&&Date.parse(pick.kickoff)>now?'до старта':selectionStatus[pick.state];
+  grid.append(compBox(pick.a+' — '+pick.b,pick.team+' · '+pick.odds.toFixed(2),
+   shortTime(pick.kickoff)+' МСК · '+pct(pick.probability)+' по модели · '+status));
+ }
+ if(picks.length)root.append(grid);
+ else root.append(paragraph('muted',!fixtureStatus&&!journal.length?'Загружаем расписание и журнал…':
+  replay.covered?'Сегодня ни один прогноз с сохранённой ценой PARI не прошёл порог.':'В журнале пока нет подходящих предматчевых цен PARI на сегодня.'));
+}
 function renderSelectionReplay(root,{day,game,format,now}){
  const from='2026-11-24';
  if(day<from)return;
  const rows=dailyRows({day,from,fixtures,journal,matches,now});
- const source=filters.replaySource??'all';
+ const source=filters.replaySource??'pari';
  const {covered,baseline,scenarios}=replayDailySelection({journal,rows,from,day,game,format,source,now});
  const panel=el('details');
  panel.id='selection';
@@ -482,13 +507,13 @@ function renderSelectionReplay(root,{day,game,format,now}){
  }
  panel.append(grid);
  const log=el('details');
- log.append(el('summary','','Матчи · до двух при запасе от 3%'));
- const status={won:'попадание',lost:'промах',pending:'ждёт результата',void:'возврат'};
- for(const pick of scenarios[1].two.picks){
+ log.append(el('summary','','Матчи · до двух при запасе от +1%'));
+ const {picks}=scenarios.find(({threshold})=>threshold===dailySelectionThreshold).two;
+ for(const pick of picks){
   log.append(paragraph('muted',pick.day+' · '+shortTime(new Date(pick.at).toISOString())+' · '+pick.a+' — '+pick.b+
-   ' · '+pick.team+' '+pick.odds.toFixed(2)+' ('+pick.bookmaker+') · '+status[pick.state]));
+   ' · '+pick.team+' '+pick.odds.toFixed(2)+' ('+pick.bookmaker+') · '+selectionStatus[pick.state]));
  }
- if(!scenarios[1].two.picks.length)log.append(paragraph('muted','Подходящих цен за период нет.'));
+ if(!picks.length)log.append(paragraph('muted','Подходящих цен за период нет.'));
  panel.append(log,paragraph('muted','Исторический прогон. Разные правила используют одни и те же доступные записи, но выбирают разное число матчей.'));
  root.append(panel);
 }
@@ -633,7 +658,8 @@ function renderWorkspace(){
   button.classList.toggle('active',active);
   button.setAttribute('aria-pressed',String(active));
  }
- if(!isDaily)return;
+ $('today-selection').hidden=isDaily;
+ if(!isDaily){renderTodaySelection();return}
  const root=$('workspace-content');root.replaceChildren();renderDaily(root);
 }
 function updateFilters(){
@@ -642,7 +668,14 @@ function updateFilters(){
  if(!rows.some(row=>row.id===selected?.id))selected=rows[0]??null;
  renderFixtures();renderAnalysis();renderWorkspace();
 }
-for(const btn of document.querySelectorAll('[data-view]'))btn.onclick=()=>{filters.view=btn.dataset.view;history.replaceState(null,'',filters.view==='daily'?'#daily':location.pathname+location.search);updateFilters()};
+for(const btn of document.querySelectorAll('[data-view]'))btn.onclick=()=>{
+ filters.view=btn.dataset.view;
+ const url=new URL(location.href);
+ if(filters.view==='today')url.searchParams.delete('selection');
+ url.hash=filters.view==='daily'?'daily':'';
+ history.replaceState(null,'',url);
+ updateFilters();
+};
 for(const key of ['period','tournament'])$(key).onchange=()=>{filters[key]=$(key).value;updateFilters()};
 function setDiscipline(game){
  filters.game=game;

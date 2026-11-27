@@ -225,7 +225,8 @@ test('daily replay freezes the first qualifying entry and ranks only prices know
  journal.push({type:'settlement',fixtureId:'second',checkedAt:'2026-11-25T15:00:00Z'});
  const rows=[{forecast:first,winner:first.a},{forecast:second,winner:second.b},{forecast:later,winner:later.a}];
  const replay=replayDailySelection({journal,rows,source:'pari',from:'2026-11-24',day:'2026-11-26',now:Date.parse('2026-11-26T11:00:00Z')});
- const {one,two}=replay.scenarios[1];
+ const {one,two}=replay.scenarios.find(({threshold})=>threshold===.03);
+ assert.ok(replay.scenarios.some(({threshold})=>threshold===.01));
  assert.equal(replay.covered,4);
  assert.deepEqual(one.picks.map(p=>p.id),['second','pending']);
  assert.deepEqual(two.picks.map(p=>p.id),['second','first','pending']);

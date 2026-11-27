@@ -320,7 +320,7 @@ export function replayDailySelection({journal,rows,from,day,game='all',format='a
    if(visited.has(match)||(daily.get(date)??0)>=limit||price.expectedReturn<minReturn)continue;
    visited.add(match);daily.set(date,(daily.get(date)??0)+1);
    const result=outcomes.get(p.fixtureId), final=finals.get(p.fixtureId);
-   const decision={day:date,id:p.fixtureId,team:p.pick,a:p.a,b:p.b,at,odds:price.odds,expectedReturn:price.expectedReturn,bookmaker:price.bookmaker};
+   const decision={day:date,id:p.fixtureId,team:p.pick,a:p.a,b:p.b,at,kickoff:p.kickoff,probability:p.probability,odds:price.odds,expectedReturn:price.expectedReturn,bookmaker:price.bookmaker};
    if(result?.technical){picks.push({...decision,state:'void'});continue}
    if(!result?.winner){picks.push({...decision,state:'pending'});continue}
    const win=result.winner===p.pick;
@@ -347,5 +347,5 @@ export function replayDailySelection({journal,rows,from,day,game='all',format='a
    profit,roi:closed.length?profit/closed.length:null,drawdown:batches.size&&closed.every(x=>Number.isFinite(x.settledAt))?drawdown:null,maxStreak};
  }
  return {covered:new Set(candidates.map(x=>x.match)).size,baseline:select(Infinity,-Infinity),
-  scenarios:[0,.03,.05].map(threshold=>({threshold,one:select(1,threshold),two:select(2,threshold)}))};
+  scenarios:[0,.01,.03,.05].map(threshold=>({threshold,one:select(1,threshold),two:select(2,threshold)}))};
 }
