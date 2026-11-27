@@ -35,6 +35,7 @@ const worker=await readFile(resolve(root,'site/sw.js'),'utf8');
 const version=shellHash.update(worker).digest('hex').slice(0,16);
 await writeFile(resolve(dist,'sw.js'),worker.replace('__SHELL_VERSION__',version));
 await copyFile(resolve(root,'site/brief.json'),resolve(dist,'brief.json'));
+await copyFile(resolve(root,'site/pari-screenshots.json'),resolve(dist,'pari-screenshots.json'));
 const report=await read('data/private/report.json').catch(()=>null);
 const publishedReport={schemaVersion:1,games:{}};
 for(const game of ['cs2','dota']){

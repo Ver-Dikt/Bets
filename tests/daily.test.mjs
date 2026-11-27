@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {dailyRows,tally,totalTally,confidenceBreakdown,cs2ConfidenceBenchmark,qualifiesForCs2Shortlist,verifiedForecastRows,
- forecastPrice,pricedResults,qualifiesForPricedCs2Shortlist,inPlayFixtures,publishedWinnerPick,hasPublishedTotalPick,compareCs2Forecast,cs2ComparisonResults,cs2ReservePick,cs2CoverageResults,replayDailySelection} from '../src/daily.mjs';
+ forecastPrice,pricedResults,qualifiesForPricedCs2Shortlist,inPlayFixtures,publishedWinnerPick,hasPublishedTotalPick,compareCs2Forecast,cs2ComparisonResults,cs2ReservePick,cs2CoverageResults,replayDailySelection,pariScreenshotSelections} from '../src/daily.mjs';
 
 test('the published picks exclude near-equal winners and weak or exploratory totals',()=>{
  assert.equal(publishedWinnerPick({pick:'DENDELE',probability:.5276}),null);
@@ -235,4 +235,23 @@ test('daily replay freezes the first qualifying entry and ranks only prices know
  assert.equal(one.pending,1);
  assert.equal(two.closed,2);
  assert.equal(two.roi,0);
+});
+
+test('PARI screenshot uses the last forecast known at capture and stays outside the automated replay',()=>{
+ const kickoff='2026-11-27T15:00:00Z';
+ const observedAt='2026-11-27T05:19:00Z';
+ const original={fixtureId:'nine',a:'9INE',b:'Revise',kickoff,probability:.725,pick:'9INE',
+  createdAt:'2026-11-27T04:00:00Z',game:'cs2',format:'Bo3'};
+ const late={...original,createdAt:'2026-11-27T06:00:00Z',probability:.6};
+ const journal=[late,original].map(record=>({type:'forecast',record}));
+ const quote={fixtureId:'nine',kickoff,observedAt,odds:[1.4,2.7]};
+ const day='2026-11-27',now=Date.parse('2026-11-27T06:30:00Z');
+ const params={journal,rows:[],day,now,minReturn:.01};
+ const [pick]=pariScreenshotSelections({...params,quotes:[quote]});
+ assert.equal(pick.team,'9INE');
+ assert.equal(pick.probability,.725);
+ assert.equal(pick.screenshot,true);
+ const newer={...quote,observedAt:'2026-11-27T06:10:00Z',odds:[1.38,2.8]};
+ assert.equal(pariScreenshotSelections({...params,quotes:[newer,quote]}).length,0);
+ assert.equal(replayDailySelection({...params,from:day,source:'pari'}).covered,0);
 });

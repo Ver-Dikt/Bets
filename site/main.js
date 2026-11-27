@@ -1,6 +1,6 @@
 import {dailyRows,tally,reviewPeriod,totalTally,errorReview,compareJournalWinners,
  confidenceBreakdown,cs2ConfidenceBenchmark,qualifiesForCs2Shortlist,verifiedForecastRows,forecastPrice,pricedResults,
- qualifiesForPricedCs2Shortlist,inPlayFixtures,publishedWinnerPick,hasPublishedTotalPick,compareCs2Forecast,cs2ComparisonResults,cs2ReservePick,cs2CoverageResults,replayDailySelection} from './daily.mjs';
+ qualifiesForPricedCs2Shortlist,inPlayFixtures,publishedWinnerPick,hasPublishedTotalPick,compareCs2Forecast,cs2ComparisonResults,cs2ReservePick,cs2CoverageResults,replayDailySelection,pariScreenshotSelections} from './daily.mjs';
 import {analyzeFixture,probabilitySteps} from './analysis.mjs';
 const modelNames={
  dynamicElo:'Dynamic Elo',glicko2:'Glicko-2',trueSkill:'TrueSkill',bradleyTerry:'Bradley–Terry',
@@ -17,7 +17,7 @@ const shortTime=x=>Number.isFinite(Date.parse(x))?dateFmt.format(new Date(x)):'�
 const dateLong=x=>Number.isFinite(Date.parse(x))?new Intl.DateTimeFormat('ru-RU',{timeZone:moscow,day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(x)):'Время неизвестно';
 const pct=x=>typeof x==='number'&&Number.isFinite(x)?(x*100).toFixed(1)+'%':'—';
 const asNum=x=>x==null?'—':Number(x).toFixed(1);
-let matches=[],fixtures=[],journal=[],report=null,research=null,mapInsights=null,filters={game:'all',view:(['#brief','#daily'].includes(location.hash)||new URLSearchParams(location.search).has('selection'))?'daily':'today',period:'today',tournament:'all',confidence:'recorded'},selected=null,expanded=false,loading=false,fixtureStatus=null;
+let matches=[],fixtures=[],journal=[],pariScreenshots=[],report=null,research=null,mapInsights=null,filters={game:'all',view:(['#brief','#daily'].includes(location.hash)||new URLSearchParams(location.search).has('selection'))?'daily':'today',period:'today',tournament:'all',confidence:'recorded'},selected=null,expanded=false,loading=false,fixtureStatus=null;
 const assessments=new Map();
 const published=new Map();
 let playing=[];
@@ -377,7 +377,7 @@ function renderAnalysis(){
 async function load(){
  if(loading)return;loading=true;
  const read=async(name)=>{const r=await fetch('./'+name+'?v='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error(name+' HTTP '+r.status);return r.json()};
- const [matchesResult,fixtureResult,reportResult,mapResult,journalResult,researchResult]=await Promise.allSettled([read('snapshot.json'),read('fixtures.json'),read('report.json'),read('map-insights.json'),read('journal.json'),read('research.json')]);
+ const [matchesResult,fixtureResult,reportResult,mapResult,journalResult,researchResult,pariScreenshotsResult]=await Promise.allSettled([read('snapshot.json'),read('fixtures.json'),read('report.json'),read('map-insights.json'),read('journal.json'),read('research.json'),read('pari-screenshots.json')]);
  if(matchesResult.status==='fulfilled'&&matchesResult.value?.schemaVersion===1&&Array.isArray(matchesResult.value.matches))
   matches=matchesResult.value.matches.filter(m=>m&&m.id&&m.a&&m.b&&(m.winner===m.a||m.winner===m.b)&&Number.isFinite(Date.parse(m.date))).sort((a,b)=>Date.parse(a.date)-Date.parse(b.date));
  if(fixtureResult.status==='fulfilled'&&fixtureResult.value?.schemaVersion===1&&Array.isArray(fixtureResult.value.fixtures)){
@@ -394,6 +394,7 @@ async function load(){
   }
  }
  if(researchResult.status==='fulfilled')research=researchResult.value;
+ if(pariScreenshotsResult.status==='fulfilled'&&pariScreenshotsResult.value?.schemaVersion===1&&Array.isArray(pariScreenshotsResult.value.quotes))pariScreenshots=pariScreenshotsResult.value.quotes;
  assessments.clear();
  playing=inPlayFixtures(fixtures,journal,matches,Date.now());
  syncTournaments();
@@ -456,7 +457,9 @@ function renderTodaySelection(){
  const now=Date.now(),day=dayFmt.format(now),root=$('today-selection');
  const rows=dailyRows({day,fixtures,journal,matches,now});
  const replay=replayDailySelection({journal,rows,from:day,day,source:'pari',now});
- const {picks}=replay.scenarios.find(({threshold})=>threshold===dailySelectionThreshold).two;
+ const automatic=replay.scenarios.find(({threshold})=>threshold===dailySelectionThreshold).two.picks;
+ const screenshots=pariScreenshotSelections({quotes:pariScreenshots,journal,rows,day,now,minReturn:dailySelectionThreshold});
+ const picks=automatic.concat(screenshots.filter(pick=>!automatic.some(saved=>saved.id===pick.id))).slice(0,2);
  const title=el('div','panel-heading');
  const historyLink=el('a','','Бэктест');
  historyLink.href='?selection=1#daily';
@@ -468,11 +471,22 @@ function renderTodaySelection(){
  for(const pick of picks){
   const status=pick.state==='pending'&&Date.parse(pick.kickoff)>now?'до старта':selectionStatus[pick.state];
   grid.append(compBox(pick.a+' — '+pick.b,pick.team+' · '+pick.odds.toFixed(2),
-   shortTime(pick.kickoff)+' МСК · '+pct(pick.probability)+' по модели · '+status));
+   shortTime(pick.kickoff)+' МСК · '+pct(pick.probability)+' по модели · '+status+
+   (pick.screenshot?' · скрин PARI '+shortTime(new Date(pick.at).toISOString())+' МСК':'')));
  }
  if(picks.length)root.append(grid);
  else root.append(paragraph('muted',!fixtureStatus&&!journal.length?'Загружаем расписание и журнал…':
   replay.covered?'Сегодня ни один прогноз с сохранённой ценой PARI не прошёл порог.':'В журнале пока нет подходящих предматчевых цен PARI на сегодня.'));
+ if(pariScreenshots.length){
+  const archive=el('details');
+  archive.append(el('summary','','Цены со скриншотов PARI · '+pariScreenshots.length+' матчей'));
+  for(const quote of pariScreenshots){
+   archive.append(paragraph('muted',shortTime(quote.kickoff)+' МСК · '+quote.a+' — '+quote.b+' · '+
+    quote.odds.map(price=>price.toFixed(2)).join(' / ')+' · скрин '+shortTime(quote.observedAt)+
+    (quote.fixtureId?'':' · матч пока без привязки к расписанию BETS')));
+  }
+  root.append(archive);
+ }
 }
 function renderSelectionReplay(root,{day,game,format,now}){
  const from='2026-11-24';

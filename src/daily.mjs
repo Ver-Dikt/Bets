@@ -349,3 +349,39 @@ export function replayDailySelection({journal,rows,from,day,game='all',format='a
  return {covered:new Set(candidates.map(x=>x.match)).size,baseline:select(Infinity,-Infinity),
   scenarios:[0,.01,.03,.05].map(threshold=>({threshold,one:select(1,threshold),two:select(2,threshold)}))};
 }
+
+// Screenshot quotes are reference prices, kept separate from the automated replay.
+export function pariScreenshotSelections({quotes,journal,rows,day,now,minReturn}){
+ const saved=new Map();
+ const settled=new Map(rows.filter(row=>row.forecast).map(row=>[row.forecast.fixtureId,row]));
+ const decisions=new Map();
+ for(const {type,record} of journal){
+  if(type!=='forecast'||!record?.fixtureId||record.probabilityBasis==='map')continue;
+  const list=saved.get(record.fixtureId)??[];
+  list.push(record);
+  saved.set(record.fixtureId,list);
+ }
+ for(const quote of quotes){
+  const {fixtureId,kickoff,observedAt,odds}=quote;
+  const at=Date.parse(observedAt),start=Date.parse(kickoff);
+  if(!fixtureId||moscowDay(kickoff)!==day||moscowDay(observedAt)!==day||
+   !(at<=now&&at<start)||odds?.length!==2||!odds.every(price=>Number.isFinite(price)&&price>1))continue;
+  const records=saved.get(fixtureId)??[];
+  if(records.some(record=>Date.parse(record.kickoff)<=at))continue;
+  const forecast=records.reduce((latest,record)=>{
+   const created=Date.parse(record.createdAt);
+   return record.kickoff===kickoff&&created<=at&&(!latest||created>Date.parse(latest.createdAt))?record:latest;
+  },null);
+  const pick=publishedWinnerPick(forecast);
+  if(!pick)continue;
+  const price=odds[pick===forecast.a?0:1];
+  const expectedReturn=forecast.probability*price-1;
+  if(decisions.get(fixtureId)?.at>=at)continue;
+  const result=settled.get(fixtureId);
+  const state=result?.technical?'void':!result?.winner?'pending':result.winner===pick?'won':'lost';
+  decisions.set(fixtureId,{id:fixtureId,a:forecast.a,b:forecast.b,team:pick,kickoff,
+   at,odds:price,probability:forecast.probability,expectedReturn,state,screenshot:true});
+ }
+ return [...decisions.values()].filter(pick=>pick.expectedReturn>=minReturn)
+  .sort((a,b)=>b.expectedReturn-a.expectedReturn||a.id.localeCompare(b.id));
+}

@@ -1,5 +1,5 @@
 const CACHE = 'bets-pages-__SHELL_VERSION__';
-const DATA = new Set(['snapshot.json','report.json','fixtures.json','map-insights.json','journal.json','release.json','brief.json','research.json']);
+const DATA = new Set(['snapshot.json','report.json','fixtures.json','map-insights.json','journal.json','release.json','brief.json','research.json','pari-screenshots.json']);
 const SHELL = new Set(['','index.html','main.js','brief.mjs','daily.mjs','analysis.mjs','settlement.mjs','engine.mjs','identity.mjs',
   'live.mjs','calibration.mjs','evidence-time.mjs','roster-factor.mjs','manifest.webmanifest','icon.svg']);
 
